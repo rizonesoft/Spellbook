@@ -48,6 +48,8 @@ __pycache__/
 *.db-journal
 *.db-wal
 *.db-shm
+# ...except the committed fixture databases migration tests upgrade
+!tests/fixtures/**/*.db
 
 # OS noise
 Thumbs.db
