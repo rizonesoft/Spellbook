@@ -1,0 +1,48 @@
+name: Feature request
+description: Suggest a new capability or an improvement.
+title: "[Feature]: "
+labels: ["enhancement", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the idea. Please search [existing issues](https://github.com/rizonesoft/Spellbook/issues) and the [roadmap](https://github.com/rizonesoft/Spellbook/blob/main/todo/implementation-plan.md) first; it may already be planned.
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Library (spells, chapters, the editor)
+        - Import scrolls (.txt files)
+        - Search, sigils, favourites, and the quick-search popup
+        - Runes (templates) and revisions
+        - Settings, themes, export, and backup
+        - Installer or portable ZIP
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What are you trying to do, and what gets in the way today?
+      placeholder: "When I keep prompts for ..., I have to ..."
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: How would you like it to work? Mention how other tools handle it if that helps.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+  - type: checkboxes
+    id: contribute
+    attributes:
+      label: Contribution
+      options:
+        - label: I would like to help implement this.

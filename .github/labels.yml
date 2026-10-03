@@ -1,0 +1,45 @@
+# The repository's issue and PR labels. GitHub does not read this file: it is
+# the record the operator applies once (todo/99-manual/TODO-01 §2), for example:
+#   gh label create <name> --color <color> --description "<description>" --force
+- name: bug
+  color: d73a4a
+  description: Something does not work as expected
+- name: enhancement
+  color: a2eeef
+  description: A new capability or an improvement
+- name: triage
+  color: fbca04
+  description: Needs a first look from a maintainer
+- name: documentation
+  color: 0075ca
+  description: README, docs/, or in-app help
+- name: dependencies
+  color: 0366d6
+  description: vcpkg ports, the toolchain pins, or GitHub Actions
+- name: ci
+  color: 5319e7
+  description: Workflows, scripts, and gates
+- name: good first issue
+  color: 7057ff
+  description: A contained change for a new contributor
+- name: help wanted
+  color: 008672
+  description: Maintainers would welcome a pull request
+- name: area:core
+  color: c5def5
+  description: src/core (domain and services)
+- name: area:storage
+  color: c5def5
+  description: src/storage, migrations
+- name: area:ui
+  color: c5def5
+  description: src/app (the Win32 shell)
+- name: area:import
+  color: c5def5
+  description: Importing .txt prompt files (Import scrolls)
+- name: duplicate
+  color: cfd3d7
+  description: Already reported
+- name: wontfix
+  color: ffffff
+  description: Out of scope for Spellbook

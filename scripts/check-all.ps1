@@ -11,7 +11,9 @@
    5. ctest Debug and Release
    6. launch smoke, Release                     (scripts/run.ps1 -Smoke)
    7. pwsh scripts/lint.ps1                     (clang-tidy, skipped with -SkipLint)
-   8. python scripts/todo-graph.py self-test, validate, plan --check
+   8. actionlint over .github/workflows
+   9. python scripts/check-docs.py --self-test, then the check (links, forms, em dashes)
+  10. python scripts/todo-graph.py self-test, validate, plan --check
   Every gate runs even after an earlier failure; the exit code is 1 when any gate failed.
 .PARAMETER SkipBuild
   Skip the builds (tests and smoke then use what is already built).
@@ -70,7 +72,10 @@ try {
     if (-not $SkipLint) {
         Invoke-Gate 'lint' { & $pwsh -NoProfile -File scripts/lint.ps1 }
     }
+    Invoke-Gate 'actionlint' { & (Get-ToolPath 'actionlint') }
     if ($python) {
+        Invoke-Gate 'check-docs self-test' { & $python scripts/check-docs.py --self-test }
+        Invoke-Gate 'check-docs' { & $python scripts/check-docs.py }
         Invoke-Gate 'todo-graph self-test' { & $python scripts/todo-graph.py self-test }
         Invoke-Gate 'todo-graph validate' { & $python scripts/todo-graph.py validate }
         Invoke-Gate 'todo-graph plan --check' { & $python scripts/todo-graph.py plan --check }

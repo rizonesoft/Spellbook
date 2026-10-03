@@ -1,0 +1,14 @@
+version: 2
+updates:
+  # GitHub Actions, pinned by SHA in .github/workflows/*.yml.
+  # C++ dependencies move with the vcpkg baseline in toolchain.json and
+  # vcpkg.json, which Dependabot does not manage; bump them deliberately.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    groups:
+      actions:
+        patterns:
+          - "*"

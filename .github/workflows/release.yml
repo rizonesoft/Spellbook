@@ -1,0 +1,98 @@
+name: release
+
+# Tag-driven releases. Pushing v<SemVer> (made by scripts/release.ps1) builds the
+# Release configuration, runs the tests and the launch smoke, packages the
+# portable ZIP and SHA256SUMS (scripts/package.ps1), and publishes a GitHub
+# release with those files attached and the CHANGELOG section as its notes.
+# A version with a hyphen (v0.1.0-beta.1) is published as a prerelease.
+# The Inno Setup installer joins the assets in M5 (todo/05-ship/TODO-02).
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref_name }}
+  cancel-in-progress: false
+
+env:
+  VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}/.vcpkg-cache
+
+jobs:
+  release:
+    runs-on: windows-latest
+    timeout-minutes: 60
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Check the tag
+        id: tag
+        env:
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          if ($env:REF_NAME -notmatch '^v(\d+\.\d+\.\d+(?:-[0-9A-Za-z.]+)?)$') { throw "Tag '$env:REF_NAME' is not v<SemVer>" }
+          $version = $Matches[1]
+          "version=$version" >> $env:GITHUB_OUTPUT
+          "prerelease=$(($version -like '*-*').ToString().ToLowerInvariant())" >> $env:GITHUB_OUTPUT
+      - name: Cache the pinned tools
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .tools
+          key: tools-v1-${{ runner.os }}-${{ hashFiles('toolchain.json') }}
+      - name: Cache vcpkg binary packages
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .vcpkg-cache
+          key: vcpkg-v1-${{ runner.os }}-${{ hashFiles('vcpkg.json', 'toolchain.json') }}
+          restore-keys: vcpkg-v1-${{ runner.os }}-
+      - name: Toolchain
+        run: |
+          New-Item -ItemType Directory -Force -Path $env:VCPKG_DEFAULT_BINARY_CACHE | Out-Null
+          ./scripts/setup.ps1
+      - name: Build, test, and smoke (Release)
+        run: |
+          ./scripts/test.ps1 -Config Release
+          ./scripts/run.ps1 -Config Release -Smoke -NoBuild
+      - name: Package
+        run: ./scripts/package.ps1 -SkipBuild
+      - name: Check the package version matches the tag
+        env:
+          VERSION: ${{ steps.tag.outputs.version }}
+        run: |
+          $zip = "artifacts/dist/Spellbook-$env:VERSION-win-x64-Portable.zip"
+          if (-not (Test-Path $zip)) { throw "expected $zip; the build derived a different version from the tag" }
+      - name: Release notes from CHANGELOG.md
+        env:
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          # The release heading names the tag, e.g. "## [v0.1.0] - 2026-11-01".
+          $lines = Get-Content CHANGELOG.md
+          $start = -1
+          for ($i = 0; $i -lt $lines.Count; $i++) { if ($lines[$i] -match '^## ' -and $lines[$i].Contains("[$env:REF_NAME]")) { $start = $i; break } }
+          if ($start -lt 0) { throw "CHANGELOG.md has no '## [$env:REF_NAME]' section" }
+          $end = $lines.Count
+          for ($j = $start + 1; $j -lt $lines.Count; $j++) { if ($lines[$j] -match '^## ') { $end = $j; break } }
+          $notes = ($lines[($start + 1)..($end - 1)] -join "`n").Trim()
+          $sums = (Get-Content artifacts/dist/SHA256SUMS) -join "`n"
+          "$notes`n`n### SHA-256`n`n``````text`n$sums`n``````" | Set-Content -Encoding utf8 artifacts/release-notes.md
+      - name: Create the GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REF_NAME: ${{ github.ref_name }}
+          VERSION: ${{ steps.tag.outputs.version }}
+          PRERELEASE: ${{ steps.tag.outputs.prerelease }}
+        run: |
+          $releaseArgs = @('release', 'create', $env:REF_NAME, '--verify-tag', '--title', "Spellbook $env:VERSION",
+            '--notes-file', 'artifacts/release-notes.md',
+            "artifacts/dist/Spellbook-$env:VERSION-win-x64-Portable.zip", 'artifacts/dist/SHA256SUMS')
+          if ($env:PRERELEASE -eq 'true') { $releaseArgs += '--prerelease' }
+          gh @releaseArgs
+          if ($LASTEXITCODE -ne 0) { throw "gh release create failed ($LASTEXITCODE)" }

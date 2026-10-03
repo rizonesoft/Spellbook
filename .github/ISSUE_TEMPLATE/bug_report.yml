@@ -1,0 +1,88 @@
+name: Bug report
+description: Something in Spellbook does not work as expected.
+title: "[Bug]: "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug. Please search [existing issues](https://github.com/rizonesoft/Spellbook/issues) first.
+        **Security problems** must not be reported here; follow [SECURITY.md](https://github.com/rizonesoft/Spellbook/blob/main/SECURITY.md) instead.
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: From Help > About, the ZIP or installer file name, or the commit hash if you built from source.
+      placeholder: "e.g. v0.1.0, or commit 1d441e0"
+    validations:
+      required: true
+  - type: dropdown
+    id: install
+    attributes:
+      label: How did you get Spellbook?
+      options:
+        - Installer
+        - Portable ZIP
+        - Built from source
+    validations:
+      required: true
+  - type: dropdown
+    id: windows
+    attributes:
+      label: Windows version
+      description: Press Win+R and type `winver`.
+      options:
+        - Windows 11 25H2
+        - Windows 11 24H2
+        - Windows 11 23H2
+        - Windows 10 22H2
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: display
+    attributes:
+      label: Display scaling and theme (optional)
+      description: Useful for layout and colour problems.
+      placeholder: "e.g. 150% scaling, two monitors, dark app mode"
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: The smallest set of steps that shows the problem. For import problems, attach a sample .txt file if you can share it.
+      placeholder: |
+        1. Open Spellbook
+        2. Choose Import scrolls and pick a folder
+        3. ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: What happened instead? Screenshots help.
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Log
+      description: |
+        The log is `%LOCALAPPDATA%\Spellbook\logs\spellbook.log`. Paste the lines around the problem.
+        Remove anything personal first: the log names files and folders, never prompt text.
+      render: text
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checks
+      options:
+        - label: I searched existing issues and this is not a duplicate.
+          required: true
+        - label: This is not a security vulnerability.
+          required: true

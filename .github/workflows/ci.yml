@@ -1,0 +1,97 @@
+name: ci
+
+# Builds and tests Spellbook on every push and pull request to main, through the
+# same runners a developer uses (scripts/*.ps1), so CI and a local
+# `pwsh scripts/check-all.ps1` cannot drift. The toolchain comes from
+# toolchain.json via scripts/setup.ps1; MSVC is the runner image's.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}/.vcpkg-cache
+
+jobs:
+  build-and-test:
+    runs-on: windows-latest
+    timeout-minutes: 60
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # Full history: the version comes from git tags (cmake/SpellbookVersion.cmake).
+          fetch-depth: 0
+      - name: Cache the pinned tools
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .tools
+          key: tools-v1-${{ runner.os }}-${{ hashFiles('toolchain.json') }}
+      - name: Cache vcpkg binary packages
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .vcpkg-cache
+          key: vcpkg-v1-${{ runner.os }}-${{ hashFiles('vcpkg.json', 'toolchain.json') }}
+          restore-keys: vcpkg-v1-${{ runner.os }}-
+      - name: Toolchain (scripts/setup.ps1)
+        run: |
+          New-Item -ItemType Directory -Force -Path $env:VCPKG_DEFAULT_BINARY_CACHE | Out-Null
+          ./scripts/setup.ps1
+      - name: Format check
+        run: ./scripts/format.ps1 -Check
+      - name: Layering check
+        run: |
+          python scripts/check-layering.py --self-test
+          python scripts/check-layering.py
+      - name: Workflow lint
+        run: ./.tools/actionlint/actionlint.exe -color
+      - name: Build Debug
+        run: ./scripts/build.ps1 -Config Debug
+      - name: Test Debug
+        run: ./scripts/test.ps1 -Config Debug -NoBuild
+      - name: Build Release
+        run: ./scripts/build.ps1 -Config Release
+      - name: Test Release
+        run: ./scripts/test.ps1 -Config Release -NoBuild
+      - name: Launch smoke (Release)
+        run: ./scripts/run.ps1 -Config Release -Smoke -NoBuild
+      - name: Upload Spellbook.exe
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: spellbook-release-${{ github.sha }}
+          path: artifacts/build/release/bin/Spellbook.exe
+          if-no-files-found: warn
+          retention-days: 14
+
+  plan-gates:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Self-test the TODO graph tool
+        run: python3 scripts/todo-graph.py self-test
+      - name: Validate the TODO tree
+        run: python3 scripts/todo-graph.py validate
+      - name: Check the plan projection is current
+        run: python3 scripts/todo-graph.py plan --check
+      - name: Check docs and templates
+        run: python3 scripts/check-docs.py
+      - name: Assert the commit hooks are intact
+        run: |
+          for hook in pre-commit commit-msg; do
+            test "$(git ls-files -s tools/githooks/$hook | cut -d' ' -f1)" = "100755" || { echo "$hook index mode is not 100755"; exit 1; }
+            if git show HEAD:tools/githooks/$hook | grep -q $'\r'; then echo "$hook blob carries CR"; exit 1; fi
+          done
