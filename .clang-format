@@ -1,0 +1,43 @@
+# Spellbook C++ formatting. The reference repos have no clang-format file
+# (Isotone and ScratchPad are C#; Resolute formats by review), so this is the
+# project default recorded in docs/reference-conventions.md. Change it in one
+# commit that also runs `pwsh scripts/format.ps1` over the tree.
+BasedOnStyle: Microsoft
+Language: Cpp
+Standard: c++20
+ColumnLimit: 110
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+LineEnding: DeriveLF
+AccessModifierOffset: -4
+AllowShortFunctionsOnASingleLine: Inline
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+AlwaysBreakTemplateDeclarations: Yes
+BreakBeforeBraces: Allman
+BreakConstructorInitializers: BeforeComma
+NamespaceIndentation: None
+FixNamespaceComments: true
+PointerAlignment: Left
+ReferenceAlignment: Left
+SortIncludes: CaseSensitive
+IncludeBlocks: Regroup
+IncludeCategories:
+  # Order: the file's own header (always first), <windows.h>, other C and
+  # Win32 headers, the standard library, third-party libraries, Spellbook
+  # headers, then local headers. <windows.h> must precede the Win32 headers.
+  - Regex: '^<(windows|Windows)\.h>'
+    Priority: 1
+  - Regex: '^<[A-Za-z0-9_]+\.h>'
+    Priority: 2
+  - Regex: '^<[a-z_]+>'
+    Priority: 3
+  - Regex: '^<.*>'
+    Priority: 4
+  - Regex: '^"spellbook/'
+    Priority: 5
+  - Regex: '.*'
+    Priority: 6
+SpaceAfterTemplateKeyword: true
+SpacesBeforeTrailingComments: 2

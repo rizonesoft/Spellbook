@@ -1,0 +1,64 @@
+# Spellbook
+
+# Build output (every CMake preset builds under artifacts/)
+artifacts/
+out/
+CMakeUserPresets.json
+compile_commands.json
+*.binlog
+
+# Scratch, caches, and logs that are never authoritative
+/build/
+
+# Provisioned tools (the vcpkg clone, bootstrapped by scripts/setup.ps1)
+.tools/
+vcpkg_installed/
+
+# IDE and user state
+.vs/
+.idea/
+.cache/
+*.user
+*.suo
+*.code-workspace
+
+# Tests
+Testing/
+TestResults/
+*.trx
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+
+# Agent and session state
+.remember/
+.claude/scheduled_tasks.lock
+.claude/settings.local.json
+
+# Local configuration and secrets (never committed)
+*.local.json
+*.pfx
+*.snk
+.env
+
+# Dev databases created by scripts/migrate.ps1 and tests
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# OS noise
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
+$RECYCLE.BIN/
+
+# Logs and temp
+*.log
+*.tmp
+*.temp
+*.bak
+logs/

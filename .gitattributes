@@ -1,0 +1,42 @@
+# Spellbook: line endings and binary handling (same rules as Isotone).
+* text=auto
+
+# LF: scripts, docs, config read by POSIX tools, and git hooks
+*.sh text eol=lf
+*.py text eol=lf
+*.ps1 text eol=lf
+*.psm1 text eol=lf
+*.psd1 text eol=lf
+*.md text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.json text eol=lf
+*.sql text eol=lf
+*.cmake text eol=lf
+CMakeLists.txt text eol=lf
+.editorconfig text eol=lf
+.gitattributes text eol=lf
+.gitignore text eol=lf
+.clang-format text eol=lf
+.clang-tidy text eol=lf
+tools/githooks/** text eol=lf
+
+# CRLF: Windows-native sources and resource files
+*.cpp text eol=crlf diff=cpp
+*.hpp text eol=crlf diff=cpp
+*.h text eol=crlf diff=cpp
+*.rc text eol=crlf
+*.manifest text eol=crlf
+*.iss text eol=crlf
+
+# Binary
+*.png binary
+*.jpg binary
+*.gif binary
+*.ico binary
+*.bmp binary
+*.zip binary
+*.pdf binary
+*.exe binary
+*.dll binary
+*.db binary

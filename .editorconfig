@@ -1,0 +1,48 @@
+# EditorConfig: Spellbook
+# https://editorconfig.org
+# Layout rules follow Isotone's root .editorconfig. C++ formatting itself is
+# owned by .clang-format; these rules keep editors from fighting it.
+
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+indent_size = 4
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Windows-native sources keep CRLF (matches .gitattributes)
+[*.{cpp,hpp,h,rc,manifest,iss}]
+end_of_line = crlf
+
+# XML, manifests
+[*.{xml,manifest}]
+indent_size = 2
+
+# JSON and YAML
+[*.{json,yml,yaml}]
+indent_size = 2
+
+# CMake
+[{CMakeLists.txt,*.cmake}]
+indent_size = 4
+
+# Scripts
+[*.{ps1,psm1,psd1,py}]
+indent_size = 4
+
+[*.sh]
+indent_size = 2
+
+# SQL migrations
+[*.sql]
+indent_size = 4
+
+# Markdown: trailing double-space is a hard line break
+[*.md]
+trim_trailing_whitespace = false
+
+[**/artifacts/**]
+generated_code = true

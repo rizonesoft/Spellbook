@@ -1,0 +1,35 @@
+# Spellbook static analysis. The check families and their reasons are copied
+# from Resolute's .clang-tidy: find defects, not style opinions, because a
+# list nobody can get to zero is a list somebody turns off.
+#
+# What is in:
+#   bugprone-*        real mistakes: misuse, narrowing, dangling, bad casts
+#   clang-analyzer-*  path-sensitive analysis: leaks, null derefs, uninit reads
+#   performance-*     copies and conversions that cost something
+#   misc-*            the leftovers that are still defects
+#
+# What is out, and why:
+#   modernize-*       churn for no behavioural gain
+#   readability-*     style is decided by .clang-format and standards/cpp.md
+#   misc-include-cleaner  reports Win32 umbrella headers as unused
+#   misc-const-correctness  style, and it drowns real findings
+#   misc-non-private-member-variables-in-classes  domain types are plain structs
+#   performance-no-int-to-ptr  Win32 message parameters (WPARAM, LPARAM,
+#                     GWLP_USERDATA) are integers that carry pointers by design
+Checks: >
+  -*,
+  bugprone-*,
+  clang-analyzer-*,
+  performance-*,
+  misc-*,
+  -bugprone-easily-swappable-parameters,
+  -misc-non-private-member-variables-in-classes,
+  -misc-include-cleaner,
+  -misc-const-correctness,
+  -misc-use-anonymous-namespace,
+  -performance-no-int-to-ptr
+
+# Our headers only; vcpkg headers live under vcpkg_installed/ and are skipped.
+HeaderFilterRegex: '.*[/\\](src|tests)[/\\].*'
+WarningsAsErrors: ''
+FormatStyle: none
