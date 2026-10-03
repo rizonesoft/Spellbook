@@ -65,7 +65,7 @@ struct PromptVersion
 };
 
 // A {{name}} placeholder found in a prompt body. Detected, not stored: M4
-// decides how an optional default is written (todo/03-app/TODO-04 §1).
+// decides how an optional default is written (D04 T01 §1).
 struct TemplateVariable
 {
     std::string name;
