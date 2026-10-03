@@ -1,0 +1,25 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+  "name": "spellbook",
+  "version-semver": "0.0.0",
+  "description": "Spellbook, a native Windows prompt manager.",
+  "homepage": "https://github.com/rizonesoft/Spellbook",
+  "license": "MIT",
+  "supports": "windows & x64",
+  "builtin-baseline": "5dd2e1600d049b498ff9fb9fe15997533ae0c804",
+  "dependencies": [
+    {
+      "name": "sqlite3",
+      "default-features": false,
+      "features": ["fts5", "json1"]
+    },
+    "fmt",
+    {
+      "name": "spdlog",
+      "default-features": false,
+      "features": ["fmt"]
+    },
+    "nlohmann-json",
+    "catch2"
+  ]
+}
