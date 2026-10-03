@@ -1,0 +1,63 @@
+{
+  "pinned": "2026-10-04",
+  "comment": "Repo-portable tools. scripts/setup.ps1 downloads each archive into .tools/<dir>/, checks its SHA-256, and writes .tools/<dir>/.pinned-version. MSVC and the Windows SDK are machine-wide (see msvc). Change a pin in one commit that also passes scripts/check-all.ps1.",
+  "msvc": {
+    "vswhereVersionRange": "[17.0,18.0)",
+    "fallbackToLatest": true,
+    "requires": "Microsoft.VisualStudio.Component.VC.Tools.x86.x64",
+    "wingetId": "Microsoft.VisualStudio.2022.BuildTools",
+    "wingetOverride": "--wait --passive --add Microsoft.VisualStudio.Workload.VCTools --includeRecommended"
+  },
+  "components": [
+    {
+      "name": "cmake",
+      "version": "4.4.4",
+      "url": "https://github.com/Kitware/CMake/releases/download/v4.4.4/cmake-4.4.4-windows-x86_64.zip",
+      "sha256": "bace36e94b31c68ab6fa295f26dfa11219e0701cf7c94b0284a7d1cb13dac536",
+      "dir": "cmake",
+      "stripRoot": true,
+      "probe": "bin/cmake.exe",
+      "versionArgs": ["--version"],
+      "versionMatch": "cmake version (\\S+)"
+    },
+    {
+      "name": "ninja",
+      "version": "1.13.2",
+      "url": "https://github.com/ninja-build/ninja/releases/download/v1.13.2/ninja-win.zip",
+      "sha256": "07fc8261b42b20e71d1720b39068c2e14ffcee6396b76fb7a795fb460b78dc65",
+      "dir": "ninja",
+      "stripRoot": false,
+      "probe": "ninja.exe",
+      "versionArgs": ["--version"],
+      "versionMatch": "^(\\S+)"
+    },
+    {
+      "name": "clang-format",
+      "version": "23.1.2",
+      "url": "https://files.pythonhosted.org/packages/36/2e/e05c36c47b0577d694a53636f91a967cfbec6a572c5e95a68fd703e868a8/clang_format-23.1.2-py2.py3-none-win_amd64.whl",
+      "sha256": "955dd1c09c60a69645e4a21be514d5153b29b9e6f159d7501ad566d7d0dd64bc",
+      "dir": "clang-format",
+      "stripRoot": false,
+      "probe": "clang_format/data/bin/clang-format.exe",
+      "versionArgs": ["--version"],
+      "versionMatch": "clang-format version (\\S+)"
+    },
+    {
+      "name": "clang-tidy",
+      "version": "22.1.8",
+      "url": "https://files.pythonhosted.org/packages/54/af/0580f6145d8a0c218844208a6c90ce539a4bdf65a66b672e6b4604a81c0a/clang_tidy-22.1.8-py2.py3-none-win_amd64.whl",
+      "sha256": "df9bf841ecbf501d08b6fa34523be840f59b1a76d16b6ee5edb0e5c7c22b59c2",
+      "dir": "clang-tidy",
+      "stripRoot": false,
+      "probe": "clang_tidy/data/bin/clang-tidy.exe",
+      "versionArgs": ["--version"],
+      "versionMatch": "LLVM version (\\S+)"
+    }
+  ],
+  "vcpkg": {
+    "repository": "https://github.com/microsoft/vcpkg",
+    "commit": "5dd2e1600d049b498ff9fb9fe15997533ae0c804",
+    "dir": "vcpkg",
+    "comment": "The commit is also vcpkg.json's builtin-baseline; keep the two equal."
+  }
+}
