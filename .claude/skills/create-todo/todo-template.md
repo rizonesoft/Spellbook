@@ -16,7 +16,7 @@ depends_on: []
 
 ## Inputs
 
-- [CHANGEME file or spec](CHANGEME-path) -- what this TODO consumes from it
+- `CHANGEME/path/or/spec` -- what this TODO consumes from it
 - -> XREF: CHANGEME DNN TNN §N -- the related work (the target file must carry an XREF back)
 
 ## Outcome

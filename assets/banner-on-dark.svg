@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="256" viewBox="0 0 640 256" role="img" aria-labelledby="t d">
+  <title id="t">Spellbook</title>
+  <desc id="d">An open spellbook whose pages glow, beside the word Spellbook and the line: Your grimoire of AI prompts.</desc>
+  <defs>
+    <radialGradient id="glow" cx="50%" cy="45%" r="50%">
+      <stop offset="0%" stop-color="#FFC45C" stop-opacity="0.75"/>
+      <stop offset="100%" stop-color="#FFC45C" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <g transform="translate(0,0)">
+    <ellipse cx="128" cy="110" rx="118" ry="96" fill="url(#glow)"/>
+    <rect x="24" y="95" width="208" height="120" rx="12" fill="#4A2C7A" stroke="#2E1A52" stroke-width="4"/>
+    <polygon points="35,82 125,100 125,205 35,190" fill="#FAF4E4"/>
+    <polygon points="221,82 131,100 131,205 221,190" fill="#FAF4E4"/>
+    <polygon points="35,190 125,205 125,209 35,195" fill="#E2D6BC"/>
+    <polygon points="221,190 131,205 131,209 221,195" fill="#E2D6BC"/>
+    <rect x="125" y="99" width="6" height="111" fill="#2E1A52"/>
+    
+<line x1="49" y1="118" x2="113" y2="127" stroke="#E8A03C" stroke-width="5.5" stroke-linecap="round"/>    <line x1="207" y1="118" x2="143" y2="127" stroke="#E8A03C" stroke-width="5.5" stroke-linecap="round"/>    <line x1="55" y1="133" x2="113" y2="142" stroke="#E8A03C" stroke-width="5.5" stroke-linecap="round"/>    <line x1="201" y1="133" x2="143" y2="142" stroke="#E8A03C" stroke-width="5.5" stroke-linecap="round"/>    <line x1="49" y1="148" x2="113" y2="157" stroke="#E8A03C" stroke-width="5.5" stroke-linecap="round"/>    <line x1="207" y1="148" x2="143" y2="157" stroke="#E8A03C" stroke-width="5.5" stroke-linecap="round"/>    <line x1="55" y1="163" x2="113" y2="172" stroke="#E8A03C" stroke-width="5.5" stroke-linecap="round"/>    <line x1="201" y1="163" x2="143" y2="172" stroke="#E8A03C" stroke-width="5.5" stroke-linecap="round"/>    <line x1="49" y1="178" x2="113" y2="187" stroke="#E8A03C" stroke-width="5.5" stroke-linecap="round"/>    <line x1="207" y1="178" x2="143" y2="187" stroke="#E8A03C" stroke-width="5.5" stroke-linecap="round"/>
+    <polygon points="128,30 135,52 157,59 135,66 128,89 121,66 99,59 121,52" fill="#FFECAA"/>
+  </g>
+  <text x="268" y="138" font-family="Segoe UI Variable Display, Segoe UI, system-ui, sans-serif" font-size="68" font-weight="600" fill="#F3F3F3">Spellbook</text>
+  <text x="271" y="180" font-family="Segoe UI Variable Text, Segoe UI, system-ui, sans-serif" font-size="24" fill="#B8B0C8">Your grimoire of AI prompts.</text>
+</svg>
