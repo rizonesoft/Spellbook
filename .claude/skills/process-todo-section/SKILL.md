@@ -23,6 +23,7 @@ It accepts a `DNN TNN §N` ref or a row pasted from `todo/implementation-plan.md
 | 2 | not found | report the input and stop |
 | 3 | already shipped | stop; auditing shipped work is `review-todo-section` |
 | 4 | a dependency is unmet | report the unmet ref and stop, or process that one first if asked to run the plan |
+| 5 | operator-only (`todo/99-manual/`) | never build it as an agent; report it as the operator's step and stop |
 
 ## Step 1: read
 

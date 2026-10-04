@@ -73,7 +73,7 @@ core  <-  storage  <-  app
 
 ## Choose the work contract
 
-Use the skill under `.claude/skills/` that fits: capture work through `add-todo`, author a file through `create-todo`, build a section through `process-todo-section`, stamp it through `review-todo-section`. For the engineering itself: `build-and-test`, `add-feature` (core, then storage, then UI, then tests, docs, and the plan), `fix-bug`, `add-migration`, `win32-ui-patterns`, and `release`.
+Use the skill under `.claude/skills/` that fits: capture work through `add-todo`, author a file through `create-todo`, build a section through `process-todo-section`, stamp it through `review-todo-section`. To run the plan unattended, `process-plan` (which chains `process-phase` and guards the session with a Stop hook); close a finished file with `process-todo-file`; harden the tree before a long run with `groom-plan`. Run records live in `docs/phase-runs/`. For the engineering itself: `build-and-test`, `add-feature` (core, then storage, then UI, then tests, docs, and the plan), `fix-bug`, `add-migration`, `win32-ui-patterns`, and `release`.
 
 **One section = one commit.** Each section must be executable with zero conversation context.
 
