@@ -12,7 +12,7 @@ depends_on: []
 > **Goal:** The steps no agent session can or should take on its own (creating and configuring the GitHub repository, deciding ownership, and accepting the import of real prompts) are listed with exact commands, so they never stall a runner silently.
 
 > [!IMPORTANT]
-> **Current state (verified 2026-10-04):** The repository exists only locally (`R:\GitHub\Spellbook`, branch `main`, no remote). The README, templates, and workflows assume `https://github.com/rizonesoft/Spellbook`; that is an assumption until §1 confirms it.
+> **Current state (verified 2026-10-04):** The operator created `https://github.com/rizonesoft/Spellbook` (public, default branch `main`) on 2026-10-04, and `main` is pushed (§1). Labels, security settings, and branch protection (§2) are not applied yet.
 
 ## Inputs
 
@@ -28,7 +28,7 @@ depends_on: []
 
 | Order | Section | Deliverable | Depends On | Status |
 | :---: | :-----: | ----------- | ---------- | :----: |
-|   1   |   §1    | Create the GitHub repository and push main | -- |  [ ]   |
+|   1   |   §1    | Create the GitHub repository and push main | -- |  [x]   |
 |   2   |   §2    | Repository settings: labels, security, branch protection | §1 |  [ ]   |
 |   3   |   §3    | Accept the import of the real prompt library | D02 T01 §5 |  [ ]   |
 |   4   |   §4    | Confirm ownership, branding, and the publisher | -- |  [ ]   |
@@ -37,11 +37,14 @@ depends_on: []
 
 ## 1. Create the GitHub Repository and Push Main
 
-- [ ] Confirm the owner and name (the tree assumes `rizonesoft/Spellbook`, public). Done when: recorded in `AGENTS.md`; a different owner means one commit replacing the URL everywhere (`git grep -n "rizonesoft/Spellbook"`).
-- [ ] `gh repo create rizonesoft/Spellbook --public --source . --remote origin --description "Your grimoire of AI prompts."` then `git push -u origin main`. Done when: the repository page shows the README.
-- [ ] Commit: none (repository state).
+- [x] Confirm the owner and name (the tree assumes `rizonesoft/Spellbook`, public). Done when: recorded in `AGENTS.md`; a different owner means one commit replacing the URL everywhere (`git grep -n "rizonesoft/Spellbook"`).
+- [x] `gh repo create rizonesoft/Spellbook --public --source . --remote origin --description "Your grimoire of AI prompts."` then `git push -u origin main`. Done when: the repository page shows the README.
+- [x] Commit: none (repository state).
 
 **Test checkpoint:** Driven run: `git ls-remote origin main` prints the local `main` hash, and the `ci` workflow has started.
+
+> **Verified:** 2026-10-04 | §1 | the operator created rizonesoft/Spellbook (public, empty, default branch main) through the GitHub web UI instead of `gh repo create`; recorded in AGENTS.md; `git push -u origin main` pushed b39045c; `git ls-remote origin main` printed b39045c83d74, equal to the local main; ci run 37164511590 started on b39045c and completed success
+> **Implementer:** Claude (claude-opus-5-5)
 
 ## 2. Repository Settings: Labels, Security, Branch Protection
 

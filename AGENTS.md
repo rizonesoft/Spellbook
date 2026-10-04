@@ -39,6 +39,7 @@ Everything here is Windows-only. The Python gates are stdlib Python 3 (`python` 
 - **Packaging:** the portable ZIP now; an **Inno Setup 7** installer in M5 (`D05 T02 §2`). Releases attach both to the GitHub release.
 - **No network calls in the app** for v0.1.0, and **no secrets in the repository**.
 - **Theme in UI copy and docs only:** Spell, Chapter, Sigil, Cast, Rune, Revisions, Import scrolls in labels; Prompt, Folder, Tag, copy, TemplateVariable, PromptVersion, import in code and schema. Every themed label has a tooltip with the plain meaning, and all labels come from one string table that can switch to plain words (`standards/ui.md`).
+- **Repository:** https://github.com/rizonesoft/Spellbook, public, default branch `main`, created by the operator on 2026-10-04 (`D99 T01 §1`).
 - **Ownership:** MIT License, "Copyright (c) 2026 Rizonetech (Pty) Ltd", publisher Rizonesoft, following Isotone. Pending the operator's confirmation in `D99 T01 §4`.
 
 ## Layering

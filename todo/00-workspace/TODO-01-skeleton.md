@@ -13,7 +13,7 @@ frozen: true
 > **Goal:** A clean clone becomes a working Spellbook in four commands (`setup`, `build`, `test`, `run`): the pinned toolchain provisions itself, the app opens an empty main window titled "Spellbook" with its icon, `%LOCALAPPDATA%\Spellbook\spellbook.db` is created at schema version 1, logging writes to disk, the gates run locally in one command, CI is green on GitHub, and the plan, standards, skills, and docs are in place for M1.
 
 > [!IMPORTANT]
-> **Current state (verified 2026-10-04):** Sections 1 to 9 were built and verified in the initialisation session on 2026-10-04; their stamps below quote the runs. §10 (CI green) is open: the workflows are written, but the repository has no GitHub remote yet, which is the operator step `D99 T01 §1`.
+> **Current state (verified 2026-10-04):** Sections 1 to 9 were built and verified in the initialisation session on 2026-10-04; their stamps below quote the runs. §10 is in progress: the first `ci` run on `main` (37164511590, b39045c) was green in about 5 minutes and saved both caches; the cache-restore run is owed.
 
 ## Inputs
 
@@ -182,7 +182,7 @@ The plan lives in the repository, in the format all three reference repos share,
 
 The workflows only count once GitHub has run them. This needs the repository to exist (`D99 T01 §1`).
 
-- [ ] Push `main` and watch `ci` run. Done when: the `ci` run on `main` is green, and its log shows the vcpkg cache saved.
+- [x] Push `main` and watch `ci` run. Done when: the `ci` run on `main` is green, and its log shows the vcpkg cache saved.
 - [ ] Re-run `ci` and confirm the vcpkg cache restores. Done when: the second run's configure step takes under five minutes.
 - [ ] Commit: `"ci: record the first green run"` (the README badge goes live; no code change expected)
 
