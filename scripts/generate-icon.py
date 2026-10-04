@@ -1,69 +1,81 @@
-"""Draw the placeholder Spellbook icon: an open book whose pages glow.
+"""Render the Spellbook icon from its masters into the .ico and the 256 px PNG.
 
-Writes assets/spellbook.ico (16, 20, 24, 32, 40, 48, 64, 256 px) and
-assets/spellbook-256.png. This is a placeholder until a designed icon lands
-(todo/05-ship/TODO-02 §1); rerun it after changing the drawing:
+Reads assets/brand/spellbook-icon-small.svg (the 16 to 32 px drawing: one
+sparkle, heavier text lines) and assets/brand/spellbook-icon.svg (40 px and up),
+and writes assets/spellbook.ico (16, 20, 24, 32, 40, 48, 64, 256 px, each frame
+rendered at its own size, never resampled) and assets/spellbook-256.png. Rerun
+it after changing a master:
 
     python scripts/generate-icon.py
 
-Needs Pillow (pip install pillow). Not part of any gate: the outputs are committed.
+The masters come from the Spellbook brand kit (Rizonesoft branding, "Spellbook",
+Source Files/build-kit.py), which also writes the logo, banners, and web files.
+Needs Pillow (pip install pillow) and Microsoft Edge or Google Chrome, which
+renders the SVGs. Not part of any gate: the outputs are committed.
 """
 from __future__ import annotations
 
+import base64
+import subprocess
+import tempfile
 from pathlib import Path
 
-from PIL import Image, ImageDraw, ImageFilter
+from PIL import Image
 
 ROOT = Path(__file__).resolve().parent.parent
 ASSETS = ROOT / "assets"
-CANVAS = 1024
+BRAND = ASSETS / "brand"
+SIZES = (16, 20, 24, 32, 40, 48, 64, 256)
+SMALL_MAX = 32
+BROWSERS = (
+    Path(r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"),
+    Path(r"C:\Program Files\Microsoft\Edge\Application\msedge.exe"),
+    Path(r"C:\Program Files\Google\Chrome\Application\chrome.exe"),
+)
 
-COVER = (74, 44, 122, 255)        # deep violet
-COVER_EDGE = (46, 26, 82, 255)
-PAGE = (250, 244, 228, 255)       # parchment
-PAGE_SHADE = (226, 214, 188, 255)
-GLOW = (255, 196, 92)             # warm gold
-TEXT = (232, 160, 60, 255)
+
+def browser() -> Path:
+    for b in BROWSERS:
+        if b.exists():
+            return b
+    raise SystemExit("generate-icon: Microsoft Edge or Google Chrome is required to render the SVG masters")
 
 
-def draw() -> Image.Image:
-    img = Image.new("RGBA", (CANVAS, CANVAS), (0, 0, 0, 0))
-
-    # Soft glow rising from the pages.
-    glow = Image.new("RGBA", (CANVAS, CANVAS), (0, 0, 0, 0))
-    g = ImageDraw.Draw(glow)
-    g.ellipse((212, 150, 812, 700), fill=GLOW + (190,))
-    glow = glow.filter(ImageFilter.GaussianBlur(90))
-    img.alpha_composite(glow)
-
-    d = ImageDraw.Draw(img)
-    # Cover, slightly wider than the pages.
-    d.rounded_rectangle((96, 380, 928, 860), radius=48, fill=COVER, outline=COVER_EDGE, width=16)
-    # Left and right pages, curving down to the spine.
-    d.polygon([(140, 330), (500, 400), (500, 820), (140, 760)], fill=PAGE)
-    d.polygon([(884, 330), (524, 400), (524, 820), (884, 760)], fill=PAGE)
-    d.polygon([(140, 760), (500, 820), (500, 836), (140, 780)], fill=PAGE_SHADE)
-    d.polygon([(884, 760), (524, 820), (524, 836), (884, 780)], fill=PAGE_SHADE)
-    # Spine.
-    d.rectangle((500, 396, 524, 840), fill=COVER_EDGE)
-    # Glowing lines of text.
-    for i, y in enumerate(range(440, 720, 56)):
-        inset = 24 if i % 2 else 0
-        d.line([(196 + inset, y + (y - 440) // 12), (452, y + 36 + (y - 440) // 12)], fill=TEXT, width=22)
-        d.line([(828 - inset, y + (y - 440) // 12), (572, y + 36 + (y - 440) // 12)], fill=TEXT, width=22)
-    # A spark above the spine.
-    d.polygon([(512, 120), (540, 210), (630, 238), (540, 266), (512, 356), (484, 266), (394, 238), (484, 210)],
-              fill=(255, 236, 170, 255))
+def render(svg: Path, size: int, out: Path) -> Image.Image:
+    data = base64.b64encode(svg.read_bytes()).decode("ascii")
+    page = out.with_suffix(".html")
+    page.write_text(
+        f'<html><body style="margin:0;background:transparent"><img src="data:image/svg+xml;base64,{data}" '
+        f'style="display:block;width:{size}px;height:{size}px"></body></html>',
+        encoding="utf-8",
+    )
+    subprocess.run(
+        [str(browser()), "--headless", "--disable-gpu", "--hide-scrollbars", "--force-device-scale-factor=1",
+         "--default-background-color=00000000", f"--window-size={size},{size}", f"--screenshot={out}", page.as_uri()],
+        check=True, capture_output=True, timeout=120,
+    )
+    img = Image.open(out).convert("RGBA")
+    if img.size != (size, size):
+        raise SystemExit(f"generate-icon: rendered {img.size} for a {size} px frame")
     return img
 
 
 def main() -> None:
-    ASSETS.mkdir(exist_ok=True)
-    art = draw()
-    art.resize((256, 256), Image.LANCZOS).save(ASSETS / "spellbook-256.png")
-    sizes = [(s, s) for s in (16, 20, 24, 32, 40, 48, 64, 256)]
-    art.save(ASSETS / "spellbook.ico", sizes=sizes)
-    print(f"wrote {ASSETS / 'spellbook.ico'} and {ASSETS / 'spellbook-256.png'}")
+    with tempfile.TemporaryDirectory() as td:
+        frames = []
+        for s in SIZES:
+            master = BRAND / ("spellbook-icon-small.svg" if s <= SMALL_MAX else "spellbook-icon.svg")
+            frames.append(render(master, s, Path(td) / f"frame-{s}.png"))
+        ico = ASSETS / "spellbook.ico"
+        frames[-1].save(ico, format="ICO", sizes=[(s, s) for s in SIZES], append_images=frames[:-1])
+        frames[-1].save(ASSETS / "spellbook-256.png")
+    # Every frame must be the drawing rendered for its size, not a resample of the 256 px one.
+    check = Image.open(ico)
+    for s, frame in zip(SIZES, frames):
+        check.size = (s, s)
+        if check.copy().convert("RGBA").tobytes() != frame.tobytes():
+            raise SystemExit(f"generate-icon: the {s} px frame was resampled")
+    print(f"wrote {ico} ({', '.join(map(str, SIZES))} px) and {ASSETS / 'spellbook-256.png'}")
 
 
 if __name__ == "__main__":

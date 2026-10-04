@@ -24,7 +24,7 @@ depends_on: []
 - -> XREF: D00 T01 §10 -- CI must be green on the old stack before this file changes it
 - -> XREF: D99 T01 §5 -- the operator installs the VS 2026 C++ and WinUI workloads
 - -> XREF: D01 T01 §5 -- the first M1 surface, which builds on the WinUI shell from §3
-- -> XREF: D05 T02 §1 -- the approved icon, which feeds the WinUI asset set
+- -> XREF: D05 T02 §1 -- the approved icon (`assets/spellbook.ico`), which the WinUI shell uses for the window, taskbar, and Explorer
 
 ## Outcome
 

@@ -12,7 +12,7 @@ depends_on: []
 > **Goal:** Spellbook v0.1.0 is published: a designed icon and README banner replace the placeholders, an Inno Setup 7 installer and the portable ZIP are built by `scripts/package.ps1`, the `release` workflow publishes both with checksums from a pushed tag, and the release checklist in `standards/release.md` holds on a clean Windows 11 machine.
 
 > [!IMPORTANT]
-> **Current state (verified 2026-10-04):** `assets/spellbook.ico` is a placeholder drawn by `scripts/generate-icon.py`; `assets/banner.svg` is a placeholder. `scripts/package.ps1` builds the portable ZIP and `SHA256SUMS`; `-Installer` exits 1 naming §2. `.github/workflows/release.yml` publishes the ZIP on a `v*` tag and has never run. `scripts/release.ps1` moves the changelog and tags.
+> **Current state (verified 2026-10-04):** The designed icon (Prompt Deck, teal) replaced the placeholder in `assets/spellbook.ico` and `assets/banner-on-light.svg` / `banner-on-dark.svg` on 2026-10-04; §1 owes its captures and the GitHub checks. `scripts/package.ps1` builds the portable ZIP and `SHA256SUMS`; `-Installer` exits 1 naming §2. `.github/workflows/release.yml` publishes the ZIP on a `v*` tag and has never run. `scripts/release.ps1` moves the changelog and tags.
 
 ## Inputs
 
@@ -41,14 +41,15 @@ depends_on: []
 
 ## 1. The Designed Icon and the README Banner
 
-The operator approved the icon design on 2026-10-04 from three concepts: "Prompt Grimoire", an open book, revised to a blue cover with no star above it and an AI sparkle in place of the prompt chevron. The approved sketch is `assets/brand/spellbook-icon-concept.svg`. The app ships unpackaged (ADR 0002), so the `.ico` is the only icon format the app needs; there is no MSIX logo set.
+The operator chose the icon on 2026-10-04 after three rounds of concepts: "Prompt Deck", a fanned stack of three prompt cards whose front card carries a white AI sparkle (with a small companion sparkle) and two white lines of prompt text, in the Teal palette picked from six (front card `#2DD4BF` to `#0B6B63`, middle card `#8FE3D6`, back card `#CFF5EE`). It replaced the earlier open-book concepts. The full brand kit (guide PDF, every SVG and PNG version, web and GitHub files) lives outside the repository in the Rizonesoft branding drive, `Branding\Spellbook`, and is rebuilt by its `Source Files\build-kit.py`; the repository keeps the masters in `assets/brand/`. The app ships unpackaged (ADR 0002), so the `.ico` is the only icon format the app needs; there is no MSIX logo set.
 
-- [ ] Draw the production master `assets/brand/spellbook-icon.svg` from `assets/brand/spellbook-icon-concept.svg`: open book on a blue cover (gradient `#4C9BFF` to `#0B3A9E`, one light top edge), cream pages, a blue four-point AI sparkle with a small companion sparkle on the left page, two text lines ending in a gold `#E8A03C` cursor on the right page, nothing above the book. Done when: the operator confirms the master matches the approved sketch. Cheaper substitute: the sketch committed as the master unchanged.
-- [ ] Generate `assets/spellbook.ico` (16, 20, 24, 32, 40, 48, 64, 256 px) and `assets/spellbook-256.png` from the master, replacing the placeholder drawing in `scripts/generate-icon.py`; the 16 and 24 px frames are separate simplified drawings (one sparkle, one text line and the cursor). Done when: the 16 and 24 px sizes are legible on light and dark taskbars. Cheaper substitute: the 256 px render downscaled to 16 px.
-- [ ] Redraw `assets/banner-on-light.svg` and `assets/banner-on-dark.svg` around the new icon in blue; the README's existing `<picture>` keeps serving both. Done when: GitHub renders the right one per theme.
-- [ ] Commit: `"brand: the Spellbook icon and README banner (D05 T02 §1)"`
+- [x] Masters in `assets/brand/`: `spellbook-icon.svg` (40 px and up), `spellbook-icon-small.svg` (32 px and under: no companion sparkle, heavier text lines), `spellbook-icon-black.svg` and `spellbook-icon-white.svg` (one colour, the cards separated by cut gaps), `spellbook-logo.svg` and `spellbook-logo-reversed.svg` (icon plus the name outlined from Exo Bold, the Rizonesoft logo face), and `social-preview.png` (1280 by 640 px). Done when: the operator confirms the drawing and the palette. Cheaper substitute: one drawing scaled to every size.
+- [x] `scripts/generate-icon.py` renders `assets/spellbook.ico` (16, 20, 24, 32, 40, 48, 64, 256 px) and `assets/spellbook-256.png` from the masters, the small drawing for 16 to 32 px, and fails if any frame is a resample. Done when: the script reports every frame and the `.ico` lists all eight sizes. Cheaper substitute: the 256 px render downscaled to 16 px.
+- [ ] `assets/banner-on-light.svg` and `assets/banner-on-dark.svg`: the logo with the tagline below the name, all text outlined; the README's existing `<picture>` serves both. Done when: GitHub renders the right one per theme (after the push).
+- [ ] Set `assets/brand/social-preview.png` as the repository's social preview (Settings, General, Social preview). Done when: a shared link to the repository shows it.
+- [ ] Commit: `"brand: the Prompt Deck icon, logo, and README banners (D05 T02 §1)"`
 
-**Test checkpoint:** Driven run with evidence: captures of the taskbar and Explorer at 100 and 200 percent in light and dark, under `docs/captures/`.
+**Test checkpoint:** Driven run with evidence: captures of the taskbar and Explorer at 100 and 200 percent in light and dark, under `docs/captures/`, showing the small drawing at 16 to 32 px and the full drawing above.
 
 ## 2. The Inno Setup 7 Installer
 

@@ -8,6 +8,7 @@ The format follows [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/
 
 ### Added
 
+- The Spellbook icon: a fanned deck of teal prompt cards with an AI sparkle, with a simpler drawing at small sizes, and new README banners.
 - The Spellbook window: a native Win32 window titled Spellbook with its icon, aware of display scaling on every monitor, with a dark title bar when Windows apps are set to dark.
 - The local database: `%LOCALAPPDATA%\Spellbook\spellbook.db` is created on first launch and kept at the current schema, with a full-text search index ready for M3.
 - Logging to `%LOCALAPPDATA%\Spellbook\logs\spellbook.log`.

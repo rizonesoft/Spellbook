@@ -68,7 +68,7 @@ Everything later builds on a toolchain that provisions itself, a build with warn
 | [ ] | `D00 T02 §4` | Runners, CI, and the portable package on the new stack | 7 |
 | [ ] | `D00 T02 §5` | The winui-patterns skill, the UI standard, and the architecture doc | 5 |
 | [ ] | `D00 T02 §6` | Retarget the open UI sections of the plan to WinUI | 6 |
-| [ ] | `D05 T02 §1` | The designed icon and the README banner | 4 |
+| [ ] | `D05 T02 §1` | The designed icon and the README banner | 5 |
 
 ### Phase 1 -- The Library (M1)
 
