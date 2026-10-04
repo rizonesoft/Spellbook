@@ -13,7 +13,7 @@ frozen: true
 > **Goal:** A clean clone becomes a working Spellbook in four commands (`setup`, `build`, `test`, `run`): the pinned toolchain provisions itself, the app opens an empty main window titled "Spellbook" with its icon, `%LOCALAPPDATA%\Spellbook\spellbook.db` is created at schema version 1, logging writes to disk, the gates run locally in one command, CI is green on GitHub, and the plan, standards, skills, and docs are in place for M1.
 
 > [!IMPORTANT]
-> **Current state (verified 2026-10-04):** Sections 1 to 9 were built and verified in the initialisation session on 2026-10-04; their stamps below quote the runs. §10 is in progress: the first `ci` run on `main` (37164511590, b39045c) was green in about 5 minutes and saved both caches; the cache-restore run is owed.
+> **Current state (verified 2026-10-04):** Sections 1 to 9 were built and verified in the initialisation session on 2026-10-04; their stamps below quote the runs. §10 is in progress: the first `ci` run on `main` (37164511590, b39045c) was green in about 5 minutes and saved both caches (tools 337 MB, vcpkg binaries 42 MB); the second (37164815434, 312ee1f) restored them: build-and-test 92 s, Build Debug 33 s instead of 167 s, setup 2 s instead of 33 s. Owed: the negative probe in the Test checkpoint.
 
 ## Inputs
 
@@ -183,7 +183,7 @@ The plan lives in the repository, in the format all three reference repos share,
 The workflows only count once GitHub has run them. This needs the repository to exist (`D99 T01 §1`).
 
 - [x] Push `main` and watch `ci` run. Done when: the `ci` run on `main` is green, and its log shows the vcpkg cache saved.
-- [ ] Re-run `ci` and confirm the vcpkg cache restores. Done when: the second run's configure step takes under five minutes.
+- [x] Re-run `ci` and confirm the vcpkg cache restores. Done when: the second run's configure step takes under five minutes.
 - [ ] Commit: `"ci: record the first green run"` (the README badge goes live; no code change expected)
 
 **Test checkpoint:** Driven run with evidence: `gh run list --workflow ci.yml --branch main --limit 1` shows `completed success`; a probe branch with a misformatted file fails the `format` step.
