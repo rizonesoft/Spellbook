@@ -18,6 +18,7 @@ Operator-only steps: the GitHub repository and its settings, ownership and brand
 ## In scope
 
 - Anything only the operator can do or decide
+- Machine changes that need elevation, such as Visual Studio workloads
 
 ## Out of scope
 

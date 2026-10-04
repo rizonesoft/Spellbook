@@ -11,7 +11,7 @@ The live execution plan for Spellbook. Format spec: [README.md](./README.md). Or
 
 ## What this plan is
 
-Spellbook is a native Windows prompt manager in C++20 and Win32, replacing a folder of Notepad `.txt` files. The plan runs six milestones: M0 the skeleton (this initialisation), M1 the library, M2 importing the existing `.txt` files (the operator's migration path, so it comes before search), M3 search and the quick-search popup, M4 templates and revisions, and M5 polish and the first release. Each milestone is one domain and one phase of [`implementation-plan.md`](./implementation-plan.md).
+Spellbook is a native Windows prompt manager in C++20, moving from Win32 to WinUI 3 on Visual Studio 2026 (operator decision 2026-10-04, [`00-workspace/TODO-02-winui-stack.md`](./00-workspace/TODO-02-winui-stack.md)), replacing a folder of Notepad `.txt` files. The plan runs six milestones: M0 the skeleton (this initialisation), M1 the library, M2 importing the existing `.txt` files (the operator's migration path, so it comes before search), M3 search and the quick-search popup, M4 templates and revisions, and M5 polish and the first release. Each milestone is one domain and one phase of [`implementation-plan.md`](./implementation-plan.md).
 
 ## Domain order
 
@@ -34,5 +34,6 @@ Current dependency-safe work comes from `python scripts/todo-graph.py query read
 | TODO | Domain | Title |
 | ---- | ------ | ----- |
 | [TODO-01](./00-workspace/TODO-01-skeleton.md) | 00-workspace | The M0 Skeleton (one section open: CI green on GitHub) |
+| [TODO-02](./00-workspace/TODO-02-winui-stack.md) | 00-workspace | The WinUI 3 Stack (next: ADR 0002, then the VS 2026 workloads) |
 | [TODO-01](./99-manual/TODO-01-operator.md) | 99-manual | Operator Steps |
 | [TODO-01](./01-library/TODO-01-library-crud.md) | 01-library | The Library: Spells, Chapters, the Editor, and Autosave (next) |

@@ -22,6 +22,7 @@ frozen: true
 - [`.claude/skills/win32-ui-patterns/SKILL.md`](../../.claude/skills/win32-ui-patterns/SKILL.md) -- control creation, subclassing, and DPI handling
 - -> XREF: D02 T01 §3 -- import writes through the folder and prompt operations §1 and §2 add
 - -> XREF: D05 T01 §2 -- the settings store owns the persisted vocabulary choice §4 reads
+- -> XREF: D00 T02 §6 -- the app moves to WinUI 3 (operator decision 2026-10-04); §5 to §7 are retargeted there before they are built
 
 ## Outcome
 
@@ -38,7 +39,7 @@ frozen: true
 |   2   |   §2    | Folder tree operations in the repository | §1 |  [ ]   |
 |   3   |   §3    | LibraryService: rules, clock, and the autosave policy | §2 |  [ ]   |
 |   4   |   §4    | The vocabulary string table | D00 T01 §3 |  [ ]   |
-|   5   |   §5    | The three-pane main window | §3, §4 |  [ ]   |
+|   5   |   §5    | The three-pane main window | §3, §4, D00 T02 §6 |  [ ]   |
 |   6   |   §6    | Create, rename, move, and delete commands | §5 |  [ ]   |
 |   7   |   §7    | Autosave wiring and the status bar | §6 |  [ ]   |
 |   8   |   §8    | The library user guide | §7 |  [ ]   |

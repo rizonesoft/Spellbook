@@ -2,7 +2,7 @@
 
 The order to run every section in, from the M0 skeleton to the first public release, v0.1.0.
 
-> **Progress:** **10 of 51 sections complete (19%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
+> **Progress:** **10 of 58 sections complete (17%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
 
 Seeded 2026-10-04 by the initialisation session from the project brief (milestones M0 to M5) and the conventions of Isotone, Resolute, and ScratchPad (recorded in [`../docs/reference-conventions.md`](../docs/reference-conventions.md)).
 
@@ -45,7 +45,7 @@ v0.1.0 is **a native Windows prompt manager the operator uses instead of Notepad
 
 ### Phase 0 -- The Skeleton (M0)
 
-Everything later builds on a toolchain that provisions itself, a build with warnings as errors, a database that migrates, a window that opens, and gates that run in one command. The operator's repository steps sit here because CI cannot go green without them.
+Everything later builds on a toolchain that provisions itself, a build with warnings as errors, a database that migrates, a window that opens, and gates that run in one command. The operator's repository steps sit here because CI cannot go green without them. On 2026-10-04 the operator moved the app to WinUI 3 on Visual Studio 2026 (`D00 T02`); that change lands here, before the first M1 surface, so no Win32 UI is built only to be rewritten. The approved icon (`D05 T02 §1`) moved here with it.
 
 | ✔ | Section | Deliverable | Items |
 | :-: | ------- | ----------- | :---: |
@@ -61,6 +61,14 @@ Everything later builds on a toolchain that provisions itself, a build with warn
 | [x] | `D99 T01 §1` | Create the GitHub repository and push main | 3 |
 | [ ] | `D00 T01 §10` | CI green on GitHub | 3 |
 | [ ] | `D99 T01 §2` | Repository settings: labels, security, branch protection | 4 |
+| [ ] | `D00 T02 §1` | ADR 0002 and the decision record | 5 |
+| [ ] | `D99 T01 §5` | Install the Visual Studio 2026 C++ and WinUI workloads | 2 |
+| [ ] | `D00 T02 §2` | The Visual Studio 2026 toolchain pins and the setup leg | 5 |
+| [ ] | `D00 T02 §3` | The WinUI 3 shell in the hybrid build | 9 |
+| [ ] | `D00 T02 §4` | Runners, CI, and the portable package on the new stack | 7 |
+| [ ] | `D00 T02 §5` | The winui-patterns skill, the UI standard, and the architecture doc | 5 |
+| [ ] | `D00 T02 §6` | Retarget the open UI sections of the plan to WinUI | 6 |
+| [ ] | `D05 T02 §1` | The designed icon and the README banner | 4 |
 
 ### Phase 1 -- The Library (M1)
 
@@ -130,7 +138,6 @@ Polish comes last because it touches every surface the earlier phases built; the
 | [ ] | `D05 T01 §4` | Restore from a JSON backup | 2 |
 | [ ] | `D05 T01 §5` | The accessibility pass | 3 |
 | [ ] | `D99 T01 §4` | Confirm ownership, branding, and the publisher | 2 |
-| [ ] | `D05 T02 §1` | The designed icon and the README banner | 3 |
 | [ ] | `D05 T02 §2` | The Inno Setup 7 installer | 4 |
 | [ ] | `D05 T02 §3` | A draft run of the release pipeline | 3 |
 | [ ] | `D05 T02 §4` | The complete user guide | 2 |

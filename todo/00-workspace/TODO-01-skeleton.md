@@ -20,6 +20,7 @@ frozen: true
 - [`../../docs/reference-conventions.md`](../../docs/reference-conventions.md) -- the Isotone, Resolute, and ScratchPad conventions this skeleton copies, and every divergence
 - [`../../docs/adr/0001-tech-stack.md`](../../docs/adr/0001-tech-stack.md) -- the stack decisions
 - -> XREF: D99 T01 §1 -- the GitHub repository and first push, without which §10 cannot run
+- -> XREF: D00 T02 §3 -- the WinUI 3 shell that replaces the Win32 shell from §5 (operator decision 2026-10-04, ADR 0002)
 
 ## Outcome
 

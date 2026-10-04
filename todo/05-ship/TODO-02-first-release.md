@@ -19,6 +19,7 @@ depends_on: []
 - [`standards/release.md`](../../standards/release.md) -- the release checklist this file must satisfy
 - [`docs/adr/0001-tech-stack.md`](../../docs/adr/0001-tech-stack.md) -- why Inno Setup 7
 - Isotone's `installer/common.iss` -- the per-user default, all-users option, and Windows 10 notice to copy
+- -> XREF: D00 T02 §6 -- the WinUI 3 stack: the installer ships the self-contained app folder, not one exe
 
 ## Outcome
 
@@ -40,11 +41,14 @@ depends_on: []
 
 ## 1. The Designed Icon and the README Banner
 
-- [ ] Commission or draw the icon (an open book with glowing text), as SVG source in `assets/brand/` plus a 16 to 256 px `.ico` generated from it. Done when: the 16 and 24 px sizes are hand-tuned and legible on light and dark taskbars.
-- [ ] Replace `assets/banner.svg` and add `assets/banner-dark.svg`; the README uses a `<picture>` element for both. Done when: GitHub renders the right one per theme.
-- [ ] Commit: `"brand: the Spellbook icon and README banner"`
+The operator approved the icon design on 2026-10-04 from three concepts: "Prompt Grimoire", an open book, revised to a blue cover with no star above it and an AI sparkle in place of the prompt chevron. The approved sketch is `assets/brand/spellbook-icon-concept.svg`. The app ships unpackaged (ADR 0002), so the `.ico` is the only icon format the app needs; there is no MSIX logo set.
 
-**Test checkpoint:** Driven run with evidence: captures of the taskbar and Explorer at 100 and 200 percent in light and dark.
+- [ ] Draw the production master `assets/brand/spellbook-icon.svg` from `assets/brand/spellbook-icon-concept.svg`: open book on a blue cover (gradient `#4C9BFF` to `#0B3A9E`, one light top edge), cream pages, a blue four-point AI sparkle with a small companion sparkle on the left page, two text lines ending in a gold `#E8A03C` cursor on the right page, nothing above the book. Done when: the operator confirms the master matches the approved sketch. Cheaper substitute: the sketch committed as the master unchanged.
+- [ ] Generate `assets/spellbook.ico` (16, 20, 24, 32, 40, 48, 64, 256 px) and `assets/spellbook-256.png` from the master, replacing the placeholder drawing in `scripts/generate-icon.py`; the 16 and 24 px frames are separate simplified drawings (one sparkle, one text line and the cursor). Done when: the 16 and 24 px sizes are legible on light and dark taskbars. Cheaper substitute: the 256 px render downscaled to 16 px.
+- [ ] Redraw `assets/banner-on-light.svg` and `assets/banner-on-dark.svg` around the new icon in blue; the README's existing `<picture>` keeps serving both. Done when: GitHub renders the right one per theme.
+- [ ] Commit: `"brand: the Spellbook icon and README banner (D05 T02 §1)"`
+
+**Test checkpoint:** Driven run with evidence: captures of the taskbar and Explorer at 100 and 200 percent in light and dark, under `docs/captures/`.
 
 ## 2. The Inno Setup 7 Installer
 

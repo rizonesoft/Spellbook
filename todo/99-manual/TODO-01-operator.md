@@ -17,12 +17,14 @@ depends_on: []
 ## Inputs
 
 - -> XREF: D00 T01 §10 -- CI goes green only after §1 pushes
+- -> XREF: D00 T02 §2 -- the toolchain pins that need §5's Visual Studio 2026 workloads
 
 ## Outcome
 
 - The GitHub repository exists, `main` is pushed, CI has run, labels and security settings are applied.
 - Ownership and branding decisions are recorded in `AGENTS.md`.
 - The operator has accepted the import of their real prompt library.
+- Visual Studio 2026 has the C++ desktop and WinUI workloads.
 
 ## Implementation Order
 
@@ -32,6 +34,7 @@ depends_on: []
 |   2   |   §2    | Repository settings: labels, security, branch protection | §1 |  [ ]   |
 |   3   |   §3    | Accept the import of the real prompt library | D02 T01 §5 |  [ ]   |
 |   4   |   §4    | Confirm ownership, branding, and the publisher | -- |  [ ]   |
+|   5   |   §5    | Install the Visual Studio 2026 C++ and WinUI workloads | -- |  [ ]   |
 
 ---
 
@@ -68,6 +71,15 @@ depends_on: []
 - [ ] Commit: `"workspace: record the ownership and branding decision"`
 
 **Test checkpoint:** Static evidence: `grep -n "Rizonetech" LICENSE AGENTS.md src/app/res/version.rc.in` agrees with the recorded decision.
+
+## 5. Install the Visual Studio 2026 C++ and WinUI Workloads
+
+The stack moves to WinUI 3 on Visual Studio 2026 (operator decision 2026-10-04, `D00 T02`). Visual Studio Professional 2026 18.10.3 is installed with only the Core Editor and Web workloads, so it has no C++ compiler. Modifying an installation needs elevation and changes the machine, so the operator runs it.
+
+- [ ] From an elevated terminal: `& "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\setup.exe" modify --installPath "C:\Program Files\Microsoft Visual Studio\18\Professional" --add Microsoft.VisualStudio.Workload.NativeDesktop --add Microsoft.VisualStudio.ComponentGroup.WindowsAppSDK.Cpp --includeRecommended --passive` (or tick "Desktop development with C++" and, under "WinUI application development", the C++ WinUI app tools in the Installer). Done when: `C:\Program Files\Microsoft Visual Studio\18\Professional\VC\Tools\MSVC` holds a 14.50 or later folder.
+- [ ] Commit: none (machine state).
+
+**Test checkpoint:** Driven run: `& "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -version "[18.0,19.0)" -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 Microsoft.VisualStudio.ComponentGroup.WindowsAppSDK.Cpp -property installationPath` prints the VS 2026 path.
 
 ## Verification
 
