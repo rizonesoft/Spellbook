@@ -37,7 +37,7 @@ depends_on: []
 
 | Order | Section | Deliverable | Depends On | Status |
 | :---: | :-----: | ----------- | ---------- | :----: |
-|   1   |   §1    | Operator-only work in the graph: runnable now and elsewhere | -- |  [ ]   |
+|   1   |   §1    | Operator-only work in the graph: runnable now and elsewhere | -- |  [x]   |
 |   2   |   §2    | The run skills: process-plan, process-phase, process-todo-file, groom-plan | §1 |  [ ]   |
 |   3   |   §3    | The run guard: the Stop hook and its probe | §2 |  [ ]   |
 |   4   |   §4    | The UI driver for driven runs | D00 T02 §3 |  [ ]   |
@@ -49,12 +49,15 @@ depends_on: []
 
 An unattended run must never start a section only the operator can do (creating accounts, approving a release, judging a capture by eye), and it must be able to tell "nothing left for me" from "nothing left at all". The rule is structural, so it cannot drift: every section in `todo/99-manual/` is operator-only, and nothing outside it is.
 
-- [ ] `scripts/todo-graph.py query ready`: split ready rows into runnable now (agent) and runnable elsewhere (operator, domain 99), print each group, and end with the exact line `<N> runnable now, <M> runnable elsewhere`. `--context operator` treats domain 99 as runnable now. Done when: on today's tree the output lists `D99 T01 §2` under elsewhere and the summary line parses with the regex `(\d+) runnable now`.
-- [ ] `resolve` prints `context  operator` and exits 5 for an open, dependency-met section in domain 99 (exit codes documented in the module docstring and `todo/README.md` Tooling). Done when: `python scripts/todo-graph.py resolve 'D99 T01 §2'; echo $?` prints 5.
-- [ ] `self-test` fixtures: an operator row lands in elsewhere; `--context operator` moves it to now; `resolve` exits 5 then 0 with the flag. Done when: `python scripts/todo-graph.py self-test` passes the new cases.
-- [ ] Commit: `"workspace: operator-only rows in the todo graph (D00 T03 §1)"`
+- [x] `scripts/todo-graph.py query ready`: split ready rows into runnable now (agent) and runnable elsewhere (operator, domain 99), print each group, and end with the exact line `<N> runnable now, <M> runnable elsewhere`. `--context operator` treats domain 99 as runnable now. Done when: on today's tree the output lists `D99 T01 §2` under elsewhere and the summary line parses with the regex `(\d+) runnable now`.
+- [x] `resolve` prints `context  operator` and exits 5 for an open, dependency-met section in domain 99 (exit codes documented in the module docstring and `todo/README.md` Tooling). Done when: `python scripts/todo-graph.py resolve 'D99 T01 §2'; echo $?` prints 5.
+- [x] `self-test` fixtures: an operator row lands in elsewhere; `--context operator` moves it to now; `resolve` exits 5 then 0 with the flag. Done when: `python scripts/todo-graph.py self-test` passes the new cases.
+- [x] Commit: `"workspace: operator-only rows in the todo graph (D00 T03 §1)"`
 
 **Test checkpoint:** Unit test: `python scripts/todo-graph.py self-test` passes; a mutant that drops the domain-99 rule fails the elsewhere case. Driven run: `query ready` on the real tree prints the summary line.
+
+> **Verified:** 2026-10-04 | §1 | self-test "todo-graph self-test: 16 passed, 0 failed"; query ready lists D99 T01 §2 under "runnable elsewhere" and ends "7 runnable now, 5 runnable elsewhere" (regex `(\d+) runnable now` -> 7); resolve 'D99 T01 §2' prints "context  operator", exit 5, and with --context operator exit 0; mutant with runnable_here always True: "todo-graph self-test: 14 passed, 2 failed", exit 1; check-all "all gates passed" (build/check-all-d00t03s1.log), validate 0 fatal 0 warnings, check-docs 0 findings
+> **Implementer:** Claude (claude-opus-5-5)
 
 ## 2. The Run Skills: process-plan, process-phase, process-todo-file, groom-plan
 

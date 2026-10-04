@@ -17,15 +17,22 @@ guard, budget, backlog ratchets, design lines, and measured claims):
   Progress line match the tree (`plan --sync` rewrites them);
 * every domain INDEX.md lists its TODO files, and skills cite only live refs.
 
+Operator-only work: every section in domain 99 (todo/99-manual/) is work only
+the operator does. `query ready` lists such rows as runnable elsewhere, never
+as runnable now, and `resolve` exits 5 for one, so an unattended run never
+starts it. `--context operator` treats domain 99 as runnable now.
+
 Usage (stdlib only, Python 3.10+):
     python scripts/todo-graph.py validate
     python scripts/todo-graph.py plan --sync | --check
-    python scripts/todo-graph.py query ready | blocked | stats
-    python scripts/todo-graph.py resolve "D01 T01 §2"
+    python scripts/todo-graph.py query ready | blocked | stats [--context operator]
+    python scripts/todo-graph.py resolve "D01 T01 §2" [--context operator]
     python scripts/todo-graph.py self-test
 
 Exit codes: 0 ok; 1 findings or a stale plan. `resolve`: 0 open and ready,
-2 not found, 3 already shipped, 4 a dependency is unmet.
+2 not found, 3 already shipped, 4 a dependency is unmet, 5 open and ready but
+operator-only (domain 99) in the agent context. `query ready` ends with the
+line `<N> runnable now, <M> runnable elsewhere`.
 """
 from __future__ import annotations
 
@@ -50,6 +57,8 @@ XREF_RE = re.compile(r"-> XREF: (D\d{2} T\d{2} §\d+)")
 PHASE_RE = re.compile(r"^### Phase (\d+) -- (.+)$")
 PLAN_ROW_RE = re.compile(r"^\|\s*\[( |x)\]\s*\|\s*`(D\d{2} T\d{2} §\d+)`\s*\|(.*)\|\s*(\d+)\s*\|\s*$")
 PROGRESS_RE = re.compile(r"^> \*\*Progress:\*\*.*$", re.M)
+OPERATOR_DOMAIN = "99"
+CONTEXTS = ("agent", "operator")
 
 
 @dataclass
@@ -439,7 +448,12 @@ def cmd_plan(tree: Tree, mode: str) -> int:
     return 1 if stale or found else 0
 
 
-def cmd_query(tree: Tree, what: str) -> int:
+def runnable_here(ref: str, context: str) -> bool:
+    """Operator-only work (domain 99) is runnable only in the operator context."""
+    return context == "operator" or not ref.startswith(f"D{OPERATOR_DOMAIN} ")
+
+
+def cmd_query(tree: Tree, what: str, context: str = "agent") -> int:
     rows = []
     for tf, sec in tree.all_sections():
         ref = tf.ref(sec.num)
@@ -448,9 +462,18 @@ def cmd_query(tree: Tree, what: str) -> int:
         unmet = [d for d in tree.deps_of(tf, sec.num) if not tree.is_done(d)]
         rows.append((ref, sec.title, unmet))
     if what == "ready":
-        for ref, title, unmet in rows:
-            if not unmet:
-                print(f"{ref}  {title}")
+        ready = [(ref, title) for ref, title, unmet in rows if not unmet]
+        now = [r for r in ready if runnable_here(r[0], context)]
+        elsewhere = [r for r in ready if not runnable_here(r[0], context)]
+        for ref, title in now:
+            print(f"{ref}  {title}")
+        if elsewhere:
+            print("")
+            print("runnable elsewhere (operator only, todo/99-manual/):")
+            for ref, title in elsewhere:
+                print(f"  {ref}  {title}")
+        print("")
+        print(f"{len(now)} runnable now, {len(elsewhere)} runnable elsewhere")
     elif what == "blocked":
         for ref, title, unmet in rows:
             if unmet:
@@ -459,14 +482,16 @@ def cmd_query(tree: Tree, what: str) -> int:
         total = sum(1 for _ in tree.all_sections())
         done = total - len(rows)
         ready = sum(1 for r in rows if not r[2])
-        print(f"files {len(tree.files)}  sections {total}  done {done}  open {len(rows)}  ready {ready}  blocked {len(rows) - ready}")
+        elsewhere = sum(1 for r in rows if not r[2] and not runnable_here(r[0], context))
+        print(f"files {len(tree.files)}  sections {total}  done {done}  open {len(rows)}  ready {ready} "
+              f"({ready - elsewhere} now, {elsewhere} elsewhere)  blocked {len(rows) - ready}")
     else:
         print(f"unknown query '{what}' (ready | blocked | stats)")
         return 1
     return 0
 
 
-def cmd_resolve(tree: Tree, arg: str) -> int:
+def cmd_resolve(tree: Tree, arg: str, context: str = "agent") -> int:
     m = FULL_REF_RE.search(arg)
     if not m:
         print(f"resolve: no 'DNN TNN §N' reference in {arg!r}")
@@ -485,12 +510,16 @@ def cmd_resolve(tree: Tree, arg: str) -> int:
     print(f"items    {len(sec.items)} ({sum(1 for ok, _ in sec.items if ok)} ticked)")
     print(f"deps     {', '.join(deps) or '--'}")
     print(f"unmet    {', '.join(unmet) or '--'}")
+    print(f"context  {'operator' if tf.domain == OPERATOR_DOMAIN else 'agent'}")
     if tree.is_done(ref):
         print("status   shipped [x]")
         return 3
     if unmet:
         print("status   blocked")
         return 4
+    if not runnable_here(ref, context):
+        print("status   ready, operator only (runnable elsewhere)")
+        return 5
     print("status   ready")
     return 0
 
@@ -610,7 +639,40 @@ def self_test() -> int:
         if codes != (0, 4, 2):
             failed += 1
             print(f"self-test 'resolve exit codes': want (0, 4, 2), got {codes}")
-    total = len(cases) + 1
+    # operator-only rows: elsewhere in the agent context, now in the operator context
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        _fixture(root, second=False)
+        (root / "todo" / "99-manual").mkdir(parents=True)
+        (root / "todo" / "99-manual" / "INDEX.md").write_text("TODO-01-fixture.md\n", encoding="utf-8")
+        (root / "todo" / "99-manual" / "TODO-01-fixture.md").write_text(
+            FIXTURE_TODO.format(id="fixture-op", domain="99-manual", b1=" ", i1=" ", stamp="", dep2="§1", xref=""),
+            encoding="utf-8")
+        plan = root / "todo" / "implementation-plan.md"
+        plan.write_text(plan.read_text(encoding="utf-8").rstrip("\n")
+                        + "\n| [ ] | `D99 T01 §1` | First | 2 |\n| [ ] | `D99 T01 §2` | Second | 1 |\n", encoding="utf-8")
+        tree = Tree(root)
+        import io
+        import contextlib
+        outs = {}
+        for ctx in CONTEXTS:
+            buf = io.StringIO()
+            with contextlib.redirect_stdout(buf):
+                cmd_query(tree, "ready", ctx)
+            outs[ctx] = buf.getvalue()
+        with contextlib.redirect_stdout(io.StringIO()):
+            rcodes = (cmd_resolve(tree, "D99 T01 §1"), cmd_resolve(tree, "D99 T01 §1", "operator"))
+        checks = [
+            ("an operator row is elsewhere in the agent context",
+             "1 runnable now, 1 runnable elsewhere" in outs["agent"] and "  D99 T01 §1" in outs["agent"]),
+            ("--context operator makes it runnable now", "2 runnable now, 0 runnable elsewhere" in outs["operator"]),
+            ("resolve exits 5, then 0 with --context operator", rcodes == (5, 0)),
+        ]
+        for name, ok in checks:
+            if not ok:
+                failed += 1
+                print(f"self-test '{name}': failed (outputs {outs}, resolve codes {rcodes})")
+    total = len(cases) + 1 + 3
     print(f"todo-graph self-test: {total - failed} passed, {failed} failed")
     return 1 if failed else 0
 
@@ -619,6 +681,14 @@ def main(argv: list[str]) -> int:
     if not argv:
         print(__doc__)
         return 1
+    context = "agent"
+    if "--context" in argv:
+        i = argv.index("--context")
+        if i + 1 >= len(argv) or argv[i + 1] not in CONTEXTS:
+            print(f"--context takes one of: {', '.join(CONTEXTS)}")
+            return 1
+        context = argv[i + 1]
+        argv = argv[:i] + argv[i + 2:]
     cmd = argv[0]
     if cmd == "self-test":
         return self_test()
@@ -628,9 +698,9 @@ def main(argv: list[str]) -> int:
     if cmd == "plan" and len(argv) > 1 and argv[1] in ("--sync", "--check"):
         return cmd_plan(tree, argv[1])
     if cmd == "query" and len(argv) > 1:
-        return cmd_query(tree, argv[1])
+        return cmd_query(tree, argv[1], context)
     if cmd == "resolve" and len(argv) > 1:
-        return cmd_resolve(tree, " ".join(argv[1:]))
+        return cmd_resolve(tree, " ".join(argv[1:]), context)
     print(__doc__)
     return 1
 

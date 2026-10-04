@@ -175,12 +175,14 @@ Max 30 checklist items per section (`validate` warns above that). Split where th
 python scripts/todo-graph.py validate          # structure, graph, stamps, plan parity; FATAL fails
 python scripts/todo-graph.py plan --sync       # re-derive the plan boxes, items, and progress
 python scripts/todo-graph.py plan --check      # fail if the plan is stale
-python scripts/todo-graph.py query ready       # sections whose dependencies have all shipped
+python scripts/todo-graph.py query ready       # dependency-met sections: runnable now, then runnable elsewhere
 python scripts/todo-graph.py query blocked     # sections waiting, and on what
 python scripts/todo-graph.py query stats       # tree health
-python scripts/todo-graph.py resolve 'D01 T01 §2'   # ref -> file, section, deps; exit 3 shipped, 4 blocked
+python scripts/todo-graph.py resolve 'D01 T01 §2'   # ref -> file, section, deps; exit 3 shipped, 4 blocked, 5 operator-only
 python scripts/todo-graph.py self-test         # the tool's own fixtures
 ```
+
+**Operator-only work.** Every section in `todo/99-manual/` is work only the operator does (accounts, secrets, approvals, machine-wide installs, judging by eye or ear). `query ready` lists those rows under "runnable elsewhere" and ends with the line `<N> runnable now, <M> runnable elsewhere`; `resolve` exits 5 for one. An agent, and above all an unattended `process-plan` run, never starts an operator-only section; the operator runs it, or passes `--context operator` to see it as runnable now. Nothing outside `todo/99-manual/` may need a person.
 
 `resolve` takes whatever you have in front of you, including a row pasted from the plan, so this is a complete instruction:
 
