@@ -85,7 +85,7 @@ A Test checkpoint cites one or more of the five proofs in `todo/README.md`: buil
 
 A change is done when all of these hold:
 
-1. `pwsh scripts/check-all.ps1` exits 0 (toolchain, layering, format, Debug and Release builds with `/W4 /WX`, tests, the launch smoke, clang-tidy, actionlint, docs, and the plan gates).
+1. `pwsh scripts/check-all.ps1` exits 0 (toolchain, layering, format, Debug and Release builds with `/W4 /WX`, tests, the launch smoke, clang-tidy, actionlint, docs, the plan gates, and the run guard probe).
 2. Every new public core function has a unit test; a bug fix has a test that failed before the fix.
 3. The Test checkpoint ran and its evidence is quoted in the stamp.
 4. User-visible changes update `docs/user/` and the `CHANGELOG.md` Unreleased section.

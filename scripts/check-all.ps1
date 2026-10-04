@@ -13,6 +13,7 @@
    8. actionlint over .github/workflows
    9. python scripts/check-docs.py --self-test, then the check (links, forms, em dashes)
   10. python scripts/todo-graph.py self-test, validate, plan --check
+  11. pwsh scripts/check-campaign-stop.ps1     (the unattended run's Stop hook, six cases)
   Every gate runs even after an earlier failure; the exit code is 1 when any gate failed.
 .PARAMETER SkipBuild
   Skip the builds (tests and smoke then use what is already built).
@@ -79,6 +80,7 @@ try {
         Invoke-Gate 'todo-graph self-test' { & $python scripts/todo-graph.py self-test }
         Invoke-Gate 'todo-graph validate' { & $python scripts/todo-graph.py validate }
         Invoke-Gate 'todo-graph plan --check' { & $python scripts/todo-graph.py plan --check }
+        Invoke-Gate 'run guard probe' { & $pwsh -NoProfile -File scripts/check-campaign-stop.ps1 }
     } else {
         $results.Add([pscustomobject]@{ Gate = 'python gates'; Status = 'SKIP (no python)'; Seconds = 0 })
     }

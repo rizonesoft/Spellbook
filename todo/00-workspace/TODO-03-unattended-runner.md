@@ -39,7 +39,7 @@ depends_on: []
 | :---: | :-----: | ----------- | ---------- | :----: |
 |   1   |   §1    | Operator-only work in the graph: runnable now and elsewhere | -- |  [x]   |
 |   2   |   §2    | The run skills: process-plan, process-phase, process-todo-file, groom-plan | §1 |  [x]   |
-|   3   |   §3    | The run guard: the Stop hook and its probe | §2 |  [ ]   |
+|   3   |   §3    | The run guard: the Stop hook and its probe | §2 |  [x]   |
 |   4   |   §4    | The UI driver for driven runs | D00 T02 §3 |  [ ]   |
 |   5   |   §5    | Unattended proof rules and the checkpoint sweep | §4, D00 T02 §6 |  [ ]   |
 
@@ -78,12 +78,15 @@ Port ScratchPad's four skills, keeping their loop discipline (one continuous loo
 
 Without a guard a run dies quietly at the first end of turn. Port ScratchPad's `campaign-stop.ps1`, which blocks only the session named in the guard file, releases on closeout, park, or zero runnable rows, and trips a stall breaker after three blocks with no change to the tree.
 
-- [ ] `.claude/hooks/campaign-stop.ps1` (PowerShell 7 and Windows PowerShell compatible, fail open): reads `build/claude-campaign-guard.json` (`runner`, `workspace`, `phase`, `run_file`, `session_id`, `cron_id`) and writes `build/claude-campaign-state.json`; calls `python scripts/todo-graph.py query ready`. Done when: it matches ScratchPad's behaviour with `python` in place of `python3`.
-- [ ] `.claude/settings.json`: a `Stop` hook running it with `pwsh -NoProfile -File`, keeping `includeCoAuthoredBy: false` and the empty `attribution`. Done when: `python -m json.tool .claude/settings.json` succeeds and both attribution keys are unchanged.
-- [ ] `scripts/check-campaign-stop.ps1`: feeds the hook JSON payloads in a temp workspace copy and asserts: no guard allows; another session allows; an open run blocks with `"decision":"block"`; a `## Closeout` heading allows; a column-0 `PARKED` line allows; a fourth block with an unchanged tree allows and records a trip. `check-all.ps1` runs it. Done when: it passes, and breaking the session check makes it fail.
-- [ ] Commit: `"workspace: the run guard stop hook and its probe (D00 T03 §3)"`
+- [x] `.claude/hooks/campaign-stop.ps1` (PowerShell 7 and Windows PowerShell compatible, fail open): reads `build/claude-campaign-guard.json` (`runner`, `workspace`, `phase`, `run_file`, `session_id`, `cron_id`) and writes `build/claude-campaign-state.json`; calls `python scripts/todo-graph.py query ready`. Done when: it matches ScratchPad's behaviour with `python` in place of `python3`.
+- [x] `.claude/settings.json`: a `Stop` hook running it with `pwsh -NoProfile -File`, keeping `includeCoAuthoredBy: false` and the empty `attribution`. Done when: `python -m json.tool .claude/settings.json` succeeds and both attribution keys are unchanged.
+- [x] `scripts/check-campaign-stop.ps1`: feeds the hook JSON payloads in a temp workspace copy and asserts: no guard allows; another session allows; an open run blocks with `"decision":"block"`; a `## Closeout` heading allows; a column-0 `PARKED` line allows; a fourth block with an unchanged tree allows and records a trip. `check-all.ps1` runs it. Done when: it passes, and breaking the session check makes it fail.
+- [x] Commit: `"workspace: the run guard stop hook and its probe (D00 T03 §3)"`
 
 **Test checkpoint:** Unit test: `pwsh scripts/check-campaign-stop.ps1` passes all six cases; `pwsh scripts/check-all.ps1` exits 0 with it included.
+
+> **Verified:** 2026-10-04 | §3 | `pwsh scripts/check-campaign-stop.ps1` "check-campaign-stop: all 6 cases passed" exit 0 (no guard, another session, open run blocks, Closeout, PARKED, stall breaker); negative probe on a temp copy with the session check removed: "FAIL  another session is never blocked ... \"decision\":\"block\"", "1 of 6 cases failed" exit 1 (real hook untouched); diff against ScratchPad's hook: `python` first with `python3` fallback (missing interpreter allows), next-row filter `^D\d{2} T\d{2} ` (skips the operator-only "runnable elsewhere" lines), message names fresh-context review and todo/99-manual/ instead of the panel, comments only otherwise; `python -m json.tool .claude/settings.json` exit 0, `includeCoAuthoredBy` false, `attribution` commit "" and pr ""; the hook runs as `pwsh -NoProfile -ExecutionPolicy Bypass -Command` with `[Environment]::GetEnvironmentVariable('CLAUDE_PROJECT_DIR')` in place of `-File "$CLAUDE_PROJECT_DIR..."` so neither cmd nor bash expands a variable: the settings command line printed nothing exit 0 from bash and from a cmd batch with no guard, and printed `{"decision":"block",...}` from both against a probe workspace; Windows PowerShell 5.1 blocks the owner and allows another session; fail open: malformed stdin "campaign-stop: Conversion from JSON failed..." on stderr exit 0, empty stdin exit 0; check-all "run guard probe PASS 7,40", "check-all: all gates passed" (build/check-all-d00t03s3.log, written after every changed file); validate "17 files, 116 sections, 0 fatal, 0 warnings"; check-docs "0 findings"
+> **Implementer:** Claude (claude-opus-5-5)
 
 ## 4. The UI Driver for Driven Runs
 

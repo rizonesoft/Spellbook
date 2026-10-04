@@ -49,7 +49,7 @@ pwsh scripts/format.ps1 -Check # clang-format
 pwsh scripts/lint.ps1          # clang-tidy and the layering check
 ```
 
-`check-all.ps1` runs: the toolchain check, the layering self-test and check, the format check, Debug and Release builds, Debug and Release tests, the Release launch smoke, clang-tidy, actionlint, the docs check, and the three TODO-graph gates. Every gate runs even after a failure, and a table at the end shows each result.
+`check-all.ps1` runs: the toolchain check, the layering self-test and check, the format check, Debug and Release builds, Debug and Release tests, the Release launch smoke, clang-tidy, actionlint, the docs check, the three TODO-graph gates, and the run guard probe (`scripts/check-campaign-stop.ps1`). Every gate runs even after a failure, and a table at the end shows each result.
 
 ## The dev database
 
