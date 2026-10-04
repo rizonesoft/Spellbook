@@ -12,7 +12,7 @@ depends_on: []
 > **Goal:** The steps no agent session can or should take on its own (creating and configuring the GitHub repository, installing machine-wide tools, deciding ownership, accepting the import of real prompts, judging what only eyes and ears can judge, approving the release, and anything that needs an account, a secret, or money) are listed with exact commands, so they never stall a runner silently. Every section here is operator-only: `query ready` lists them as runnable elsewhere and an unattended run never starts one (`D00 T03 §1`).
 
 > [!IMPORTANT]
-> **Current state (verified 2026-10-04):** The operator created `https://github.com/rizonesoft/Spellbook` (public, default branch `main`) on 2026-10-04, and `main` is pushed (§1). Labels, security settings, and branch protection (§2) were applied on 2026-10-04; the social preview upload is outstanding. The Visual Studio 2026 C++ and WinUI workloads (§5) were installed on 2026-10-04.
+> **Current state (verified 2026-10-04):** The operator created `https://github.com/rizonesoft/Spellbook` (public, default branch `main`) on 2026-10-04, and `main` is pushed (§1). Labels, security settings, branch protection, and the social preview (§2) were applied on 2026-10-04. The Visual Studio 2026 C++ and WinUI workloads (§5) were installed on 2026-10-04.
 
 ## Inputs
 
@@ -41,7 +41,7 @@ depends_on: []
 | Order | Section | Deliverable | Depends On | Status |
 | :---: | :-----: | ----------- | ---------- | :----: |
 |   1   |   §1    | Create the GitHub repository and push main | -- |  [x]   |
-|   2   |   §2    | Repository settings: labels, security, branch protection | §1 |  [ ]   |
+|   2   |   §2    | Repository settings: labels, security, branch protection | §1 |  [x]   |
 |   3   |   §3    | Accept the import of the real prompt library | D02 T01 §5 |  [ ]   |
 |   4   |   §4    | Confirm ownership, branding, and the publisher | -- |  [ ]   |
 |   5   |   §5    | Install the Visual Studio 2026 C++ and WinUI workloads | -- |  [x]   |
@@ -68,13 +68,16 @@ depends_on: []
 
 ## 2. Repository Settings: Labels, Security, Branch Protection
 
-- [ ] Apply `.github/labels.yml` (for each entry: `gh label create "<name>" --color <color> --description "<description>" --force`). Done when: `gh label list` shows every entry.
-- [ ] Enable private vulnerability reporting and Dependabot alerts (Settings, Code security). Done when: the Security tab offers "Report a vulnerability".
-- [ ] Protect `main`: require the `ci` checks (`build-and-test`, `plan-gates`) for pull requests, no force pushes, no deletion, with repository admins allowed to bypass so an unattended run's direct pushes after each section still land (ADR 0003). Done when: a probe PR shows the required checks and a direct push by the operator's account succeeds.
-- [ ] Set `assets/brand/social-preview.png` as the social preview (Settings, General, Social preview, Edit, Upload an image). Done when: a link to the repository pasted into a chat app shows the teal card.
-- [ ] Commit: none (repository state).
+- [x] Apply `.github/labels.yml` (for each entry: `gh label create "<name>" --color <color> --description "<description>" --force`). Done when: `gh label list` shows every entry.
+- [x] Enable private vulnerability reporting and Dependabot alerts (Settings, Code security). Done when: the Security tab offers "Report a vulnerability".
+- [x] Protect `main`: require the `ci` checks (`build-and-test`, `plan-gates`) for pull requests, no force pushes, no deletion, with repository admins allowed to bypass so an unattended run's direct pushes after each section still land (ADR 0003). Done when: a probe PR shows the required checks and a direct push by the operator's account succeeds.
+- [x] Set `assets/brand/social-preview.png` as the social preview (Settings, General, Social preview, Edit, Upload an image). Done when: a link to the repository pasted into a chat app shows the teal card.
+- [x] Commit: none (repository state).
 
 **Test checkpoint:** Driven run: `gh api repos/rizonesoft/Spellbook/branches/main/protection` lists both required checks.
+
+> **Verified:** 2026-10-04 | §2 | 14 labels from .github/labels.yml applied with `gh label create --force`; Dependabot alerts on (`GET repos/rizonesoft/Spellbook/vulnerability-alerts` 204) and private vulnerability reporting `{"enabled":true}`; `gh api repos/rizonesoft/Spellbook/branches/main/protection` reads checks [build-and-test, plan-gates], enforce_admins false, force pushes false, deletions false; probe PR #1 showed both checks and mergeStateStatus BLOCKED, then was closed and its branch deleted; a direct push by the operator's account to protected main succeeded (8c84a8a..b6e70b7, ci 37225401319 success); the social preview reads usesCustomOpenGraphImage true and the served image is pixel-identical to assets/brand/social-preview.png (1280 by 640)
+> **Implementer:** the operator with Claude (claude-opus-5-5)
 
 ## 3. Accept the Import of the Real Prompt Library
 
