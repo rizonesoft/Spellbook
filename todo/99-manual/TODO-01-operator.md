@@ -12,7 +12,7 @@ depends_on: []
 > **Goal:** The steps no agent session can or should take on its own (creating and configuring the GitHub repository, installing machine-wide tools, deciding ownership, accepting the import of real prompts, judging what only eyes and ears can judge, approving the release, and anything that needs an account, a secret, or money) are listed with exact commands, so they never stall a runner silently. Every section here is operator-only: `query ready` lists them as runnable elsewhere and an unattended run never starts one (`D00 T03 §1`).
 
 > [!IMPORTANT]
-> **Current state (verified 2026-10-04):** The operator created `https://github.com/rizonesoft/Spellbook` (public, default branch `main`) on 2026-10-04, and `main` is pushed (§1). Labels, security settings, and branch protection (§2) are not applied yet.
+> **Current state (verified 2026-10-04):** The operator created `https://github.com/rizonesoft/Spellbook` (public, default branch `main`) on 2026-10-04, and `main` is pushed (§1). Labels, security settings, and branch protection (§2) were applied on 2026-10-04; the social preview upload is outstanding. The Visual Studio 2026 C++ and WinUI workloads (§5) were installed on 2026-10-04.
 
 ## Inputs
 
@@ -44,7 +44,7 @@ depends_on: []
 |   2   |   §2    | Repository settings: labels, security, branch protection | §1 |  [ ]   |
 |   3   |   §3    | Accept the import of the real prompt library | D02 T01 §5 |  [ ]   |
 |   4   |   §4    | Confirm ownership, branding, and the publisher | -- |  [ ]   |
-|   5   |   §5    | Install the Visual Studio 2026 C++ and WinUI workloads | -- |  [ ]   |
+|   5   |   §5    | Install the Visual Studio 2026 C++ and WinUI workloads | -- |  [x]   |
 |   6   |   §6    | Check the release candidate on a clean machine | D05 T02 §3 |  [ ]   |
 |   7   |   §7    | Approve the v0.1.0 release | §6, §10, §11 |  [ ]   |
 |   8   |   §8    | Channel accounts and secrets: winget, Scoop, Chocolatey | -- |  [ ]   |
@@ -92,12 +92,17 @@ depends_on: []
 
 ## 5. Install the Visual Studio 2026 C++ and WinUI Workloads
 
+**Corrected 2026-10-04:** the first install used `Microsoft.VisualStudio.ComponentGroup.WindowsAppSDK.Cpp`, which does not exist in the VS 2026 catalog and was ignored without an error; the component is `Microsoft.VisualStudio.Component.WindowsAppSdkSupport.Cpp`. PowerShell also needs the `&` call operator before the quoted `setup.exe` path, and a pasted long line can wrap, so the command below uses variables.
+
 The stack moves to WinUI 3 on Visual Studio 2026 (operator decision 2026-10-04, `D00 T02`). Visual Studio Professional 2026 18.10.3 is installed with only the Core Editor and Web workloads, so it has no C++ compiler. Modifying an installation needs elevation and changes the machine, so the operator runs it.
 
-- [ ] From an elevated terminal: `& "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\setup.exe" modify --installPath "C:\Program Files\Microsoft Visual Studio\18\Professional" --add Microsoft.VisualStudio.Workload.NativeDesktop --add Microsoft.VisualStudio.ComponentGroup.WindowsAppSDK.Cpp --includeRecommended --passive` (or tick "Desktop development with C++" and, under "WinUI application development", the C++ WinUI app tools in the Installer). Done when: `C:\Program Files\Microsoft Visual Studio\18\Professional\VC\Tools\MSVC` holds a 14.50 or later folder.
-- [ ] Commit: none (machine state).
+- [x] From an elevated PowerShell: `$setup = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\setup.exe"`, then `$vs = "C:\Program Files\Microsoft Visual Studio\18\Professional"`, then `& $setup modify --installPath $vs --add Microsoft.VisualStudio.Workload.NativeDesktop --add Microsoft.VisualStudio.Component.WindowsAppSdkSupport.Cpp --includeRecommended --passive` (or tick "Desktop development with C++" and, under "WinUI application development", the C++ WinUI app tools in the Installer). Done when: `C:\Program Files\Microsoft Visual Studio\18\Professional\VC\Tools\MSVC` holds a 14.50 or later folder.
+- [x] Commit: none (machine state).
 
-**Test checkpoint:** Driven run: `& "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -version "[18.0,19.0)" -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 Microsoft.VisualStudio.ComponentGroup.WindowsAppSDK.Cpp -property installationPath` prints the VS 2026 path.
+**Test checkpoint:** Driven run: `& "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -version "[18.0,19.0)" -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 Microsoft.VisualStudio.Component.WindowsAppSdkSupport.Cpp -property installationPath` prints the VS 2026 path.
+
+> **Verified:** 2026-10-04 | §5 | the operator ran the installer elevated twice: the first run added Microsoft.VisualStudio.Workload.NativeDesktop (MSVC 14.51.36231 in VC\Tools\MSVC) and silently ignored the non-existent ComponentGroup.WindowsAppSDK.Cpp id; the second added Microsoft.VisualStudio.Component.WindowsAppSdkSupport.Cpp 18.10.12020.329 (with Microsoft.WindowsAppSDK.Cpp.Dev17 2.0.251210006); the checkpoint's vswhere query printed C:\Program Files\Microsoft Visual Studio\18\Professional, exit 0
+> **Implementer:** the operator, recorded by Claude (claude-opus-5-5)
 
 ## 6. Check the Release Candidate on a Clean Machine
 
