@@ -1,4 +1,3 @@
-#Requires -Version 7.0
 <#
 .SYNOPSIS
   Builds a Release Spellbook and packages it into artifacts/dist/.
@@ -22,6 +21,7 @@
 .EXAMPLE
   pwsh scripts/package.ps1
 #>
+#Requires -Version 7.0
 [CmdletBinding()]
 param(
     [switch]$SkipBuild,

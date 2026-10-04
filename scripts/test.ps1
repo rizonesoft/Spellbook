@@ -1,4 +1,3 @@
-#Requires -Version 7.0
 <#
 .SYNOPSIS
   Builds Spellbook and runs the unit tests through CTest.
@@ -19,6 +18,7 @@
   pwsh scripts/test.ps1
   pwsh scripts/test.ps1 -Filter 'storage: .*migrate'
 #>
+#Requires -Version 7.0
 [CmdletBinding()]
 param(
     [ValidateSet('Debug', 'Release', 'RelWithDebInfo')]

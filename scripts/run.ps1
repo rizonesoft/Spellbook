@@ -1,4 +1,3 @@
-#Requires -Version 7.0
 <#
 .SYNOPSIS
   Builds Spellbook (if needed) and launches Spellbook.exe.
@@ -24,6 +23,7 @@
   pwsh scripts/run.ps1
   pwsh scripts/run.ps1 -Smoke -Config Release
 #>
+#Requires -Version 7.0
 [CmdletBinding()]
 param(
     [ValidateSet('Debug', 'Release', 'RelWithDebInfo')]

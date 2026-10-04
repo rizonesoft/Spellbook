@@ -1,4 +1,3 @@
-#Requires -Version 7.0
 <#
 .SYNOPSIS
   Verifies and repairs the Spellbook toolchain on this machine.
@@ -25,6 +24,7 @@
   pwsh scripts/setup.ps1
   pwsh scripts/setup.ps1 -Verify
 #>
+#Requires -Version 7.0
 [CmdletBinding()]
 param(
     [switch]$Verify,

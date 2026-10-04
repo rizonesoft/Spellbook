@@ -1,4 +1,3 @@
-#Requires -Version 7.0
 <#
 .SYNOPSIS
   Runs every local gate: toolchain, layering, format, build, tests, smoke, lint, and the plan tooling.
@@ -25,6 +24,7 @@
   pwsh scripts/check-all.ps1
   pwsh scripts/check-all.ps1 -SkipLint
 #>
+#Requires -Version 7.0
 [CmdletBinding()]
 param(
     [switch]$SkipBuild,

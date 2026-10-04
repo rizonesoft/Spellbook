@@ -1,4 +1,3 @@
-#Requires -Version 7.0
 <#
 .SYNOPSIS
   Configures and builds Spellbook with a CMake preset.
@@ -19,6 +18,7 @@
   pwsh scripts/build.ps1
   pwsh scripts/build.ps1 -Config Release -Clean
 #>
+#Requires -Version 7.0
 [CmdletBinding()]
 param(
     [ValidateSet('Debug', 'Release', 'RelWithDebInfo')]

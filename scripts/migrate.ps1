@@ -1,4 +1,3 @@
-#Requires -Version 7.0
 <#
 .SYNOPSIS
   Applies the migrations to a development database and reports its schema.
@@ -23,6 +22,7 @@
 .EXAMPLE
   pwsh scripts/migrate.ps1 -Reset
 #>
+#Requires -Version 7.0
 [CmdletBinding()]
 param(
     [string]$DataDir,

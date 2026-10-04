@@ -1,4 +1,3 @@
-#Requires -Version 7.0
 <#
 .SYNOPSIS
   Formats every C++ source with the pinned clang-format.
@@ -17,6 +16,7 @@
   pwsh scripts/format.ps1
   pwsh scripts/format.ps1 -Check
 #>
+#Requires -Version 7.0
 [CmdletBinding()]
 param(
     [switch]$Check,

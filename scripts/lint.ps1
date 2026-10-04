@@ -1,4 +1,3 @@
-#Requires -Version 7.0
 <#
 .SYNOPSIS
   Runs clang-tidy and the layering check over Spellbook's sources.
@@ -16,6 +15,7 @@
 .EXAMPLE
   pwsh scripts/lint.ps1
 #>
+#Requires -Version 7.0
 [CmdletBinding()]
 param(
     [ValidateSet('Debug', 'Release', 'RelWithDebInfo')]

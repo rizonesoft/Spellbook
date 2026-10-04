@@ -24,7 +24,8 @@ function Invoke-Native {
 }
 
 function Show-ScriptHelp([string]$Path) {
-    # Every runner takes -Help; the text is the script's comment-based help.
+    # Every runner takes -Help; the text is the script's comment-based help. The <# #> block
+    # must be the first thing in the file: PowerShell 7.6's Get-Help ignores it after #Requires.
     Get-Help $Path -Detailed | Out-String | Write-Host
 }
 

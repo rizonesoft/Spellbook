@@ -1,4 +1,3 @@
-#Requires -Version 7.0
 <#
 .SYNOPSIS
   Cuts a release: moves the CHANGELOG's Unreleased notes under the version, commits, and tags v<version>.
@@ -29,6 +28,7 @@
   pwsh scripts/release.ps1 -Version 0.1.0 -DryRun
   pwsh scripts/release.ps1 -Version 0.1.0
 #>
+#Requires -Version 7.0
 [CmdletBinding()]
 param(
     [string]$Version,

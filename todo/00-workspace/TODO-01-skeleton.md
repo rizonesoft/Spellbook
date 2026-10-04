@@ -137,7 +137,7 @@ Every runner is PowerShell 7 with comment-based help and `-Help`, dot-sources `s
 
 **Test checkpoint:** Driven run: `pwsh scripts/check-all.ps1` exits 0 with every gate PASS.
 
-> **Verified:** 2026-10-04 | §6 | PENDING
+> **Verified:** 2026-10-04 | §6 | check-all 16 gates PASS: toolchain, layering self-test, layering, format -Check, build Debug, build Release, test Debug (29), test Release (29), smoke Release, lint (clang-tidy 14 files clean), actionlint, check-docs self-test, check-docs, todo-graph self-test, validate, plan --check; clang-tidy's first run found 12 findings, 11 fixed and performance-no-int-to-ptr disabled with its reason in .clang-tidy; a fresh clone in another folder ran setup (all legs green, 48 s), build (vcpkg ports compiled from source, done at 267 s), test (29 passed), and run -Smoke (exit 0); migrate -Reset printed user_version 1 and the six tables; package wrote Spellbook-0.0.0-alpha.9-win-x64-Portable.zip (1.0 MB) and SHA256SUMS; all ten -Help switches print their synopsis after moving #Requires below the help block
 > **Implementer:** Claude (claude-opus-5-5)
 
 ## 7. The TODO System, Its Tooling, and the M0 to M5 Plan
@@ -150,7 +150,7 @@ The plan lives in the repository, in the format all three reference repos share,
 
 **Test checkpoint:** Static evidence: `python scripts/todo-graph.py self-test` prints `0 failed`; `validate` prints `0 fatal`; flipping an unstamped row to `[x]` makes `validate` exit 1 with `unstamped-flip`.
 
-> **Verified:** 2026-10-04 | §7 | PENDING
+> **Verified:** 2026-10-04 | §7 | todo-graph self-test 13 passed 0 failed; validate 8 files, 51 sections, 0 fatal, 0 warnings; plan --check current; query ready lists 7 sections, D01 T01 §1 first
 > **Implementer:** Claude (claude-opus-5-5)
 
 ## 8. Agent Infrastructure: AGENTS.md, Standards, Skills, Hooks
@@ -162,7 +162,7 @@ The plan lives in the repository, in the format all three reference repos share,
 
 **Test checkpoint:** Driven run: a staged `todo/` edit that breaks parity is refused by the pre-commit hook with the validate finding.
 
-> **Verified:** 2026-10-04 | §8 | PENDING
+> **Verified:** 2026-10-04 | §8 | pre-commit refused a probe that flipped D01 T01 §1 to [x] unstamped (partial-flip, unstamped-flip, plan-stale; commit exit 1), tree restored; both hooks at index mode 100755; 10 skills with name and description; validate checks their refs, 0 fatal
 > **Implementer:** Claude (claude-opus-5-5)
 
 ## 9. README, Docs, ADR, and the GitHub Templates
@@ -175,7 +175,7 @@ The plan lives in the repository, in the format all three reference repos share,
 
 **Test checkpoint:** Static evidence: `.tools/actionlint/actionlint.exe` exits 0 over both workflows; `python scripts/check-docs.py` prints `0 findings`; a probe link to a missing file makes it exit 1 with `dead-link`.
 
-> **Verified:** 2026-10-04 | §9 | PENDING
+> **Verified:** 2026-10-04 | §9 | actionlint 1.7.12 exit 0 over ci.yml and release.yml; check-docs self-test 1 passed 0 failed; check-docs 0 findings over every tracked Markdown file
 > **Implementer:** Claude (claude-opus-5-5)
 
 ## 10. CI Green on GitHub
