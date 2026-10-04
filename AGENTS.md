@@ -16,7 +16,7 @@ Agent instructions for this repository. Human orientation lives in `README.md`. 
 | `scripts/` | The PowerShell 7 runners (`setup`, `build`, `test`, `run`, `format`, `lint`, `migrate`, `package`, `release`, `check-all`) and the stdlib Python gates (`todo-graph.py`, `check-layering.py`, `check-docs.py`) |
 | `toolchain.json` | The pinned repo-portable tools (cmake, ninja, clang-format, clang-tidy, actionlint, vcpkg); `scripts/setup.ps1` provisions them into `.tools/` |
 | `cmake/` | The warning policy, the git-tag version, and the migration embedder |
-| `todo/` | The live execution plan; read `todo/README.md` before authoring or implementing |
+| `todo/` | The live execution plan; read `todo/README.md` before authoring or implementing; domains `00` to `06` plus `99` (operator-only) |
 | `todo/implementation-plan.md` | Phases 0 to 5 (milestones M0 to M5); boxes derived by `scripts/todo-graph.py plan --sync` |
 | `standards/` | Coding, UI, testing, and release standards |
 | `docs/` | Architecture, ADRs, the reference conventions, the developer build guide, and the user guide |
@@ -36,8 +36,10 @@ Everything here is Windows-only. The Python gates are stdlib Python 3 (`python` 
 - **Libraries:** sqlite3, spdlog (with fmt), nlohmann-json, Catch2. **A dependency is a decision:** a new one is added by a TODO section that records why and checks its license is MIT-compatible.
 - **The toolchain is repo-portable** (operator decision 2026-10-04): cmake, ninja, clang-format, clang-tidy, actionlint, and vcpkg are pinned in `toolchain.json` and live in `.tools/`; only MSVC and the Windows SDK are machine-wide. A tool from PATH is never used in their place.
 - **Version from git tags** (`v<SemVer>`, `cmake/SpellbookVersion.cmake`); no version string is typed into a project file.
-- **Packaging:** the portable ZIP now; an **Inno Setup 7** installer in M5 (`D05 T02 §2`). Releases attach both to the GitHub release.
-- **No network calls in the app** for v0.1.0, and **no secrets in the repository**.
+- **Packaging:** one **Inno Setup 7** installer with three modes (install for me, install for all users, portable) plus the portable ZIP; a `Spellbook.portable` marker beside the exe keeps all data in `Data\` beside it. Unsigned for v0.1.0. Channels: GitHub Releases, winget, Scoop, Chocolatey; the Microsoft Store waits for code signing. See `docs/adr/0003-v0.1.0-scope-and-distribution.md`.
+- **Network:** the update check (on by default, at most daily, GitHub Releases API, no user data) and the opt-in AI features (OpenRouter with the user's key in Windows Credential Manager, or an ACP agent the user runs), both governed by the Privacy page in Settings; AI costs show per result with a monthly cap. Nothing else touches the network, and there are **no secrets in the repository**. See ADR 0003 and ADR 0004.
+- **v0.1.0 is the premium release** (ADR 0003): M1 to M5 plus capture, Jump List, Trash, backups, `.spell` files, duplicates, rich runes, composition, the smart editor, tabs, the starter grimoire, metadata, and crash safety. Windows 10 (1809+) and 11. Start with Windows is opt in.
+- **Unattended runs** (`process-plan`) push `main` after each stamped section, never force-push, never amend a pushed commit, and never tag; operator-only work lives in `todo/99-manual/` and is never run by an agent.
 - **Theme in UI copy and docs only:** Spell, Chapter, Sigil, Cast, Rune, Revisions, Import scrolls in labels; Prompt, Folder, Tag, copy, TemplateVariable, PromptVersion, import in code and schema. Every themed label has a tooltip with the plain meaning, and all labels come from one string table that can switch to plain words (`standards/ui.md`).
 - **Repository:** https://github.com/rizonesoft/Spellbook, public, default branch `main`, created by the operator on 2026-10-04 (`D99 T01 §1`).
 - **Ownership:** MIT License, "Copyright (c) 2026 Rizonetech (Pty) Ltd", publisher Rizonesoft, following Isotone. Pending the operator's confirmation in `D99 T01 §4`.

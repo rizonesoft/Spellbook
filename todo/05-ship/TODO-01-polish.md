@@ -19,6 +19,10 @@ frozen: true
 
 - Microsoft Learn: "Support Dark and Light themes in Win32 apps" (`DwmSetWindowAttribute`, the `DarkMode_Explorer` visual style for list and tree views, `WM_CTLCOLOR*`)
 - -> XREF: D01 T01 §4 -- the vocabulary table whose Themed or Plain choice §2 persists
+- -> XREF: D01 T02 §6 -- open tabs restored through the settings store
+- -> XREF: D05 T03 §4 -- the Privacy page joins the Settings dialog
+- -> XREF: D06 T01 §2 -- the AI settings join the Settings dialog
+- -> XREF: D99 T01 §10 -- Narrator and high-contrast checks moved to the operator's pass
 
 ## Outcome
 
@@ -55,6 +59,7 @@ frozen: true
 - [ ] `src/core/include/spellbook/core/settings.hpp`: a typed `Settings` struct with defaults and JSON (nlohmann) load and save; unknown keys are kept, a corrupt file is renamed `settings.corrupt-<time>.json` and defaults are used with a warning. Done when: core tests cover defaults, round trip, unknown keys, and corruption.
 - [ ] Atomic write: write `settings.json.tmp` in the same folder, flush, `ReplaceFileW` (or `MoveFileExW` with `MOVEFILE_REPLACE_EXISTING`) in the app layer. Done when: killing the process mid-write leaves the old file intact (driven probe).
 - [ ] Settings dialog: vocabulary (Themed or Plain), theme (System, Light, Dark), hotkey, ANSI code page for import, autosave delay. Done when: each change logs one line and takes effect without restart.
+- [ ] **Added 2026-10-04** (ADR 0003): "Start with Windows" (off by default; writes or removes `HKCU\Software\Microsoft\Windows\CurrentVersion\Run` with `--background`; `D05 T02 §6` hides it for a portable copy), the capture hotkey (`D03 T02 §2`), and restoring the open tabs on start (`D01 T02 §6`, through `TabsHost::open_spell_ids()`). The dialog is a `NavigationView` of pages (General, Editor, Hotkeys, and later Privacy and AI) so `D05 T03 §4` and `D06 T01 §2` add pages without reshaping it. Done when: each setting persists, takes effect, and has an AutomationId.
 - [ ] Commit: `"core: the settings store; app: the Settings dialog"`
 
 **Test checkpoint:** Unit test plus driven run with evidence: switch to Plain; every menu and label reads Prompt, Folder, Tag; restart keeps it.
@@ -84,11 +89,11 @@ frozen: true
 
 ## 5. The Accessibility Pass
 
-- [ ] Every control has an accessible name (labels, `SetWindowTextW` on unlabelled controls, or `IAccessible` names through `SetProp`/Dynamic Annotation where needed); focus is always visible; no action needs a mouse. Done when: an Accessibility Insights FastPass run on each window reports no failure.
+- [ ] Every control has an accessible name (labels, `SetWindowTextW` on unlabelled controls, or `IAccessible` names through `SetProp`/Dynamic Annotation where needed); focus is always visible; no action needs a mouse. Done when: `scripts/a11y-scan.ps1` (Axe.Windows CLI, pinned in `toolchain.json`) scans the main window, the popup, the fill-in dialog, and Settings with no error. **Corrected 2026-10-04:** an automated scanner replaces the Accessibility Insights FastPass a person would run; Narrator and the high-contrast look moved to `D99 T01 §10`.
 - [ ] High contrast: system colours are used when `SPI_GETHIGHCONTRAST` is on. Done when: a capture in a high-contrast theme is committed.
 - [ ] Commit: `"app: accessibility pass"`
 
-**Test checkpoint:** Driven run with evidence: the Accessibility Insights FastPass report saved under `docs/captures/accessibility/`; Narrator reads the spell list row, the editor fields, and the popup results.
+**Test checkpoint:** Driven run with evidence: the Axe.Windows reports saved under `docs/captures/accessibility/` with zero errors, and `pwsh scripts/drive.ps1 -Scenario keyboard-only` completes create, find, and cast without a mouse event.
 
 ## Verification
 

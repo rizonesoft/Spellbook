@@ -18,6 +18,9 @@ frozen: true
 ## Inputs
 
 - -> XREF: D03 T01 §5 -- the Cast path this file routes through the fill-in dialog
+- -> XREF: D04 T02 §1 -- rich runes extend §1's parser
+- -> XREF: D03 T02 §3 -- Jump List casts go through §4
+- -> XREF: D06 T01 §5 -- Refine's review uses §6's diff
 
 ## Outcome
 
@@ -41,7 +44,7 @@ frozen: true
 
 ## 1. The Rune Syntax and the Template Parser
 
-A justified default, recorded with its cost of changing: `{{name}}` is a rune; `{{name|default text}}` gives it a default; `{{{{` is a literal `{{`. Names are letters, digits, spaces, `_`, and `-`, trimmed and compared case-insensitively, so `{{ Topic }}` and `{{topic}}` are one rune. The default is the text after the first `|`. Changing the syntax later means a migration of stored bodies, so it is decided here and documented in `docs/user/runes.md`.
+A justified default, recorded with its cost of changing: `{{name}}` is a rune; `{{name|default text}}` gives it a default; `{{{{` is a literal `{{`. Names are letters, digits, spaces, `_`, and `-`, trimmed and compared case-insensitively, so `{{ Topic }}` and `{{topic}}` are one rune. The default is the text after the first `|`. Changing the syntax later means a migration of stored bodies, so it is decided here and documented in `docs/user/runes.md`. **Corrected 2026-10-04:** `D04 T02 §1` extends this syntax for rich runes (a second `|` makes a choice list; `:long`, `@` built-ins, and `>` includes use characters a name cannot contain), so this parser keeps the raw text after the first `|` and treats it whole as the default until `D04 T02 §1` splits it, and its lexer is written to be extended (one segment type with a kind).
 
 - [ ] `src/core/include/spellbook/core/template.hpp`: `parse_template(std::string_view) -> ParsedTemplate` (literal and rune segments, in order) and `runes(const ParsedTemplate&) -> std::vector<TemplateVariable>` (unique, first-seen order, first default wins). Done when: it compiles in core.
 - [ ] Malformed input never throws: an unclosed `{{` is literal text, an empty name is literal text. Done when: tests cover each.

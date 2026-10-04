@@ -9,6 +9,7 @@ Import scrolls: the bulk import of Notepad `.txt` prompt files, the operator's m
 | TODO | Title | Status |
 | ---- | ----- | :----: |
 | [TODO-01](./TODO-01-import-scrolls.md) | Import Scrolls: Bulk Import of Notepad .txt Prompts | draft |
+| [TODO-02](./TODO-02-spell-files-and-duplicates.md) | Spell Files and Duplicates: Share, Open, Find, and Merge | draft |
 
 ## Completed
 

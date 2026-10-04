@@ -10,6 +10,7 @@ Toolchain, build, runners, CI, the TODO system, agent rules, and docs. Nothing h
 | ---- | ----- | :----: |
 | [TODO-01](./TODO-01-skeleton.md) | The M0 Skeleton | active |
 | [TODO-02](./TODO-02-winui-stack.md) | The WinUI 3 Stack: Visual Studio 2026, Windows App SDK, and the Hybrid Build | draft |
+| [TODO-03](./TODO-03-unattended-runner.md) | The Unattended Runner: Contexts, Run Skills, the Run Guard, and the UI Driver | draft |
 
 ## Completed
 

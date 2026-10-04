@@ -23,6 +23,8 @@ frozen: true
 - -> XREF: D02 T01 §3 -- import writes through the folder and prompt operations §1 and §2 add
 - -> XREF: D05 T01 §2 -- the settings store owns the persisted vocabulary choice §4 reads
 - -> XREF: D00 T02 §6 -- the app moves to WinUI 3 (operator decision 2026-10-04); §5 to §7 are retargeted there before they are built
+- -> XREF: D01 T02 §4 -- Delete becomes Move to Trash once the Trash lands
+- -> XREF: D04 T02 §4 -- the smart editor replaces §5's body box
 
 ## Outcome
 
@@ -109,6 +111,8 @@ Every UI label comes from one table, so the themed words (Spell, Chapter, Sigil,
 **Test checkpoint:** Driven run with evidence: with a dev database holding 3 folders and 20 prompts (seeded by a test fixture through `scripts/migrate.ps1`), the window shows all of them; captures at 100 and 150 percent committed under `docs/captures/library/`; the log records no error.
 
 ## 6. Create, Rename, Move, and Delete Commands
+
+**Note 2026-10-04:** `D01 T02 §4` later turns Delete into Move to Trash with Undo (ADR 0003); build Delete here through `LibraryService::remove` only, so that change is one place.
 
 - [ ] Menu bar and accelerators: New spell (Ctrl+N), New chapter (Ctrl+Shift+N), Rename (F2), Delete (Del), Move to chapter (Ctrl+M). Done when: each runs `LibraryService` and the panes refresh.
 - [ ] Delete asks for confirmation naming what and how many ("Delete the chapter 'Code' and its 12 spells?"); Del on a spell with an empty body skips the prompt. Done when: a driven run shows both. Cheaper substitute: a generic "Are you sure?".

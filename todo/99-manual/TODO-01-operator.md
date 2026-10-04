@@ -9,7 +9,7 @@ depends_on: []
 
 # TODO-01 -- Operator Steps
 
-> **Goal:** The steps no agent session can or should take on its own (creating and configuring the GitHub repository, deciding ownership, and accepting the import of real prompts) are listed with exact commands, so they never stall a runner silently.
+> **Goal:** The steps no agent session can or should take on its own (creating and configuring the GitHub repository, installing machine-wide tools, deciding ownership, accepting the import of real prompts, judging what only eyes and ears can judge, approving the release, and anything that needs an account, a secret, or money) are listed with exact commands, so they never stall a runner silently. Every section here is operator-only: `query ready` lists them as runnable elsewhere and an unattended run never starts one (`D00 T03 §1`).
 
 > [!IMPORTANT]
 > **Current state (verified 2026-10-04):** The operator created `https://github.com/rizonesoft/Spellbook` (public, default branch `main`) on 2026-10-04, and `main` is pushed (§1). Labels, security settings, and branch protection (§2) are not applied yet.
@@ -18,6 +18,13 @@ depends_on: []
 
 - -> XREF: D00 T01 §10 -- CI goes green only after §1 pushes
 - -> XREF: D00 T02 §2 -- the toolchain pins that need §5's Visual Studio 2026 workloads
+- -> XREF: D00 T03 §5 -- the checkpoint sweep that moves human-only checks into §10
+- -> XREF: D05 T02 §5 -- the release that waits for §6 and §7
+- -> XREF: D05 T02 §10 -- channel publishing, which needs §8's accounts and secrets
+- -> XREF: D05 T02 §11 -- signing and the Store, which need §9
+- -> XREF: D06 T01 §3 -- the AI features §11 tries with a real key and agent
+- -> XREF: D05 T03 §1 -- backups exist before §3's real import
+- -> XREF: D05 T01 §5 -- the accessibility pass whose Narrator and high-contrast checks §10 takes
 
 ## Outcome
 
@@ -25,6 +32,9 @@ depends_on: []
 - Ownership and branding decisions are recorded in `AGENTS.md`.
 - The operator has accepted the import of their real prompt library.
 - Visual Studio 2026 has the C++ desktop and WinUI workloads.
+- The release candidate has passed a clean-machine check and the operator has approved the v0.1.0 tag in writing.
+- The channel accounts, secrets, signing, and Store account exist when their sections need them.
+- The visual, screen-reader, and live AI checks no agent can judge have been done and recorded.
 
 ## Implementation Order
 
@@ -35,6 +45,13 @@ depends_on: []
 |   3   |   §3    | Accept the import of the real prompt library | D02 T01 §5 |  [ ]   |
 |   4   |   §4    | Confirm ownership, branding, and the publisher | -- |  [ ]   |
 |   5   |   §5    | Install the Visual Studio 2026 C++ and WinUI workloads | -- |  [ ]   |
+|   6   |   §6    | Check the release candidate on a clean machine | D05 T02 §3 |  [ ]   |
+|   7   |   §7    | Approve the v0.1.0 release | §6, §10, §11 |  [ ]   |
+|   8   |   §8    | Channel accounts and secrets: winget, Scoop, Chocolatey | -- |  [ ]   |
+|   9   |   §9    | Code signing and a Partner Center account | -- |  [ ]   |
+|  10   |   §10   | The visual and screen-reader pass | D05 T02 §3 |  [ ]   |
+|  11   |   §11   | Try AI assist with a real key and a real agent | D06 T01 §10 |  [ ]   |
+|  12   |   §12   | Submit Spellbook to the Microsoft Store | D05 T02 §11 |  [ ]   |
 
 ---
 
@@ -53,7 +70,8 @@ depends_on: []
 
 - [ ] Apply `.github/labels.yml` (for each entry: `gh label create "<name>" --color <color> --description "<description>" --force`). Done when: `gh label list` shows every entry.
 - [ ] Enable private vulnerability reporting and Dependabot alerts (Settings, Code security). Done when: the Security tab offers "Report a vulnerability".
-- [ ] Protect `main`: require the `ci` checks (`build-and-test`, `plan-gates`), no force pushes. Done when: a probe PR shows the required checks.
+- [ ] Protect `main`: require the `ci` checks (`build-and-test`, `plan-gates`) for pull requests, no force pushes, no deletion, with repository admins allowed to bypass so an unattended run's direct pushes after each section still land (ADR 0003). Done when: a probe PR shows the required checks and a direct push by the operator's account succeeds.
+- [ ] Set `assets/brand/social-preview.png` as the social preview (Settings, General, Social preview, Edit, Upload an image). Done when: a link to the repository pasted into a chat app shows the teal card.
 - [ ] Commit: none (repository state).
 
 **Test checkpoint:** Driven run: `gh api repos/rizonesoft/Spellbook/branches/main/protection` lists both required checks.
@@ -80,6 +98,71 @@ The stack moves to WinUI 3 on Visual Studio 2026 (operator decision 2026-10-04, 
 - [ ] Commit: none (machine state).
 
 **Test checkpoint:** Driven run: `& "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -version "[18.0,19.0)" -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 Microsoft.VisualStudio.ComponentGroup.WindowsAppSDK.Cpp -property installationPath` prints the VS 2026 path.
+
+## 6. Check the Release Candidate on a Clean Machine
+
+Operator decision 2026-10-04: install tests run unattended on the development PC and in CI (`D05 T02 §8`); a truly clean machine is checked by hand before the release.
+
+- [ ] On a Windows 11 machine (and, if one is at hand, Windows 10 22H2) that has never had Spellbook or the Windows App SDK: download the release candidate's installer from the draft release (`D05 T02 §3`), install for me, import a folder of three `.txt` files, cast a prompt with a rune, open a `.spell` file by double-click, uninstall keeping data; then run the portable ZIP from a USB stick. Done when: each step's result is written here, with Windows' version (`winver`).
+- [ ] Commit: `"todo: record the clean-machine check (D99 T01 §6)"`
+
+**Test checkpoint:** Driven run: the recorded results, every step passing, quoted here.
+
+## 7. Approve the v0.1.0 Release
+
+The tag is irreversible in practice (channels pick it up), so it waits for the operator's own words.
+
+- [ ] Read the draft release notes, the `docs/phase-runs/` closeouts, and the §6, §10, and §11 results; then write "Approved for v0.1.0" with the date and the commit hash here. Done when: the approval line is present.
+- [ ] Commit: `"todo: approve the v0.1.0 release (D99 T01 §7)"`
+
+**Test checkpoint:** Static evidence: the approval line names the commit `D05 T02 §5` tags.
+
+## 8. Channel Accounts and Secrets: winget, Scoop, Chocolatey
+
+- [ ] Create the public repository `rizonesoft/scoop-bucket` with a `bucket/` folder (`gh repo create rizonesoft/scoop-bucket --public --description "Scoop bucket for Rizonesoft apps"`). Done when: it exists.
+- [ ] Create a fine-grained GitHub token with Contents read and write on `rizonesoft/scoop-bucket` and add it as the `SCOOP_BUCKET_TOKEN` secret of `rizonesoft/Spellbook`; create a classic token with `public_repo` for winget pull requests and add it as `WINGET_TOKEN`. Done when: `gh secret list` shows both names.
+- [ ] Create a Chocolatey community account, copy its API key, and add it as `CHOCOLATEY_API_KEY`. Done when: `gh secret list` shows it.
+- [ ] Commit: none (repository state).
+
+**Test checkpoint:** Driven run: `gh secret list --repo rizonesoft/Spellbook` lists `SCOOP_BUCKET_TOKEN`, `WINGET_TOKEN`, and `CHOCOLATEY_API_KEY` (names only).
+
+## 9. Code Signing and a Partner Center Account
+
+Operator decision 2026-10-04: v0.1.0 ships unsigned; the Microsoft Store waits for signing.
+
+- [ ] Choose and set up signing: Azure Artifact Signing (an Azure subscription, a signing account, identity validation for Rizonetech (Pty) Ltd, a certificate profile) or an OV or EV certificate from a CA in the Microsoft Trusted Root Program; record the choice and how `scripts/package.ps1 -Sign` reaches it (secret names only) here. Done when: recorded.
+- [ ] Register a Microsoft Partner Center developer account for Rizonesoft and reserve the name "Spellbook". Done when: the reservation is confirmed.
+- [ ] Commit: `"todo: record the signing setup (D99 T01 §9)"`
+
+**Test checkpoint:** Static evidence: the recorded choice and secret names; the Partner Center reservation confirmation date.
+
+## 10. The Visual and Screen-Reader Pass
+
+The checks an agent cannot judge, moved here by the checkpoint sweep (`D00 T03 §5`): each item names the section it came from.
+
+- [ ] Display scales: run the release candidate at 100, 150, and 200 percent (Settings, Display, Scale) in light and dark; look at the main window, the popup, the fill-in dialog, Settings, and the taskbar and Explorer icons (from `D05 T02 §1`). Done when: anything wrong is filed through `add-todo` and the pass is recorded here.
+- [ ] Narrator: with Narrator on, create, find, and cast a spell using the keyboard only; Narrator must read the spell list rows, the editor fields, the popup results, and the fill-in dialog (from `D05 T01 §5`). Done when: recorded, with gaps filed.
+- [ ] High contrast: one pass with a contrast theme on (from `D05 T01 §5`). Done when: recorded.
+- [ ] Commit: `"todo: record the visual and screen-reader pass (D99 T01 §10)"`
+
+**Test checkpoint:** Driven run: the recorded results; every gap found has a filed section named here.
+
+## 11. Try AI Assist with a Real Key and a Real Agent
+
+Every AI test in the plan runs against mocks, so nothing spends money unattended. This is the live trial.
+
+- [ ] Enter a real OpenRouter key, keep the default cap, and run Refine, Adapt, Write, Rune-ify, Critique, Suggest, and semantic search on ten real spells; note the costs shown. Done when: each feature's outcome and the month's spend are recorded.
+- [ ] Add one ACP agent from the registry (for example the Claude agent through `npx`) and run Refine and Critique through it. Done when: recorded, including any sign-in step the agent needed.
+- [ ] Commit: `"todo: record the live AI trial (D99 T01 §11)"`
+
+**Test checkpoint:** Driven run: the recorded outcomes; anything broken is filed through `add-todo` and named here.
+
+## 12. Submit Spellbook to the Microsoft Store
+
+- [ ] In Partner Center, create the EXE app submission from `packaging/store/` (`D05 T02 §11`): the signed installer's versioned HTTPS URL, silent switches, listing text, screenshots, age rating, and privacy statement; submit for certification. Done when: certification passes and the listing URL is recorded here.
+- [ ] Commit: `"todo: record the Microsoft Store listing (D99 T01 §12)"`
+
+**Test checkpoint:** Driven run: the Store listing URL opens and offers Install.
 
 ## Verification
 

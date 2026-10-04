@@ -9,6 +9,7 @@ Finding and using prompts: full-text search, tags (Sigils), favourites, sorting,
 | TODO | Title | Status |
 | ---- | ----- | :----: |
 | [TODO-01](./TODO-01-find-and-cast.md) | Find and Cast: Search, Sigils, Favourites, the Clipboard, and the Quick-Search Popup | draft |
+| [TODO-02](./TODO-02-capture-and-jump-list.md) | Capture and the Jump List | draft |
 
 ## Completed
 

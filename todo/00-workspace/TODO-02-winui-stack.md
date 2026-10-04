@@ -25,6 +25,7 @@ depends_on: []
 - -> XREF: D99 T01 §5 -- the operator installs the VS 2026 C++ and WinUI workloads
 - -> XREF: D01 T01 §5 -- the first M1 surface, which builds on the WinUI shell from §3
 - -> XREF: D05 T02 §1 -- the approved icon (`assets/spellbook.ico`), which the WinUI shell uses for the window, taskbar, and Explorer
+- -> XREF: D00 T03 §4 -- the UI driver that drives the WinUI shell from §3
 
 ## Outcome
 

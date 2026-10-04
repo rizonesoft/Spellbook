@@ -1,15 +1,17 @@
 # 05 Ship
 
-> **Phase 5 (M5)**
+> **Phases 0, 2, 5, 7, 8 (M0, M2, M5, M7, channels)**
 
-Polish and the first release: dark mode, settings, export and backup, accessibility, the installer, and v0.1.0.
+Polish, safety, and shipping: the icon, dark mode, settings and privacy, backups and crash recovery, the update check, first run, export and restore, accessibility, portable mode, the installer, v0.1.0, and the package channels.
 
 ## TODOs
 
 | TODO | Title | Status |
 | ---- | ----- | :----: |
 | [TODO-01](./TODO-01-polish.md) | Polish: Dark Mode, Settings, Export, Backup, and Accessibility | draft |
-| [TODO-02](./TODO-02-first-release.md) | The First Release: Icon, Installer, Release Pipeline, and v0.1.0 | draft |
+| [TODO-02](./TODO-02-first-release.md) | The First Release: Icon, Installer, Portable Mode, Channels, and v0.1.0 | draft |
+| [TODO-03](./TODO-03-safety-nets.md) | Safety Nets: Automatic Backups, Restore, Crash Recovery, and the Update Check | draft |
+| [TODO-04](./TODO-04-first-run.md) | First Run: the Starter Grimoire, the Welcome Tour, About, and What's New | draft |
 
 ## Completed
 

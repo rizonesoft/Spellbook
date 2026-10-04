@@ -9,6 +9,7 @@ Runes (`{{name}}` template variables), the fill-in dialog, revisions, and diff.
 | TODO | Title | Status |
 | ---- | ----- | :----: |
 | [TODO-01](./TODO-01-runes-and-revisions.md) | Runes and Revisions: Templates, the Fill-In Dialog, Version History, and Diff | draft |
+| [TODO-02](./TODO-02-rich-runes-and-smart-editor.md) | Rich Runes, Spell Composition, and the Smart Editor | draft |
 
 ## Completed
 

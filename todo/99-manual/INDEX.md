@@ -1,6 +1,6 @@
 # 99 Manual
 
-> **Phases 0, 2, 5**
+> **Phases 0, 2, 5, 7, 8**
 
 Operator-only steps: the GitHub repository and its settings, ownership and branding, and accepting the import of real prompts. Numbered apart from the allocation sequence, as in Isotone and ScratchPad.
 

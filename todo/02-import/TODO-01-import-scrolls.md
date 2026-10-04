@@ -20,6 +20,8 @@ frozen: true
 - [`src/core/include/spellbook/core/text.hpp`](../../src/core/include/spellbook/core/text.hpp) -- the UTF-8 validity check §1 builds on
 - Notepad's encodings (Windows 11): UTF-8 (default since 2019), UTF-8 with BOM, UTF-16 LE and BE with BOM, and ANSI (the user's code page, Windows-1252 on English systems)
 - -> XREF: D01 T01 §2 -- folder creation and prompt creation this import writes through
+- -> XREF: D02 T02 §2 -- `.spell` files import through §3's batch commit
+- -> XREF: D05 T04 §2 -- the welcome page opens Import scrolls
 
 ## Outcome
 
@@ -34,7 +36,7 @@ frozen: true
 | :---: | :-----: | ----------- | ---------- | :----: |
 |   1   |   §1    | Encoding detection and decoding in core | D00 T01 §3 |  [ ]   |
 |   2   |   §2    | The import planner: titles, chapters, duplicates | §1, D01 T01 §3 |  [ ]   |
-|   3   |   §3    | Migration 0002 and the transactional batch commit | §2, D01 T01 §2 |  [ ]   |
+|   3   |   §3    | The import batches migration and the transactional batch commit | §2, D01 T01 §2 |  [ ]   |
 |   4   |   §4    | The Import scrolls preview dialog | §3, D01 T01 §5 |  [ ]   |
 |   5   |   §5    | Undo last import, the report, and the user guide | §4 |  [ ]   |
 
@@ -62,15 +64,17 @@ Detection order, as Notepad itself reads: a BOM wins (EF BB BF is UTF-8; FF FE i
 
 **Test checkpoint:** Unit test: `pwsh scripts/test.ps1 -Filter "core: .*import"` passes.
 
-## 3. Migration 0002 and the Transactional Batch Commit
+## 3. The Import Batches Migration and the Transactional Batch Commit
+
+**Corrected 2026-10-04:** migrations added by `D01 T02` (Trash, metadata) run earlier in the plan, so this section's migration takes the next free number when it runs instead of a fixed `0002`.
 
 Undo needs to know which rows an import created, so the schema gains an `import_batches` table and a nullable `prompts.import_batch_id`. This is the first migration after 0001 and follows `.claude/skills/add-migration/SKILL.md`.
 
-- [ ] `migrations/0002_import_batches.sql`: `import_batches(id, source_root, started_at, file_count)`, `ALTER TABLE prompts ADD COLUMN import_batch_id INTEGER REFERENCES import_batches(id) ON DELETE SET NULL`, and an index. Done when: `storage: migrate takes a new database to the latest version` passes at version 2, and a version-1 database fixture upgrades with its rows intact.
+- [ ] the next free migration (`migrations/NNNN_import_batches.sql`): `import_batches(id, source_root, started_at, file_count)`, `ALTER TABLE prompts ADD COLUMN import_batch_id INTEGER REFERENCES import_batches(id) ON DELETE SET NULL`, and an index. Done when: `storage: migrate takes a new database to the latest version` passes at version 2, and a version-1 database fixture upgrades with its rows intact.
 - [ ] `commit_import(const ImportPlan&, root chapter) -> ImportResult` on the repository: one `BEGIN IMMEDIATE` transaction creates chapters as needed, inserts every accepted row with the batch id, and commits. Done when: tests assert counts and that a failure mid-way leaves no rows and no batch.
-- [ ] Commit: `"storage: import batches (migration 0002) and the transactional import commit"`
+- [ ] Commit: `"storage: import batches and the transactional import commit (D02 T01 §3)"`
 
-**Test checkpoint:** Unit test: the commit and rollback cases pass; a committed version-1 fixture database upgrades to version 2 and keeps every prompt.
+**Test checkpoint:** Unit test: the commit and rollback cases pass; a committed fixture database from the previous schema version upgrades to the new latest version and keeps every prompt.
 
 **Freeze check:** killing the process during `commit_import` (simulated by a throwing hook between inserts) leaves the database byte-identical in content to before the import.
 

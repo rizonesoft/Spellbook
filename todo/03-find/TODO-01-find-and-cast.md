@@ -19,6 +19,11 @@ depends_on: []
 - SQLite FTS5 documentation (https://sqlite.org/fts5.html): query syntax, `bm25()`, `snippet()`, prefix queries
 - Microsoft Learn: `RegisterHotKey`, `OpenClipboard` / `SetClipboardData(CF_UNICODETEXT)`, `SetForegroundWindow` rules
 - -> XREF: D04 T01 §4 -- Cast of a template opens the fill-in dialog this file's copy path hands to
+- -> XREF: D01 T02 §2 -- search excludes trashed spells
+- -> XREF: D02 T02 §2 -- `.spell` imports create tags through §2
+- -> XREF: D03 T02 §2 -- capture reuses §6's hotkey and popup infrastructure
+- -> XREF: D05 T04 §2 -- the tour teaches §6's hotkey
+- -> XREF: D06 T01 §9 -- semantic search joins §4's search box
 
 ## Outcome
 

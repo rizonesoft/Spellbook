@@ -9,6 +9,7 @@ The library: prompts (Spells) and folders (Chapters), the three-pane window, the
 | TODO | Title | Status |
 | ---- | ----- | :----: |
 | [TODO-01](./TODO-01-library-crud.md) | The Library: Spells, Chapters, the Editor, and Autosave | draft |
+| [TODO-02](./TODO-02-premium-library.md) | The Premium Library: Single Instance, Trash, Spell Metadata, and Tabs | draft |
 
 ## Completed
 
