@@ -41,10 +41,11 @@ depends_on: []
 | :---: | :-----: | ----------- | ---------- | :----: |
 |   1   |   §1    | ADR 0002 and the decision record | -- |  [x]   |
 |   2   |   §2    | The Visual Studio 2026 toolchain pins and the setup leg | §1, D99 T01 §5 |  [x]   |
-|   3   |   §3    | The WinUI 3 shell in the hybrid build | §2 |  [ ]   |
-|   4   |   §4    | Runners, CI, and the portable package on the new stack | §3, D00 T01 §10 |  [ ]   |
-|   5   |   §5    | The winui-patterns skill, the UI standard, and the architecture doc | §3 |  [ ]   |
-|   6   |   §6    | Retarget the open UI sections of the plan to WinUI | §5 |  [ ]   |
+|   3   |   §7    | Provision missing WinUI tools on disposable CI runners | §2 |  [x]   |
+|   4   |   §3    | The WinUI 3 shell in the hybrid build | §2, §7 |  [ ]   |
+|   5   |   §4    | Runners, CI, and the portable package on the new stack | §3, D00 T01 §10 |  [ ]   |
+|   6   |   §5    | The winui-patterns skill, the UI standard, and the architecture doc | §3 |  [ ]   |
+|   7   |   §6    | Retarget the open UI sections of the plan to WinUI | §5 |  [ ]   |
 
 ---
 
@@ -143,6 +144,23 @@ Open sections still name Win32 controls and messages, and the plan forbids silen
 - [ ] Commit: `"todo: retarget the open ui sections to winui (D00 T02 §6)"`
 
 **Test checkpoint:** Static evidence: `grep -rn "HWND\|WM_\|EN_CHANGE\|Common Controls\|DarkMode_Explorer" todo/0[1-5]*` prints only lines that name a recorded interop reason, and `python scripts/todo-graph.py validate` is clean.
+
+## 7. Provision Missing WinUI Tools on Disposable CI Runners
+
+Forward repair for §2: hosted CI run 37807805365 for `5a88f0ec8bc75feca4d68307fe88edd20cee38f5` failed at setup because its VS 2026 Enterprise installation lacks `WindowsAppSdkSupport.Cpp`. Local setup must continue to refuse machine-wide installation. A separate runner bootstrap may provision the missing component only on an explicitly identified GitHub-hosted disposable VM, before the unchanged setup verification.
+
+- [x] `scripts/setup-ci.ps1`: refuse local and self-hosted execution, locate the existing VS 2026 C++ installation, add only the missing WinUI C++ component through the installed VS Installer, wait for completion, check the exit code, and repeat component discovery. Done when: a successful exit without the component still fails and an already complete installation is left alone.
+- [x] `scripts/test-setup-ci.ps1`: exercise guard rejection, missing base tools, idempotence, installer failure, and post-install discovery with mocks that never invoke the installer. Add the probe to `scripts/check-all.ps1` and CI. Done when: every branch passes and local machine installation is never invoked.
+- [x] `.github/workflows/ci.yml` and `release.yml`: call the guarded bootstrap before `scripts/setup.ps1`. Done when: an isolated candidate branch's hosted CI gets past the original missing-component failure and completes successfully for the exact candidate commit; actionlint passes. Do not tag or run release publication.
+- [x] `docs/dev/build.md`, `docs/reference-conventions.md`, and `CHANGELOG.md`: distinguish disposable hosted provisioning from operator-owned local setup. Done when: the scope and failure behavior match the runner.
+- [x] Commit: `"ci: provision missing winui tools on hosted runners (D00 T02 §7)"`
+
+**Test checkpoint:** Driven run: `pwsh scripts/test-setup-ci.ps1` passes all guard/provisioning tests; the original failure is preserved in `build/toolchain-evidence/ci-37807805365-failed.log`; hosted `ci.yml` succeeds on the isolated candidate branch with its exact SHA recorded. `pwsh scripts/check-all.ps1` exits 0. No local installer invocation, self-hosted machine change, tag, or release publication occurs.
+
+> **Verified:** 2026-10-08 | §7 | Independent `pwsh scripts/check-all.ps1` exited 0: "check-all: all gates passed", all 23 gates PASS, "100% tests passed out of 29" in both Debug and Release, Release smoke exit 0, actionlint PASS, "todo-graph validate: 17 files, 121 sections, 0 fatal, 0 warnings", and "plan --check: current". Independent `pwsh scripts/test-setup-ci.ps1` exited 0: "setup-ci tests: 10 passed", including "PASS: local execution is refused before installation" and self-hosted refusal. Evidence: `build/reviews/d00-t02-s7-9285/stage1-check-all.log`, `stage1-check-all.exit.txt`, `stage1-checkpoint.log`, and `stage1-checkpoint.exit.txt`; writer suite: `build/codex/d00-t02-s7-check-all.log`. Direct local refusal is preserved in `build/toolchain-evidence/setup-ci-local-refusal.log`; no real local installer was invoked. Original exact-base hosted failure remains in `build/toolchain-evidence/ci-37807805365-failed.log`. Isolated probe commit `e894946fda838ed335d242c3706032af147775ac` on `probe/codex-winui-ci-9285` completed hosted CI run 37808412174 successfully for that exact SHA: "setup-ci: WinUI C++ component verified (installer exit 0)", normal setup green, 29 tests per configuration, and smoke exit 0. Full hosted log: `build/toolchain-evidence/ci-37808412174.log`; readback: `stage1-hosted-live.json` in the review directory. `hosted-proof.json` and `stage1-probe-equality.json` prove that `scripts/setup-ci.ps1`, `scripts/test-setup-ci.ps1`, `scripts/check-all.ps1`, `.github/workflows/ci.yml`, and `.github/workflows/release.yml` equal the hosted commit byte-for-byte; native installer argument construction was exercised by that hosted run. All 191 candidate paths/hashes matched before and after Stage 1 and again before finalization. Preserve the probe branch as evidence; never merge it. No tag or release publication occurred.
+> **Implementer:** Codex (gpt-6-astra).
+> **Reviewer:** Codex gpt-6-astra, effort high, CLI 0.161.0, provider openai, session `01a11c5b-69c8-7150-af87-15de6cda9a53`; APPROVE for base `5a88f0ec8bc75feca4d68307fe88edd20cee38f5` plus `build/reviews/d00-t02-s7-9285/candidate.json`, manifest SHA-256 `2bb433fe9ceb07ea757475d789973930f1ec13797fcdd052298e7dce2c7ab185`, tracked diff SHA-256 `a384d247206e2d266e777b3b596bf27e1785bf4f64d42cecc8862cff1984a1cd`, including both untracked source scripts. Reports: `stage1-review.md` and `codex-review.md`; CLI exit 0 in `codex-exit.txt`; global-configured runtime verified in `stage1-runtime.json`, `codex-cli.log`, and `runtime-identities.json`, all in that review directory. This exact reviewer session confirmed both approvals and the unchanged manifest before finalizing only the stamp and derived plan metadata.
+> **Second reviewer:** Claude claude-sonnet-5-5, alias sonnet, effort high (`--model sonnet --effort high`), CLI 2.1.294, provider firstParty, session `5dc332ff-b881-4db3-b84c-4c15ce3dc927`; APPROVE for the same candidate. Report: `build/reviews/d00-t02-s7-9285/sonnet-review.json`; success, non-error, completed, exit 0 (`sonnet-exit.txt`), no fallback model. Runtime, invocation, routing preflight, and official alias/minimum-CLI source receipt: `runtime-identities.json` in that directory. Non-blocking observations establish no missing requirement; hosted proof covers native argument construction.
 
 ## Verification
 

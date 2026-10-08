@@ -6,6 +6,10 @@ The format follows [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/
 
 ## [Unreleased]
 
+### Fixed
+
+- Provision missing WinUI C++ tools on disposable GitHub-hosted runners before setup; local and self-hosted installation remains operator-owned.
+
 ### Added
 
 - VS 2026 v145 and WinUI C++ toolchain checks, pinned NuGet provisioning, and Windows App SDK/C++/WinRT package pins for the upcoming WinUI shell.
