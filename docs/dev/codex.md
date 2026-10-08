@@ -78,6 +78,8 @@ Each section runs its exact checkpoint and full gates, receives both reviews des
 
 ## Review order for either primary writer
 
+Full automated visual acceptance is required for UI work and is planned in `D00 T03 §4`, `D00 T03 §9`, and `D00 T03 §5`. It includes driven scenarios, actual DPI/theme/state coverage, capture/comparison evidence, and independent inspection of the images by both reviewers. Those sections are currently open: the runner audit and existing 21 checks establish infrastructure readiness, not visual readiness. The Phase 0 bootstrap shell must be covered by the visual gate before later UI feature acceptance; a supplementary human release pass cannot replace it.
+
 1. A new Codex CLI session performs the full independent review and reruns the checkpoint and repository gates. Its model and reasoning effort come from the operator's global Codex configuration automatically. The invocation supplies no model, effort, profile, or alternate configuration home; repository config does not pin them. Record the effective values from the runtime, not the parent writer's identity.
 2. A new Claude CLI session performs a quick second pass with `--model sonnet --effort high`. The rolling alias avoids a version pin. Quick refers to reviewing the changed scope and nearby contracts; it does not reduce effort or waive a verdict. Record the resolved model from Claude's runtime JSON, CLI version, and explicit high-effort invocation.
 3. Both must approve the same candidate. The exact independent Codex reviewer session then checks the Sonnet evidence and writes the final stamp. Findings return to the writer; implementation changes require both reviews again. Missing reviewers, incomplete evidence, or unavailable models block shipping.

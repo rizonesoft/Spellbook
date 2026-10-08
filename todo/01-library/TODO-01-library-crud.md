@@ -41,7 +41,7 @@ frozen: true
 |   2   |   §2    | Folder tree operations in the repository | §1 |  [ ]   |
 |   3   |   §3    | LibraryService: rules, clock, and the autosave policy | §2 |  [ ]   |
 |   4   |   §4    | The vocabulary string table | D00 T01 §3 |  [ ]   |
-|   5   |   §5    | The three-pane main window | §3, §4, D00 T02 §6 |  [ ]   |
+|   5   |   §5    | The three-pane main window | §3, §4, D00 T02 §6, D00 T03 §5 |  [ ]   |
 |   6   |   §6    | Create, rename, move, and delete commands | §5 |  [ ]   |
 |   7   |   §7    | Autosave wiring and the status bar | §6 |  [ ]   |
 |   8   |   §8    | The library user guide | §7 |  [ ]   |
@@ -97,6 +97,8 @@ Every UI label comes from one table, so the themed words (Spell, Chapter, Sigil,
 **Test checkpoint:** Unit test: the vocabulary cases pass; adding a `Term` without labels fails the completeness case.
 
 ## 5. The Three-Pane Main Window
+
+**Corrected 2026-10-08:** Depend on `D00 T03 §5`, which follows the full automated visual matrix/image acceptance gate in `D00 T03 §9`. Do not accept this first feature UI, or its dependent surfaces, with only launch smoke, unreviewed screenshots, or a manual visual pass. Its checkpoint must include the automated scenario and image evidence established by that prerequisite.
 
 **Job:** the user can browse their chapters and spells and read or edit one spell.
 **Treatment:** a TreeView (Chapters), a ListView in report mode (Spells: title, updated), and an editor pane (title edit, multi-line body edit, description edit) separated by draggable splitters, all sized in DIPs. Cheaper substitute that fails the checkpoint: a single list with a modal edit dialog.

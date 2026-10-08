@@ -2,7 +2,7 @@
 
 The order to run every section in, from the M0 skeleton through the premium first release, v0.1.0, to the package channels after it.
 
-> **Progress:** **18 of 119 sections complete (15%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
+> **Progress:** **18 of 120 sections complete (15%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
 
 Seeded 2026-10-04 by the initialisation session from the project brief (milestones M0 to M5) and the conventions of Isotone, Resolute, and ScratchPad (recorded in [`../docs/reference-conventions.md`](../docs/reference-conventions.md)).
 
@@ -78,6 +78,7 @@ Everything later builds on a toolchain that provisions itself, a build with warn
 | [ ] | `D00 T02 §4` | Runners, CI, and the portable package on the new stack | 7 |
 | [ ] | `D00 T02 §5` | The winui-patterns skill, the UI standard, and the architecture doc | 5 |
 | [ ] | `D00 T02 §6` | Retarget the open UI sections of the plan to WinUI | 6 |
+| [ ] | `D00 T03 §9` | Automated visual matrix, image review, and acceptance gate | 7 |
 | [ ] | `D00 T03 §5` | Unattended proof rules and the checkpoint sweep | 3 |
 | [ ] | `D05 T02 §1` | The designed icon and the README banner | 4 |
 

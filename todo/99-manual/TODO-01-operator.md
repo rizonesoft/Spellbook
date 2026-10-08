@@ -146,7 +146,7 @@ Operator decision 2026-10-04: v0.1.0 ships unsigned; the Microsoft Store waits f
 
 ## 10. The Visual and Screen-Reader Pass
 
-The checks an agent cannot judge, moved here by the checkpoint sweep (`D00 T03 §5`): each item names the section it came from.
+**Corrected 2026-10-08:** This is supplementary human release feedback. The automated visual matrix and image review in `D00 T03 §9` own required visual/DPI/theme acceptance; `D00 T03 §5` must not move that coverage here or accept this pass as its substitute. Retain the checks below for human usability feedback, physical-device experience, and spoken-Narrator assessment alongside automated keyboard/accessibility-tree tests. Each item names the section it came from.
 
 - [ ] Display scales: run the release candidate at 100, 150, and 200 percent (Settings, Display, Scale) in light and dark; look at the main window, the popup, the fill-in dialog, Settings, and the taskbar and Explorer icons (from `D05 T02 §1`). Done when: anything wrong is filed through `add-todo` and the pass is recorded here.
 - [ ] Narrator: with Narrator on, create, find, and cast a spell using the keyboard only; Narrator must read the spell list rows, the editor fields, the popup results, and the fill-in dialog (from `D05 T01 §5`). Done when: recorded, with gaps filed.
