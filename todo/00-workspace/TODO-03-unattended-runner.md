@@ -43,6 +43,8 @@ depends_on: []
 |   4   |   §4    | The UI driver for driven runs | D00 T02 §3 |  [ ]   |
 |   5   |   §5    | Unattended proof rules and the checkpoint sweep | §4, D00 T02 §6 |  [ ]   |
 
+|   6   |   §6    | Independent Codex writer workflow and supervised runner | §1, §2, §3 |  [x]   |
+
 ---
 
 ## 1. Operator-Only Work in the Graph: Runnable Now and Elsewhere
@@ -110,6 +112,24 @@ The proof table assumed a person. This section rewrites it for an agent and fixe
 - [ ] Commit: `"todo: unattended proof rules and the checkpoint sweep (D00 T03 §5)"`
 
 **Test checkpoint:** Static evidence: the grep above, quoted; `python scripts/todo-graph.py validate` clean; `python scripts/todo-graph.py query ready` lists no operator-only work as runnable now.
+
+## 6. Independent Codex Writer Workflow and Supervised Runner
+
+Operator decision 2026-10-08: make Codex the primary writer, with separate skills, hooks, instructions, configuration, and state. Share scripts conservatively only when they are agent-neutral repository gates. Existing Claude skills, lifecycle hooks, settings, and run records remain independent; turn `CLAUDE.md` into standalone instructions so it no longer imports the Codex writer contract.
+
+- [x] Assign Codex the writer role in `AGENTS.md` and preserve the Claude workflow in standalone `CLAUDE.md`. Done when: neither instruction file imports the other and both forbid concurrent writers.
+- [x] Add independent Codex-discoverable skills under `.agents/skills/`. Done when: all fourteen contracts resolve locally, preserve section checkpoints and fresh-context review, and never call Claude tools or load Claude skills.
+- [x] Add `.codex/scripts/campaign.py` and `run-plan.ps1`. Done when: the supervisor locks out concurrent Codex runs, checks the plan in agent context, resumes only its recorded session, preserves pause and recovery evidence, and stops after bounded failures or lack of progress. Cheaper substitute: an unbounded loop that resumes the latest unrelated session.
+- [x] Add `.codex/hooks.json`, `.codex/hooks/`, and independent `.codex/githooks/`. Done when: native Stop and Interrupt events respect ownership and pause, unrelated sessions pass, and Codex commits validate the staged tree without changing Claude's hook configuration.
+- [x] Add `.codex/tests/` and `.codex/scripts/check-workflow.py`, wire them into repository gates and CI, and validate both skill trees through `scripts/todo-graph.py`. Done when: regression cases cover guard ownership, no work, closeout, phase scope, stall, pause/resume, CLI failures, and isolation.
+- [x] Document invocation, trust, recovery, limitations, and the shared-script boundary in `docs/dev/codex.md` and update `CHANGELOG.md`. Done when: a fresh Codex session can audit and start the runner from the documented commands without assuming Claude tools or automatically activating a campaign.
+- [x] Commit: `"workspace: establish an independent Codex writer workflow (D00 T03 §6)"`
+
+**Test checkpoint:** `python .codex/scripts/check-workflow.py`, `python -m unittest discover -s .codex/tests -v`, `pwsh .codex/scripts/run-plan.ps1 -Action audit`, and `pwsh scripts/check-all.ps1` exit 0; an independent reviewer verifies the candidate and quotes the results. Use temporary fixtures for campaign mutation and CLI simulation; setup must not start real plan execution.
+
+> **Verified:** 2026-10-08 | §6 | Independent review of base `fcc2b83a0702a2039d78b2cd66675654d24962df` plus all tracked and untracked candidate changes. `python .codex/scripts/check-workflow.py`: "codex workflow: 14 skills, 0 findings", exit 0; `python -m unittest discover -s .codex/tests -v`: "Ran 22 tests in 15.832s", "OK", exit 0 (`build/review-codex-campaign-tests.log`); `pwsh .codex/scripts/run-plan.ps1 -Action audit`: "7 runnable now, 3 runnable elsewhere", "codex campaign: audit passed; no run started", exit 0 (`build/review-codex-audit.log`); independent `pwsh scripts/check-all.ps1`: all 19 gates PASS, "check-all: all gates passed", exit 0 (`build/review-check-all-codex-writer.log`). Regression cases prove exact-session resume, pause preservation, worker ownership after supervisor interruption, exclusion of committed run-record chatter from progress, bounded failures, phase scope, and unrelated-session isolation. Native hook transport was tested with temporary fixtures; project hook trust remains an operator/session prerequisite, and no real implementation campaign was started.
+> **Implementer:** Codex (GPT-6; exact model ID unavailable).
+> **Reviewer:** Independent fresh-context Codex reviewer (GPT-6; exact model ID unavailable).
 
 ## Verification
 

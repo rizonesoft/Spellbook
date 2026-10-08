@@ -5,6 +5,7 @@
 | [User guide](user/README.md) | People using Spellbook | Where your data lives, the vocabulary, what works today |
 | [Architecture](architecture.md) | Contributors | The three layers, startup, storage and migrations, the Win32 shell |
 | [Building](dev/build.md) | Contributors | The toolchain, building, testing, the gates, CI, troubleshooting |
+| [Codex workflow](dev/codex.md) | Maintainers | Primary writer, isolated automation, independent review, and recovery |
 | [Decisions](adr/0001-tech-stack.md) | Anyone asking "why" | ADR 0001: the tech stack, the alternatives, and the packaging choice |
 | [Reference conventions](reference-conventions.md) | Maintainers | What Spellbook copied from Isotone, Resolute, and ScratchPad, and every divergence |
 | [Captures](captures/) | Reviewers | Screenshots recorded as evidence by plan sections |

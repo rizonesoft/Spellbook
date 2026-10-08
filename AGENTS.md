@@ -1,6 +1,14 @@
 # AGENTS.md
 
-Agent instructions for this repository. Human orientation lives in `README.md`. Claude Code loads this file through the `CLAUDE.md` import stub.
+Codex is the primary writer and implementation owner for this repository. Human orientation lives in `README.md`. Claude Code has independent instructions in `CLAUDE.md`; it does not import this file.
+
+Never run concurrent writers in this checkout. A session that launches the Codex supervisor monitors it; only the supervised worker writes implementation. Independent reviewers inspect and test without modifying implementation.
+
+Codex uses only `.agents/skills/` and `.codex/` automation. Skills, lifecycle hooks, Git hooks, configuration, and runtime state are independently maintained files, never symlinked, imported, or automatically synchronized across agents. Shared repository build/test/format/lint/TODO scripts remain agent-neutral; keep agent-specific orchestration under its own agent directory. See `docs/dev/codex.md`.
+
+The writer cannot approve its own work. Use a fresh-context Codex reviewer subagent, given only the section reference and candidate diff, for every implemented section. Record the actual implementer and reviewer model identities when available; never invent them. An unavailable reviewer blocks stamping and shipping.
+
+Preserve user side changes. Before staging or committing, inspect `git status --short` and enough diff/content to understand every dirty file. Include small, safe, non-secret, non-generated side edits in the coherent commit. Stop only for a concrete conflict or unsafe change; never discard user edits. On Windows use `exec_command` with `tty: true` and hidden background processes.
 
 ## What this project is
 
@@ -20,8 +28,10 @@ Agent instructions for this repository. Human orientation lives in `README.md`. 
 | `todo/implementation-plan.md` | Phases 0 to 5 (milestones M0 to M5); boxes derived by `scripts/todo-graph.py plan --sync` |
 | `standards/` | Coding, UI, testing, and release standards |
 | `docs/` | Architecture, ADRs, the reference conventions, the developer build guide, and the user guide |
-| `.claude/` | Skills under `skills/<name>/SKILL.md`, and settings |
-| `tools/githooks/` | `pre-commit` (validates the staged TODO tree) and `commit-msg` (strips AI attribution) |
+| `.agents/skills/` | Codex-only skills, discovered by Codex |
+| `.codex/` | Codex-only hooks, configuration, supervisor, and tests |
+| `.claude/` | Independent Claude Code workflow |
+| `.codex/githooks/` | `pre-commit` (validates the staged TODO tree) and `commit-msg` (strips AI attribution) |
 | `artifacts/` | Build output (every preset builds under `artifacts/build/<preset>/`); ignored, never authoritative |
 | `build/` | Scratch: logs, smoke data, dev databases; ignored, never authoritative |
 | `.tools/` | The provisioned toolchain and the vcpkg binary cache; ignored |
@@ -73,7 +83,7 @@ core  <-  storage  <-  app
 
 ## Choose the work contract
 
-Use the skill under `.claude/skills/` that fits: capture work through `add-todo`, author a file through `create-todo`, build a section through `process-todo-section`, stamp it through `review-todo-section`. To run the plan unattended, `process-plan` (which chains `process-phase` and guards the session with a Stop hook); close a finished file with `process-todo-file`; harden the tree before a long run with `groom-plan`. Run records live in `docs/phase-runs/`. For the engineering itself: `build-and-test`, `add-feature` (core, then storage, then UI, then tests, docs, and the plan), `fix-bug`, `add-migration`, `win32-ui-patterns`, and `release`.
+Use the Codex skill under `.agents/skills/` that fits: capture work through `add-todo`, author a file through `create-todo`, build a section through `process-todo-section`, stamp it through `review-todo-section`. To run the plan unattended, `process-plan` (which chains `process-phase` inside the Codex supervisor, with separate native Stop and Interrupt hooks); close a finished file with `process-todo-file`; harden the tree before a long run with `groom-plan`. Codex run records live in `docs/codex-runs/`. For the engineering itself: `build-and-test`, `add-feature` (core, then storage, then UI, then tests, docs, and the plan), `fix-bug`, `add-migration`, `win32-ui-patterns`, and `release`.
 
 **One section = one commit.** Each section must be executable with zero conversation context.
 
@@ -108,7 +118,7 @@ Trunk-based `main`. Messages are `<area>: <imperative lowercase summary>`, the c
 
 ## The commit hooks
 
-`tools/githooks/pre-commit` refuses a commit whose **staged** tree fails `python scripts/todo-graph.py validate`, checked in a temp checkout of the index. `tools/githooks/commit-msg` strips AI-assistant attribution (`Co-Authored-By:` trailers naming an assistant, "Generated with" footers), as in Isotone; keep `.claude/settings.json`'s `includeCoAuthoredBy: false` and empty `attribution`. Both hooks are POSIX shell with LF endings and mode `100755`; `pwsh scripts/setup.ps1` points `core.hooksPath` at `tools/githooks`. A red hook is a defect to fix, never a gate to skip.
+`.codex/githooks/pre-commit` validates the staged TODO tree and Codex workflow layout. `.codex/githooks/commit-msg` strips AI attribution. They are independent executable LF files. Use `git -c core.hooksPath=.codex/githooks commit ...` for every Codex commit; do not change the clone-wide hook setting or bypass hooks. Repository setup retains the separate legacy hook path for Claude and human use. A red hook is a defect to fix.
 
 ## Validation
 

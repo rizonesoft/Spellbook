@@ -27,7 +27,7 @@ It accepts a `DNN TNN §N` ref or a row pasted from `todo/implementation-plan.md
 
 ## Step 1: read
 
-The section, its file's Goal, Current state, and Inputs, every dependency's stamp, `CLAUDE.md`, and the standards the section touches. For engineering steps, the matching skill: `add-feature`, `add-migration`, `win32-ui-patterns`, `fix-bug`.
+The section, its file's Goal, Current state, and Inputs, every dependency's stamp, `AGENTS.md`, and the standards the section touches. For engineering steps, the matching skill: `add-feature`, `add-migration`, `win32-ui-patterns`, `fix-bug`.
 
 ## Step 2: fact-check the plan
 
@@ -61,3 +61,5 @@ and commit once, with the section's `Commit:` message and the ref: `<area>: <sum
 - Do not tick an item whose `Done when:` you have not observed.
 - Do not stamp your own work without the review step.
 - Anything genuinely unshippable now is filed through `add-todo` with an owner, and recorded as a `Deferred:` line naming that owner.
+
+Codex owns this independent skill. Use `git -c core.hooksPath=.codex/githooks commit` for commits; inspect every dirty file first and preserve safe user side edits.
