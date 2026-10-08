@@ -45,6 +45,8 @@ jobs:
           path: .vcpkg-cache
           key: vcpkg-v1-${{ runner.os }}-${{ hashFiles('vcpkg.json', 'toolchain.json') }}
           restore-keys: vcpkg-v1-${{ runner.os }}-
+      - name: Provision hosted WinUI C++ tools
+        run: ./scripts/setup-ci.ps1
       - name: Toolchain (scripts/setup.ps1)
         run: |
           New-Item -ItemType Directory -Force -Path $env:VCPKG_DEFAULT_BINARY_CACHE | Out-Null
@@ -52,7 +54,9 @@ jobs:
       - name: Format check
         run: ./scripts/format.ps1 -Check
       - name: Toolchain rejection probes
-        run: ./scripts/test-toolchain.ps1
+        run: |
+          ./scripts/test-toolchain.ps1
+          ./scripts/test-setup-ci.ps1
       - name: Layering check
         run: |
           python scripts/check-layering.py --self-test

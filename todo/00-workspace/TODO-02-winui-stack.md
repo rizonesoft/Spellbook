@@ -41,10 +41,11 @@ depends_on: []
 | :---: | :-----: | ----------- | ---------- | :----: |
 |   1   |   §1    | ADR 0002 and the decision record | -- |  [x]   |
 |   2   |   §2    | The Visual Studio 2026 toolchain pins and the setup leg | §1, D99 T01 §5 |  [x]   |
-|   3   |   §3    | The WinUI 3 shell in the hybrid build | §2 |  [ ]   |
-|   4   |   §4    | Runners, CI, and the portable package on the new stack | §3, D00 T01 §10 |  [ ]   |
-|   5   |   §5    | The winui-patterns skill, the UI standard, and the architecture doc | §3 |  [ ]   |
-|   6   |   §6    | Retarget the open UI sections of the plan to WinUI | §5 |  [ ]   |
+|   3   |   §7    | Provision missing WinUI tools on disposable CI runners | §2 |  [ ]   |
+|   4   |   §3    | The WinUI 3 shell in the hybrid build | §2, §7 |  [ ]   |
+|   5   |   §4    | Runners, CI, and the portable package on the new stack | §3, D00 T01 §10 |  [ ]   |
+|   6   |   §5    | The winui-patterns skill, the UI standard, and the architecture doc | §3 |  [ ]   |
+|   7   |   §6    | Retarget the open UI sections of the plan to WinUI | §5 |  [ ]   |
 
 ---
 
@@ -143,6 +144,18 @@ Open sections still name Win32 controls and messages, and the plan forbids silen
 - [ ] Commit: `"todo: retarget the open ui sections to winui (D00 T02 §6)"`
 
 **Test checkpoint:** Static evidence: `grep -rn "HWND\|WM_\|EN_CHANGE\|Common Controls\|DarkMode_Explorer" todo/0[1-5]*` prints only lines that name a recorded interop reason, and `python scripts/todo-graph.py validate` is clean.
+
+## 7. Provision Missing WinUI Tools on Disposable CI Runners
+
+Forward repair for §2: hosted CI run 37807805365 for `5a88f0ec8bc75feca4d68307fe88edd20cee38f5` failed at setup because its VS 2026 Enterprise installation lacks `WindowsAppSdkSupport.Cpp`. Local setup must continue to refuse machine-wide installation. A separate runner bootstrap may provision the missing component only on an explicitly identified GitHub-hosted disposable VM, before the unchanged setup verification.
+
+- [ ] `scripts/setup-ci.ps1`: refuse local and self-hosted execution, locate the existing VS 2026 C++ installation, add only the missing WinUI C++ component through the installed VS Installer, wait for completion, check the exit code, and repeat component discovery. Done when: a successful exit without the component still fails and an already complete installation is left alone.
+- [ ] `scripts/test-setup-ci.ps1`: exercise guard rejection, missing base tools, idempotence, installer failure, and post-install discovery with mocks that never invoke the installer. Add the probe to `scripts/check-all.ps1` and CI. Done when: every branch passes and local machine installation is never invoked.
+- [ ] `.github/workflows/ci.yml` and `release.yml`: call the guarded bootstrap before `scripts/setup.ps1`. Done when: an isolated candidate branch's hosted CI gets past the original missing-component failure and completes successfully for the exact candidate commit; actionlint passes. Do not tag or run release publication.
+- [ ] `docs/dev/build.md`, `docs/reference-conventions.md`, and `CHANGELOG.md`: distinguish disposable hosted provisioning from operator-owned local setup. Done when: the scope and failure behavior match the runner.
+- [ ] Commit: `"ci: provision missing winui tools on hosted runners (D00 T02 §7)"`
+
+**Test checkpoint:** Driven run: `pwsh scripts/test-setup-ci.ps1` passes all guard/provisioning tests; the original failure is preserved in `build/toolchain-evidence/ci-37807805365-failed.log`; hosted `ci.yml` succeeds on the isolated candidate branch with its exact SHA recorded. `pwsh scripts/check-all.ps1` exits 0. No local installer invocation, self-hosted machine change, tag, or release publication occurs.
 
 ## Verification
 

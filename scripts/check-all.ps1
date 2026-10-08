@@ -58,6 +58,7 @@ $pwsh = (Get-Process -Id $PID).Path
 Push-Location $RepoRoot
 try {
     Invoke-Gate 'toolchain' { & $pwsh -NoProfile -File scripts/setup.ps1 -Verify }
+    Invoke-Gate 'hosted provisioning probes' { & $pwsh -NoProfile -File scripts/test-setup-ci.ps1 }
     Invoke-Gate 'toolchain rejection probes' { & $pwsh -NoProfile -File scripts/test-toolchain.ps1 }
     if ($python) {
         Invoke-Gate 'layering self-test' { & $python scripts/check-layering.py --self-test }

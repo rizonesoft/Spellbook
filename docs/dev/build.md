@@ -25,6 +25,8 @@ pwsh scripts/setup.ps1 -Verify    # checks only; exit 0 when all legs are green
 
 Legs: `msvc`, each tool in `toolchain.json`, `vcpkg`, `hooks` (sets `git config core.hooksPath tools/githooks`), and `python`. MSVC selection requires VS 2026, a usable default v145 compiler (14.50 or later), and the WinUI C++ component. If a component is missing, setup prints the Visual Studio Installer modify command for the operator; it does not install machine-wide tools. The legacy `-InstallMsvc` switch only prints these instructions. `-Verify` also includes the component names and repair guidance on failure.
 
+GitHub-hosted CI and release jobs first run `scripts/setup-ci.ps1`. It adds a missing WinUI C++ component to the existing VS 2026 C++ installation on the disposable VM, then repeats component discovery. It refuses local and self-hosted execution. Installer exits other than 0 or 3010 fail; both accepted codes still require successful discovery and the normal setup/build checks. Local setup remains operator-owned. The installer uses the [documented modify command](https://learn.microsoft.com/en-us/visualstudio/install/use-command-line-parameters-to-install-visual-studio), with PowerShell waiting for completion.
+
 When moving an existing build tree from VS 2022 to VS 2026, run `pwsh scripts/build.ps1 -Config Debug -Clean` and `pwsh scripts/build.ps1 -Config Release -Clean` once so CMake redetects the compiler. The app is still the Win32 bootstrap until D00 T02 §3; these toolchain pins do not claim that the hybrid app already exists.
 
 ## Build, test, run
