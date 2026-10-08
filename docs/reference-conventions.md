@@ -95,4 +95,4 @@ Isotone's is the "premium" one: a centred `<div>` with a `<picture>` wordmark (d
 | C++ file names | Resolute: PascalCase files (`Settings.h`) | `snake_case.cpp` and `.hpp` | Matches the snake_case function style chosen for a std-like codebase; Resolute's naming follows its llvm-mingw and Direct2D code |
 | Docs layout | Isotone: `docs/dev/architecture.md` | `docs/architecture.md`, `docs/adr/`, `docs/dev/build.md` | The brief names `docs/architecture.md` and ADRs |
 | Workflow file names | `build.yml` and `plan.yml` | `ci.yml` (with a plan-gates job) | The brief names `ci.yml` |
-| CI runner | `windows-2025` pinned | `windows-latest` | The brief names `windows-latest`; the scripts accept VS 2022 or newer, so an image change does not break CI |
+| CI runner | `windows-2025` pinned | `windows-latest` | The brief names `windows-latest`; D00 T02 §2 now requires VS 2026 v145 and the WinUI C++ component. Setup fails explicitly if a runner image lacks either prerequisite |

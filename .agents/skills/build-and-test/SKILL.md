@@ -35,7 +35,7 @@ Keep full logs under `build/` (ignored). Quote the lines that matter, never the 
 | Symptom | Where to look | Usual cause |
 | ------- | ------------- | ----------- |
 | `setup: N leg(s) failed` | the leg name and its detail line | a tool missing or the wrong version; rerun `pwsh scripts/setup.ps1` without `-Verify` |
-| `No Visual Studio or Build Tools with the C++ x64 toolset found` | `setup.ps1` msvc leg | install VS 2022 Build Tools: `pwsh scripts/setup.ps1 -InstallMsvc` |
+| `No Visual Studio 2026 with C++ x64 and WindowsAppSdkSupport.Cpp found` | `setup.ps1` msvc leg | ask the operator to use the VS Installer command printed by `pwsh scripts/setup.ps1`; require v145 and the WinUI C++ component |
 | configure fails in `vcpkg install` | `artifacts/build/<preset>/vcpkg-manifest-install.log` | a port failed to build, or `builtin-baseline` and `toolchain.json` disagree |
 | `spellbook_set_warnings() was never called for: X` | the configure output | a new target without the warning policy: add `spellbook_set_warnings(X)` |
 | `error C2220` / `warning treated as error` | the first `warning Cxxxx` above it | fix the warning; never lower `/W4` or drop `/WX` |

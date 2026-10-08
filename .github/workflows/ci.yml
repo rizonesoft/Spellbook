@@ -51,6 +51,8 @@ jobs:
           ./scripts/setup.ps1
       - name: Format check
         run: ./scripts/format.ps1 -Check
+      - name: Toolchain rejection probes
+        run: ./scripts/test-toolchain.ps1
       - name: Layering check
         run: |
           python scripts/check-layering.py --self-test

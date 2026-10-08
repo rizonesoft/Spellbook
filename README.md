@@ -95,7 +95,7 @@ Check the download against the `SHA256SUMS` file on the release. Requirements: W
 <summary><strong>Prerequisites</strong></summary>
 
 - Windows 10 22H2 or Windows 11, x64
-- [Visual Studio 2022](https://visualstudio.microsoft.com/) or the VS 2022 Build Tools with **Desktop development with C++** (MSVC v143 and a Windows SDK). `pwsh scripts/setup.ps1 -InstallMsvc` installs the Build Tools for you.
+- [Visual Studio 2026](https://visualstudio.microsoft.com/) with **Desktop development with C++** (MSVC v145 and a Windows SDK) and the **C++ WinUI app tools** (`Microsoft.VisualStudio.Component.WindowsAppSdkSupport.Cpp`). Setup prints the VS Installer repair command; machine-wide installation remains an operator step.
 - [PowerShell 7](https://learn.microsoft.com/powershell/scripting/install/installing-powershell-on-windows), [Git](https://git-scm.com/), and [Python 3](https://www.python.org/) (for the plan and docs checks)
 
 Everything else (CMake, Ninja, vcpkg, clang-format, clang-tidy, actionlint) is pinned in [`toolchain.json`](toolchain.json) and downloaded into the repository's `.tools/` folder by the setup script. Nothing is installed globally.
@@ -191,7 +191,7 @@ flowchart TB
 
 | Piece | Choice |
 | ----- | ------ |
-| Language | C++20, MSVC (Visual Studio 2022 toolset), `/W4 /WX` |
+| Language | C++20, MSVC (Visual Studio 2026 v145 toolset), `/W4 /WX` |
 | UI | Win32 API with Common Controls v6, Per-Monitor-V2 DPI, Unicode |
 | Storage | SQLite with FTS5, behind `IPromptRepository` |
 | Libraries | spdlog and fmt (logging), nlohmann-json (settings and export), Catch2 (tests) |

@@ -1,12 +1,14 @@
 {
-  "pinned": "2026-10-04",
+  "pinned": "2026-10-08",
   "comment": "Repo-portable tools. scripts/setup.ps1 downloads each archive into .tools/<dir>/, checks its SHA-256, and writes .tools/<dir>/.pinned-version. MSVC and the Windows SDK are machine-wide (see msvc). Change a pin in one commit that also passes scripts/check-all.ps1.",
   "msvc": {
-    "vswhereVersionRange": "[17.0,18.0)",
-    "fallbackToLatest": true,
-    "requires": "Microsoft.VisualStudio.Component.VC.Tools.x86.x64",
-    "wingetId": "Microsoft.VisualStudio.2022.BuildTools",
-    "wingetOverride": "--wait --passive --add Microsoft.VisualStudio.Workload.VCTools --includeRecommended"
+    "vswhereVersionRange": "[18.0,19.0)",
+    "fallbackToLatest": false,
+    "minimumToolsetVersion": "14.50",
+    "requires": [
+      "Microsoft.VisualStudio.Component.VC.Tools.x86.x64",
+      "Microsoft.VisualStudio.Component.WindowsAppSdkSupport.Cpp"
+    ]
   },
   "components": [
     {
@@ -63,8 +65,34 @@
       "probe": "actionlint.exe",
       "versionArgs": ["--version"],
       "versionMatch": "^(\\S+)"
+    },
+    {
+      "name": "nuget",
+      "version": "7.9.0",
+      "url": "https://dist.nuget.org/win-x86-commandline/v7.9.0/nuget.exe",
+      "sha256": "992d70cac5b06c38efec91806caba64cdcc07e6d963a0959dbbbaf264d33b800",
+      "dir": "nuget",
+      "archiveType": "file",
+      "stripRoot": false,
+      "probe": "nuget.exe",
+      "versionArgs": ["help"],
+      "versionMatch": "NuGet Version: (\\d+\\.\\d+\\.\\d+)",
+      "source": "https://dist.nuget.org/tools.json",
+      "verified": "2026-10-08"
     }
   ],
+  "packages": {
+    "Microsoft.WindowsAppSDK": {
+      "version": "2.5.1",
+      "source": "https://www.nuget.org/packages/Microsoft.WindowsAppSDK/2.5.1",
+      "verified": "2026-10-08"
+    },
+    "Microsoft.Windows.CppWinRT": {
+      "version": "3.0.260818.1",
+      "source": "https://www.nuget.org/packages/Microsoft.Windows.CppWinRT/3.0.260818.1",
+      "verified": "2026-10-08"
+    }
+  },
   "vcpkg": {
     "repository": "https://github.com/microsoft/vcpkg",
     "commit": "5dd2e1600d049b498ff9fb9fe15997533ae0c804",

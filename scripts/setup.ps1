@@ -3,9 +3,9 @@
   Verifies and repairs the Spellbook toolchain on this machine.
 .DESCRIPTION
   Legs (each reported by name, with the fix when it fails):
-    msvc     Visual Studio 2022 or Build Tools with the C++ x64 toolset and a
-             Windows SDK. Machine-wide by necessity. -InstallMsvc installs the
-             VS 2022 Build Tools with winget; otherwise the command is printed.
+    msvc     Visual Studio 2026 with the v145 C++ x64 toolset, WinUI C++ tools,
+             and a Windows SDK. Machine-wide changes are left to the operator;
+             the Visual Studio Installer modify command is printed if needed.
     tools    cmake, ninja, clang-format, and clang-tidy at the versions pinned in
              toolchain.json, downloaded into .tools/<name>/ and SHA-256 checked.
     vcpkg    a clone of microsoft/vcpkg at the pinned commit in .tools/vcpkg,
@@ -17,7 +17,8 @@
 .PARAMETER Verify
   Check only; change nothing.
 .PARAMETER InstallMsvc
-  Install the VS 2022 Build Tools (C++ workload) with winget when MSVC is missing.
+  Retained for compatibility. Prints the operator's Visual Studio Installer
+  command; it does not perform a machine-wide installation.
 .PARAMETER Help
   Show this help.
 .EXAMPLE
@@ -47,8 +48,14 @@ function Test-ComponentLeg($c) {
 }
 
 function Install-Component($c) {
-    $dest = Join-Path $ToolsDir $c.dir
-    $work = Join-Path $ToolsDir ('.download-' + [Guid]::NewGuid().ToString('N'))
+    $toolsRoot = [IO.Path]::GetFullPath($ToolsDir).TrimEnd('\', '/') + [IO.Path]::DirectorySeparatorChar
+    $dest = [IO.Path]::GetFullPath((Join-Path $ToolsDir $c.dir))
+    $work = [IO.Path]::GetFullPath((Join-Path $ToolsDir ('.download-' + [Guid]::NewGuid().ToString('N'))))
+    foreach ($target in @($dest, $work)) {
+        if (-not $target.StartsWith($toolsRoot, [StringComparison]::OrdinalIgnoreCase)) {
+            throw "Tool installation path escapes .tools: $target"
+        }
+    }
     New-Item -ItemType Directory -Force -Path $work | Out-Null
     try {
         $archive = Join-Path $work 'archive.zip'
@@ -57,18 +64,23 @@ function Install-Component($c) {
         $hash = (Get-FileHash $archive -Algorithm SHA256).Hash.ToLowerInvariant()
         if ($hash -ne $c.sha256) { throw "$($c.name): SHA-256 $hash does not match the pin $($c.sha256)" }
         $unpacked = Join-Path $work 'unpacked'
-        [IO.Compression.ZipFile]::ExtractToDirectory($archive, $unpacked)
+        if ($c.PSObject.Properties['archiveType'] -and $c.archiveType -eq 'file') {
+            New-Item -ItemType Directory -Path $unpacked | Out-Null
+            Copy-Item -LiteralPath $archive -Destination (Join-Path $unpacked $c.probe)
+        } else {
+            [IO.Compression.ZipFile]::ExtractToDirectory($archive, $unpacked)
+        }
         $root = $unpacked
         if ($c.stripRoot) {
             $dirs = @(Get-ChildItem $unpacked -Directory)
             if ($dirs.Count -ne 1) { throw "$($c.name): expected one top-level folder in the archive" }
             $root = $dirs[0].FullName
         }
-        if (Test-Path $dest) { Remove-Item -Recurse -Force $dest }
-        Move-Item $root $dest
+        if (Test-Path -LiteralPath $dest) { Remove-Item -LiteralPath $dest -Recurse -Force }
+        Move-Item -LiteralPath $root -Destination $dest
         Set-Content -Path (Join-Path $dest '.pinned-version') -Value $c.version -Encoding ascii
     } finally {
-        Remove-Item -Recurse -Force $work -ErrorAction SilentlyContinue
+        Remove-Item -LiteralPath $work -Recurse -Force -ErrorAction SilentlyContinue
     }
 }
 
@@ -102,24 +114,34 @@ function Install-Vcpkg {
 
 function Test-MsvcLeg {
     $vs = Find-VisualStudio
-    if (-not $vs) { return @{ Ok = $false; Detail = 'no Visual Studio or Build Tools with Microsoft.VisualStudio.Component.VC.Tools.x86.x64' } }
+    if (-not $vs) {
+        return @{ Ok = $false; Detail = "no Visual Studio 2026 with $($Toolchain.msvc.requires -join ' and '). $(Get-MsvcInstallHelp)" }
+    }
     $sdk = Join-Path ${env:ProgramFiles(x86)} 'Windows Kits\10\Include'
     if (-not (Test-Path $sdk)) { return @{ Ok = $false; Detail = "MSVC at $vs, but no Windows 10/11 SDK under $sdk" } }
-    $toolsets = @(Get-ChildItem (Join-Path $vs 'VC\Tools\MSVC') -Directory -ErrorAction SilentlyContinue | ForEach-Object Name)
-    return @{ Ok = $true; Detail = "$vs (MSVC $($toolsets -join ', '))" }
+    $version = Get-MsvcVersion $vs
+    if (-not $version -or $version -lt [version]$Toolchain.msvc.minimumToolsetVersion) {
+        return @{ Ok = $false; Detail = "$vs lacks a usable v145 default toolset (MSVC $($Toolchain.msvc.minimumToolsetVersion)+). $(Get-MsvcInstallHelp)" }
+    }
+    return @{ Ok = $true; Detail = "$vs (v145, MSVC $version; WindowsAppSdkSupport.Cpp)" }
+}
+
+function Get-MsvcInstallHelp {
+    $installer = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio/Installer/setup.exe'
+    $vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio/Installer/vswhere.exe'
+    $installation = $null
+    if (Test-Path -LiteralPath $vswhere) {
+        $installation = & $vswhere -products * -version '[18.0,19.0)' -latest -property installationPath
+    }
+    if (-not $installation) {
+        return 'Install Visual Studio 2026, then add Desktop development with C++ and Microsoft.VisualStudio.Component.WindowsAppSdkSupport.Cpp in Visual Studio Installer.'
+    }
+    return "Operator command (elevated PowerShell): & `"$installer`" modify --installPath `"$installation`" --add Microsoft.VisualStudio.Workload.NativeDesktop --add Microsoft.VisualStudio.Component.WindowsAppSdkSupport.Cpp --includeRecommended --passive"
 }
 
 function Install-Msvc {
-    $m = $Toolchain.msvc
-    $cmd = "winget install --id $($m.wingetId) --exact --override `"$($m.wingetOverride)`""
-    if (-not $InstallMsvc) {
-        Write-Host "  MSVC is machine-wide and is not installed automatically. Install it with:" -ForegroundColor Yellow
-        Write-Host "    $cmd" -ForegroundColor Yellow
-        Write-Host '  or rerun: pwsh scripts/setup.ps1 -InstallMsvc' -ForegroundColor Yellow
-        return
-    }
-    Write-Step $cmd
-    Invoke-Native winget install --id $m.wingetId --exact --accept-package-agreements --accept-source-agreements --override $m.wingetOverride
+    Write-Host "  $(Get-MsvcInstallHelp)" -ForegroundColor Yellow
+    Write-Host '  Machine-wide installation is an operator step; setup does not run it.' -ForegroundColor Yellow
 }
 
 function Test-HooksLeg {

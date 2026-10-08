@@ -6,7 +6,7 @@ How Spellbook's C++ is written. `.clang-format` and `.clang-tidy` are the enforc
 
 | Concern | Choice | Notes |
 | ------- | ------ | ----- |
-| Language | C++20, MSVC (v143 toolset, VS 2022) | `/W4 /WX /permissive- /utf-8 /Zc:__cplusplus /Zc:preprocessor` on our targets (`cmake/SpellbookWarnings.cmake`) |
+| Language | C++20, MSVC (v145 toolset, VS 2026) | `/W4 /WX /permissive- /utf-8 /Zc:__cplusplus /Zc:preprocessor` on our targets (`cmake/SpellbookWarnings.cmake`) |
 | Build | CMake presets + Ninja | `debug`, `release`, `relwithdebinfo`; output under `artifacts/build/<preset>/` |
 | Packages | vcpkg manifest, `x64-windows-static` | Static CRT; `Spellbook.exe` has no runtime prerequisite |
 | Database | sqlite3 (FTS5, JSON1) | Behind `IPromptRepository` |

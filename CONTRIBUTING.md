@@ -35,7 +35,7 @@ If your change has no section, open an issue first so it can be planned. Typos a
 
 ## Set up and build
 
-You need Windows 10 22H2 or 11 (x64), Visual Studio 2022 or its Build Tools with the C++ workload, PowerShell 7, Git, and Python 3. Everything else is pinned in `toolchain.json` and provisioned into `.tools/`.
+You need Windows 10 22H2 or 11 (x64), Visual Studio 2026 with Desktop development with C++ (v145), a Windows SDK, and `Microsoft.VisualStudio.Component.WindowsAppSdkSupport.Cpp`, PowerShell 7, Git, and Python 3. Everything else is pinned in `toolchain.json` and provisioned into `.tools/`.
 
 ```powershell
 git clone https://github.com/rizonesoft/Spellbook.git

@@ -56,8 +56,7 @@ function Get-VcpkgRoot {
 
 function Find-VisualStudio {
     # Returns the installation path of a Visual Studio (or Build Tools) with the
-    # x64 C++ toolset. VS 2022 (the v143 toolset) is preferred; a newer one is
-    # accepted when toolchain.json allows it, which is what a fresh CI image has.
+    # required C++ and WinUI components in the pinned VS 2026 version range.
     $vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'
     if (-not (Test-Path $vswhere)) { return $null }
     $m = $script:Toolchain.msvc
@@ -69,15 +68,33 @@ function Find-VisualStudio {
     return $null
 }
 
+function Get-MsvcVersion([string]$VisualStudio) {
+    $defaultFile = Join-Path $VisualStudio 'VC/Auxiliary/Build/Microsoft.VCToolsVersion.default.txt'
+    if (-not (Test-Path -LiteralPath $defaultFile)) { return $null }
+    $versionText = (Get-Content -LiteralPath $defaultFile -Raw).Trim()
+    $version = $null
+    if (-not [version]::TryParse($versionText, [ref]$version)) { return $null }
+    $compiler = Join-Path $VisualStudio "VC/Tools/MSVC/$versionText/bin/Hostx64/x64/cl.exe"
+    if (-not (Test-Path -LiteralPath $compiler)) { return $null }
+    return $version
+}
+
 function Enter-DevEnvironment {
     # Imports the MSVC x64 developer environment into this PowerShell process,
     # then puts the pinned tools first on PATH and points VCPKG_ROOT at the repo copy.
     # Idempotent within a process.
-    if ($env:SPELLBOOK_DEVENV -eq '1') { return }
     $vs = Find-VisualStudio
     if (-not $vs) {
-        throw 'No Visual Studio or Build Tools with the C++ x64 toolset found. Run: pwsh scripts/setup.ps1'
+        throw 'No Visual Studio 2026 with C++ x64 and WindowsAppSdkSupport.Cpp found. Run: pwsh scripts/setup.ps1'
     }
+    $version = Get-MsvcVersion $vs
+    if (-not $version -or $version -lt [version]$script:Toolchain.msvc.minimumToolsetVersion) {
+        throw "Visual Studio at $vs requires MSVC $($script:Toolchain.msvc.minimumToolsetVersion) or later (v145)."
+    }
+    # An inherited marker from another VS installation cannot bypass selection.
+    if ($env:SPELLBOOK_DEVENV -eq '1' -and $env:VSINSTALLDIR -and
+        $env:VSINSTALLDIR.TrimEnd('\') -eq $vs.TrimEnd('\') -and
+        $env:VCToolsVersion -and $env:VCToolsVersion.TrimEnd('\') -eq $version.ToString()) { return }
     $vcvars = Join-Path $vs 'VC\Auxiliary\Build\vcvars64.bat'
     if (-not (Test-Path $vcvars)) { throw "vcvars64.bat not found under $vs" }
     $lines = & cmd.exe /d /c "`"$vcvars`" >nul 2>&1 && set"
@@ -85,6 +102,10 @@ function Enter-DevEnvironment {
     foreach ($line in $lines) {
         $i = $line.IndexOf('=')
         if ($i -gt 0) { [Environment]::SetEnvironmentVariable($line.Substring(0, $i), $line.Substring($i + 1)) }
+    }
+    if (-not $env:VCToolsVersion -or
+        [version]$env:VCToolsVersion.TrimEnd('\') -lt [version]$script:Toolchain.msvc.minimumToolsetVersion) {
+        throw "vcvars64.bat did not select the required v145 toolset under $vs"
     }
     $pinned = @(
         (Split-Path -Parent (Get-ToolPath 'cmake')),
