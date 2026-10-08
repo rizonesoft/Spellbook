@@ -28,7 +28,7 @@ A feature is built bottom-up, so each layer is tested before the next one leans 
 
 ## 3. UI
 
-- Follow `win32-ui-patterns` and `standards/ui.md`. Labels from the vocabulary table.
+- Follow `winui-patterns` and `standards/ui.md`. Resolve labels through the app `.resw` vocabulary adapter.
 - The window calls a core service; it never builds SQL or holds business rules.
 - Account for every control: working, or disabled with a tooltip naming its owner section.
 - Long work off the UI thread.

@@ -47,7 +47,7 @@ CHANGEME: one paragraph of context.
 
 **Job:** CHANGEME the user can <verb>.
 **Treatment:** CHANGEME the asked treatment. Cheaper substitute that fails the checkpoint: CHANGEME.
-**Chrome:** consume CHANGEME (the vocabulary table, the theme, the DPI helpers). Do not invent a second CHANGEME.
+**Chrome:** consume CHANGEME (the resource-backed vocabulary, WinUI theme, and XAML layout/native pixel boundary). Do not invent a second CHANGEME.
 
 - [ ] CHANGEME micro-step. Done when: CHANGEME.
 - [ ] Commit: `"app: CHANGEME"`

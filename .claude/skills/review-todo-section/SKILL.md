@@ -47,7 +47,7 @@ Confirm both explicit approvals and that the candidate manifest still matches. R
 4. **Layering and style:** no logic in `src/app/` that a test would want; no Windows header in core or storage; names and errors per `standards/cpp.md`.
 5. **Tests:** every new public core function has a named test; failure paths are tested for every write.
 6. **User data:** writes are transactional; migrations are new files; nothing in tests touches the real `%LOCALAPPDATA%\Spellbook`.
-7. **Surfaces:** `Job:`, `Treatment:`, `Chrome:` hold; every control is accounted for; captures exist; `docs/user/` is updated; labels come from the vocabulary table.
+7. **Surfaces:** `Job:`, `Treatment:`, `Chrome:` hold; every control is accounted for; captures exist; `docs/user/` is updated; app resources own the themed/plain labels.
 8. **Docs and changelog:** updated for anything a user sees.
 
 ## Outcome

@@ -10,7 +10,7 @@ sys.path.insert(0, str(ROOT / 'scripts'))
 import writer
 EXPECTED = {'add-feature', 'add-migration', 'add-todo', 'build-and-test', 'create-todo',
             'fix-bug', 'groom-plan', 'process-phase', 'process-plan', 'process-todo-file',
-            'process-todo-section', 'release', 'review-todo-section', 'win32-ui-patterns'}
+            'process-todo-section', 'release', 'review-todo-section', 'winui-patterns'}
 
 
 def check(root: Path) -> list[str]:

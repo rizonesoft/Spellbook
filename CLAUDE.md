@@ -46,7 +46,7 @@ Everything here is Windows-only. The Python gates are stdlib Python 3 (`python` 
 - **Network:** the update check (on by default, at most daily, GitHub Releases API, no user data) and the opt-in AI features (OpenRouter with the user's key in Windows Credential Manager, or an ACP agent the user runs), both governed by the Privacy page in Settings; AI costs show per result with a monthly cap. Nothing else touches the network, and there are **no secrets in the repository**. See ADR 0003 and ADR 0004.
 - **v0.1.0 is the premium release** (ADR 0003): M1 to M5 plus capture, Jump List, Trash, backups, `.spell` files, duplicates, rich runes, composition, the smart editor, tabs, the starter grimoire, metadata, and crash safety. Windows 10 (1809+) and 11. Start with Windows is opt in.
 - **Unattended runs** (`process-plan`) push `main` after each stamped section, never force-push, never amend a pushed commit, and never tag; operator-only work lives in `todo/99-manual/` and is never run by an agent.
-- **Theme in UI copy and docs only:** Spell, Chapter, Sigil, Cast, Rune, Revisions, Import scrolls in labels; Prompt, Folder, Tag, copy, TemplateVariable, PromptVersion, import in code and schema. Every themed label has a tooltip with the plain meaning, and all labels come from one string table that can switch to plain words (`standards/ui.md`).
+- **Theme in UI copy and docs only:** Spell, Chapter, Sigil, Cast, Rune, Revisions, Import scrolls in labels; Prompt, Folder, Tag, copy, TemplateVariable, PromptVersion, import in code and schema. Every themed label has a tooltip with the plain meaning, and UI labels use app-owned `.resw` vocabulary resources and a presentation adapter for the plain-word setting (`standards/ui.md`).
 - **Repository:** https://github.com/rizonesoft/Spellbook, public, default branch `main`, created by the operator on 2026-10-04 (`D99 T01 §1`).
 - **Ownership:** MIT License, "Copyright (c) 2026 Rizonetech (Pty) Ltd", publisher Rizonesoft, following Isotone. Pending the operator's confirmation in `D99 T01 §4`.
 
@@ -58,13 +58,13 @@ core  <-  storage  <-  app
 
 - `core` depends on the standard library only (plus header-only nlohmann-json from M5). It never includes a Windows, storage, or app header.
 - `storage` depends on core and SQLite. It never includes a Windows or app header.
-- `app` depends on both and on Win32. It holds windows, messages, and resources: **logic belongs in core.** A function in `src/app/` that a test would want to call is in the wrong layer.
+- `app` depends on both and on WinUI 3/C++/WinRT, using native APIs at documented boundaries. It owns XAML surfaces, presentation adapters, events, and resources: **logic belongs in core.** A function in `src/app/` that a test would want to call is in the wrong layer.
 - `python scripts/check-layering.py` enforces the include rules; `lint.ps1`, `check-all.ps1`, and CI run it.
 
 ## Code style
 
 - `.clang-format` is the format; run `pwsh scripts/format.ps1`, never format by hand. `.clang-tidy` is the analysis level.
-- Naming: `PascalCase` types, `snake_case` functions and variables, `trailing_underscore_` private members, `kPascalCase` constants, `I` prefix on pure interfaces (`IPromptRepository`), `UPPER_CASE` macros only for resource ids. Files `snake_case.cpp` and `.hpp`; public headers under `include/spellbook/<layer>/`.
+- Naming: `PascalCase` types, `snake_case` functions and variables, `trailing_underscore_` private members, `kPascalCase` constants, `I` prefix on pure interfaces (`IPromptRepository`), `UPPER_CASE` macros only for resource ids. Files `snake_case.cpp` and `.hpp`, with required XAML/C++/WinRT runtime-class names as documented in `standards/cpp.md`; public headers under `include/spellbook/<layer>/`.
 - C++ sources are ASCII: write non-ASCII characters as `\u` escapes in literals.
 - RAII for every handle (SQLite, GDI, Win32); no naked `new`; use C++/WinRT factories for XAML object ownership.
 - Errors: storage throws `StorageError`; the app catches at the top of an action and tells the user what failed and why. Never swallow an exception silently.
@@ -79,7 +79,7 @@ core  <-  storage  <-  app
 
 ## Choose the work contract
 
-Use the skill under `.claude/skills/` that fits: capture work through `add-todo`, author a file through `create-todo`, build a section through `process-todo-section`, stamp it through `review-todo-section`. To run the plan unattended, `process-plan` (which chains `process-phase` and guards the session with a Stop hook); close a finished file with `process-todo-file`; harden the tree before a long run with `groom-plan`. Run records live in `docs/phase-runs/`. For the engineering itself: `build-and-test`, `add-feature` (core, then storage, then UI, then tests, docs, and the plan), `fix-bug`, `add-migration`, `win32-ui-patterns`, and `release`.
+Use the skill under `.claude/skills/` that fits: capture work through `add-todo`, author a file through `create-todo`, build a section through `process-todo-section`, stamp it through `review-todo-section`. To run the plan unattended, `process-plan` (which chains `process-phase` and guards the session with a Stop hook); close a finished file with `process-todo-file`; harden the tree before a long run with `groom-plan`. Run records live in `docs/phase-runs/`. For the engineering itself: `build-and-test`, `add-feature` (core, then storage, then UI, then tests, docs, and the plan), `fix-bug`, `add-migration`, `winui-patterns`, and `release`.
 
 **One section = one commit.** Each section must be executable with zero conversation context.
 
@@ -103,9 +103,9 @@ A change is done when all of these hold:
 - **Bound every command's output** (`| Select-Object -Last 30`, `ctest -R`, `--quiet`); keep full logs under `build/`.
 - **Act, then report:** complete authorized work and report evidence. Explicit operator stop instructions take effect immediately.
 - **User data first:** the database is the user's work. Every write is transactional, every migration is tested on a database from the previous version, destructive actions confirm with what and how many, and tests never touch the real `%LOCALAPPDATA%\Spellbook` (they use `--data-dir`, temp folders, or `:memory:`).
-- **Keep the Win32 layer thin.** If a window procedure grows logic, move it to core and test it there.
+- **Keep the app layer thin.** Keep view models limited to presentation state and notifications; delegate domain rules to tested core services.
 - **No em dashes** in authored prose: use `--`, a colon, or a new sentence. One line per paragraph and list item in Markdown. `scripts/check-docs.py` checks the em dash.
-- **Source of truth:** Win32 behavior from Microsoft Learn, SQLite behavior from sqlite.org, plan state from `todo/`. Disagreements are recorded decisions, not silent reinterpretations.
+- **Source of truth:** WinUI and native Windows behavior from Microsoft Learn, SQLite behavior from sqlite.org, plan state from `todo/`. Disagreements are recorded decisions, not silent reinterpretations.
 - **Unknowns:** answer from source first. When an open question would change the implementation, take a justified default, record that it is a default and what changing it costs, and carry on.
 
 ## Commits

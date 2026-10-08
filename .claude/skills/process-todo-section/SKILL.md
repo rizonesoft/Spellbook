@@ -29,7 +29,7 @@ It accepts a `DNN TNN §N` ref or a row pasted from `todo/implementation-plan.md
 
 ## Step 1: read
 
-The section, its file's Goal, Current state, and Inputs, every dependency's stamp, `CLAUDE.md`, and the standards the section touches. For engineering steps, the matching skill: `add-feature`, `add-migration`, `win32-ui-patterns`, `fix-bug`.
+The section, its file's Goal, Current state, and Inputs, every dependency's stamp, `CLAUDE.md`, and the standards the section touches. For engineering steps, the matching skill: `add-feature`, `add-migration`, `winui-patterns`, `fix-bug`.
 
 ## Step 2: fact-check the plan
 
