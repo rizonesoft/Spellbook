@@ -2,7 +2,7 @@
   "pinned": "2026-10-08",
   "comment": "Repo-portable tools. scripts/setup.ps1 downloads each archive into .tools/<dir>/, checks its SHA-256, and writes .tools/<dir>/.pinned-version. MSVC and the Windows SDK are machine-wide (see msvc). Change a pin in one commit that also passes scripts/check-all.ps1.",
   "msvc": {
-    "vswhereVersionRange": "[18.0,19.0)",
+    "vswhereVersionRange": "[18.7,19.0)",
     "fallbackToLatest": false,
     "minimumToolsetVersion": "14.50",
     "requires": [

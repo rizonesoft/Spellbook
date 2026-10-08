@@ -127,7 +127,7 @@ function Get-BuildDir([string]$Config) {
 }
 
 function Get-ExePath([string]$Config) {
-    return Join-Path (Get-BuildDir $Config) 'bin/Spellbook.exe'
+    return Join-Path (Get-BuildDir $Config) 'app/Spellbook.exe'
 }
 
 function Get-CppSources {

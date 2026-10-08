@@ -1,0 +1,18 @@
+<Window x:Class="Spellbook.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Grid x:Name="Root">
+    <Grid.RowDefinitions><RowDefinition Height="48" /><RowDefinition Height="*" /></Grid.RowDefinitions>
+    <Grid x:Name="TitleBar" Background="Transparent">
+      <StackPanel Orientation="Horizontal" Spacing="12" Margin="16,0,0,0" VerticalAlignment="Center">
+        <Image Source="ms-appx:///spellbook.ico" Width="24" Height="24" />
+        <TextBlock x:Uid="Title" Style="{ThemeResource CaptionTextBlockStyle}" VerticalAlignment="Center" />
+      </StackPanel>
+    </Grid>
+    <StackPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12" Margin="32">
+      <FontIcon Glyph="&#xE8F1;" FontSize="40" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
+      <TextBlock x:Uid="EmptyHeading" Style="{ThemeResource TitleTextBlockStyle}" HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" />
+      <TextBlock x:Uid="EmptyGuidance" Style="{ThemeResource BodyTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" />
+    </StackPanel>
+  </Grid>
+</Window>

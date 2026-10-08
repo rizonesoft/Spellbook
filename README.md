@@ -17,7 +17,7 @@
 <br>
 [![Windows 10 | 11](https://img.shields.io/badge/Windows-10%20%7C%2011%20x64-0078D4?logo=windows&logoColor=white)](#quick-start)
 [![C++20](https://img.shields.io/badge/C%2B%2B-20-00599C?logo=cplusplus&logoColor=white)](docs/adr/0001-tech-stack.md)
-[![Win32](https://img.shields.io/badge/UI-Win32%20native-5E4A8C)](docs/architecture.md)
+[![WinUI 3](https://img.shields.io/badge/UI-WinUI%203-5E4A8C)](docs/architecture.md)
 [![SQLite FTS5](https://img.shields.io/badge/SQLite-FTS5-003B57?logo=sqlite&logoColor=white)](docs/architecture.md#storage)
 
 <br>
@@ -48,7 +48,7 @@
 
 If you work with AI models every day, your best prompts are worth keeping. Most of us keep them in a folder of Notepad files, a notes app, or a chat history we can never search. Spellbook is a home built for them.
 
-- **Native and instant.** A small C++ Win32 app, one self-contained `.exe`, that opens in a blink and stays out of the way.
+- **Native Windows app.** A C++ WinUI 3 app with its runtime bundled in one application folder.
 - **Find anything in two seconds.** Full-text search across every prompt, and a global hotkey that summons a quick-search popup over any app.
 - **Templates that fill themselves in.** Write `{{topic}}` once; Spellbook asks for it when you copy.
 - **Bring your scrolls.** Import a whole folder of `.txt` prompt files in one go, with a preview, encoding detection, and duplicates skipped.
@@ -118,7 +118,7 @@ Every script takes `-Help`. The others:
 | ------ | ---- |
 | `scripts/check-all.ps1` | Every gate CI runs: toolchain, layering, format, Debug and Release builds, tests, launch smoke, lint, docs, plan |
 | `scripts/format.ps1` | clang-format every source (`-Check` to verify only) |
-| `scripts/lint.ps1` | clang-tidy and the layering check |
+| `scripts/lint.ps1` | Library clang-tidy, MSVC app analysis, and the layering check |
 | `scripts/migrate.ps1` | Apply the migrations to a dev database in `build/dev-data/` and show the schema |
 | `scripts/package.ps1` | Build Release and produce the portable ZIP and `SHA256SUMS` |
 | `scripts/release.ps1` | Move the changelog, commit, and tag `v<version>` |
@@ -165,7 +165,7 @@ Three layers, each depending only on the ones below it. Logic lives in **core**,
 
 ```mermaid
 flowchart TB
-    subgraph app["app: Spellbook.exe (Win32)"]
+    subgraph app["app: Spellbook.exe (WinUI 3)"]
         win["Windows, panes, dialogs<br/>message loop, resources"]
     end
     subgraph storage["storage"]
@@ -192,7 +192,7 @@ flowchart TB
 | Piece | Choice |
 | ----- | ------ |
 | Language | C++20, MSVC (Visual Studio 2026 v145 toolset), `/W4 /WX` |
-| UI | Win32 API with Common Controls v6, Per-Monitor-V2 DPI, Unicode |
+| UI | WinUI 3 with C++/WinRT, Per-Monitor-V2 DPI, Unicode, and native interop |
 | Storage | SQLite with FTS5, behind `IPromptRepository` |
 | Libraries | spdlog and fmt (logging), nlohmann-json (settings and export), Catch2 (tests) |
 | Build | CMake presets, Ninja, vcpkg in manifest mode (static triplet) |
@@ -209,7 +209,7 @@ The reasoning is in [ADR 0001](docs/adr/0001-tech-stack.md) and [docs/architectu
 | ---- | ------------- |
 | `src/core/` | Domain model and services |
 | `src/storage/` | The repository interface and its SQLite implementation |
-| `src/app/` | The Win32 app: windows, resources, the manifest |
+| `src/app/` | The WinUI app: XAML, C++/WinRT windows, resources, and the MSBuild project |
 | `migrations/` | Versioned schema steps |
 | `tests/` | Unit tests for core and storage |
 | `scripts/` | PowerShell runners and the Python checks |

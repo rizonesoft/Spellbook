@@ -16,13 +16,13 @@ Preserve user side changes. Before staging or committing, inspect `git status --
 
 ## What this project is
 
-**Spellbook** is a native Windows prompt manager: a fast desktop app to store, organise, search, template, and copy AI prompts, replacing a folder of Notepad `.txt` files. Tagline: *Your grimoire of AI prompts.* C++20, WinUI 3 through C++/WinRT, SQLite with FTS5. Executable `Spellbook.exe`, C++ namespace `spellbook`, data in `%LOCALAPPDATA%\Spellbook\` (`spellbook.db`, `logs\spellbook.log`). The approved stack is recorded in ADR 0002; the existing Win32 bootstrap remains until D00 T02 §3 replaces it.
+**Spellbook** is a native Windows prompt manager: a fast desktop app to store, organise, search, template, and copy AI prompts, replacing a folder of Notepad `.txt` files. Tagline: *Your grimoire of AI prompts.* C++20, WinUI 3 through C++/WinRT, SQLite with FTS5. Executable `Spellbook.exe`, C++ namespace `spellbook`, data in `%LOCALAPPDATA%\Spellbook\` (`spellbook.db`, `logs\spellbook.log`). The hybrid WinUI shell implements ADR 0002 in D00 T02 §3.
 
 | Path | Purpose |
 | ---- | ------- |
 | `src/core/` | `spellbook_core`: the domain model and services. Standard C++ only: no Windows headers, no storage, no UI |
 | `src/storage/` | `spellbook_storage`: `IPromptRepository`, `SqlitePromptRepository`, the SQLite wrapper, and the migration runner |
-| `src/app/` | `Spellbook.exe`: the WinUI 3 app, planned MSBuild `Spellbook.vcxproj` in `Spellbook.slnx`; thin by rule. ADR 0002 governs replacement of the current Win32 bootstrap in D00 T02 §3 |
+| `src/app/` | `Spellbook.exe`: the WinUI 3 app, MSBuild `Spellbook.vcxproj` in `Spellbook.slnx`; thin by rule, following ADR 0002 |
 | `migrations/` | `NNNN_name.sql` schema steps, embedded into the binary at build time; a shipped one is never edited |
 | `tests/` | Catch2 suites, one executable per library (`tests/core/`, `tests/storage/`), run through CTest |
 | `scripts/` | The PowerShell 7 runners (`setup`, `build`, `test`, `run`, `format`, `lint`, `migrate`, `package`, `release`, `check-all`) and the stdlib Python gates (`todo-graph.py`, `check-layering.py`, `check-docs.py`) |
@@ -74,7 +74,7 @@ core  <-  storage  <-  app
 - `.clang-format` is the format; run `pwsh scripts/format.ps1`, never format by hand. `.clang-tidy` is the analysis level.
 - Naming: `PascalCase` types, `snake_case` functions and variables, `trailing_underscore_` private members, `kPascalCase` constants, `I` prefix on pure interfaces (`IPromptRepository`), `UPPER_CASE` macros only for resource ids. Files `snake_case.cpp` and `.hpp`; public headers under `include/spellbook/<layer>/`.
 - C++ sources are ASCII: write non-ASCII characters as `\u` escapes in literals.
-- RAII for every handle (SQLite, GDI, Win32); no naked `new` outside the window-procedure ownership pattern in `main_window.cpp`.
+- RAII for every handle (SQLite, GDI, Win32); no naked `new`; use C++/WinRT factories for XAML object ownership.
 - Errors: storage throws `StorageError`; the app catches at the top of an action and tells the user what failed and why. Never swallow an exception silently.
 - Logging: spdlog, structured `{}` arguments, one Information line per user action that changes data, naming the action and the id, **never the prompt text**.
 - Detail: `standards/cpp.md`.

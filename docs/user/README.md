@@ -5,8 +5,8 @@ How to use Spellbook. Spellbook is pre-alpha: this guide grows with each milesto
 ## Getting started
 
 - **Install:** there is no release yet; build from source as described in the [README](../../README.md#build-from-source). From v0.1.0 there will be an installer and a portable ZIP.
-- **Start:** run `Spellbook.exe`. The first launch creates your library in `%LOCALAPPDATA%\Spellbook\`.
-- **What you see today:** the Spellbook window with an empty grimoire. Storing and editing prompts arrives in M1.
+- **Start:** run `Spellbook.exe` from its complete application folder. Keep its DLLs, resources, and icon beside it when copying the app. The first launch creates your library in `%LOCALAPPDATA%\Spellbook\`.
+- **What you see today:** a WinUI window titled Spellbook, with a themed title bar, Mica backdrop where Windows supports it, and the message "Your grimoire is ready". Storing and editing prompts arrives in M1.
 
 ## Where your data lives
 

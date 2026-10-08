@@ -1,4 +1,4 @@
-// Spellbook.exe resources: the app icon and the application manifest.
+// Spellbook.exe icon. MSBuild embeds the application manifest.
 // The version block lives in the generated version.rc (from version.rc.in).
 #include <winres.h>
 #include "resource.h"
@@ -7,6 +7,3 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 
 // The first icon in the file is the one Explorer shows for the exe.
 IDI_SPELLBOOK ICON "spellbook.ico"
-
-// CREATEPROCESS_MANIFEST_RESOURCE_ID (1) of type RT_MANIFEST (24).
-1 24 "spellbook.manifest"
