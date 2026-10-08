@@ -12,6 +12,7 @@ struct MainWindow : MainWindowT<MainWindow>
     void initialize(bool smoke);
 
 private:
+    void update_size_limits();
     Microsoft::UI::Xaml::Media::CompositionTarget::Rendering_revoker rendering_;
 };
 }  // namespace winrt::Spellbook::implementation

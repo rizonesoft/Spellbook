@@ -32,10 +32,13 @@ using System;
 using System.Runtime.InteropServices;
 public static class SpellbookCapture {
   [StructLayout(LayoutKind.Sequential)] public struct Rect { public int Left, Top, Right, Bottom; }
+  [StructLayout(LayoutKind.Sequential)] public struct Point { public int X, Y; }
+  [StructLayout(LayoutKind.Sequential)] public struct MinMax { public Point Reserved, MaxSize, MaxPosition, MinTrack, MaxTrack; }
   [DllImport("user32.dll")] public static extern bool GetWindowRect(IntPtr window, out Rect rect);
   [DllImport("user32.dll")] public static extern uint GetDpiForWindow(IntPtr window);
   [DllImport("user32.dll")] public static extern IntPtr SetThreadDpiAwarenessContext(IntPtr value);
   [DllImport("user32.dll")] public static extern bool PrintWindow(IntPtr window, IntPtr dc, uint flags);
+  [DllImport("user32.dll", EntryPoint="SendMessageW")] public static extern IntPtr ReadMinMax(IntPtr window, uint message, IntPtr parameter, ref MinMax limits);
 }
 '@
 $start = [Diagnostics.ProcessStartInfo]::new($exe)
@@ -57,6 +60,10 @@ try {
     try {
         $rect = [SpellbookCapture+Rect]::new()
         if (-not [SpellbookCapture]::GetWindowRect($window, [ref]$rect)) { throw 'Cannot read window bounds' }
+        $dpi = [SpellbookCapture]::GetDpiForWindow($window)
+        $limits = [SpellbookCapture+MinMax]::new()
+        [SpellbookCapture]::ReadMinMax($window, 0x24, [IntPtr]::Zero, [ref]$limits) | Out-Null
+        if ($limits.MinTrack.X -ne (480 * $dpi / 96) -or $limits.MinTrack.Y -ne (320 * $dpi / 96)) { throw "Minimum window size is not 480 by 320 DIPs: $($limits.MinTrack.X) x $($limits.MinTrack.Y) at $dpi DPI" }
         $bitmap = [Drawing.Bitmap]::new($rect.Right - $rect.Left, $rect.Bottom - $rect.Top)
         $graphics = [Drawing.Graphics]::FromImage($bitmap)
         $dc = $graphics.GetHdc()
@@ -68,7 +75,7 @@ try {
         foreach ($module in $modules) {
             if (-not $module.StartsWith($copyRoot + '\', [StringComparison]::OrdinalIgnoreCase)) { throw "Runtime loaded outside copied folder: $module" }
         }
-        @{ title=$process.MainWindowTitle; dpi=[SpellbookCapture]::GetDpiForWindow($window); registeredRuntimePackages=0; copyRoot=$copyRoot; modules=$modules } | ConvertTo-Json -Depth 4 | Set-Content (Join-Path $evidence 'window.json')
+        @{ title=$process.MainWindowTitle; dpi=$dpi; minimumWidth=$limits.MinTrack.X; minimumHeight=$limits.MinTrack.Y; registeredRuntimePackages=0; copyRoot=$copyRoot; modules=$modules } | ConvertTo-Json -Depth 4 | Set-Content (Join-Path $evidence 'window.json')
     } finally { [SpellbookCapture]::SetThreadDpiAwarenessContext($previousDpi) | Out-Null }
     if (-not $process.CloseMainWindow() -or -not $process.WaitForExit(10000) -or $process.ExitCode -ne 0) { throw 'Window did not close cleanly' }
 } finally {
