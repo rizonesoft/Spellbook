@@ -87,7 +87,7 @@ Once released, Spellbook ships two ways from the [releases page](https://github.
 | **Installer** (`Spellbook-<version>-win-x64-Setup.exe`) | Most people: Start menu entry, optional start with Windows for the hotkey, clean uninstall |
 | **Portable ZIP** (`Spellbook-<version>-win-x64-portable.zip`) | Trying it out, or locked-down machines: unzip and run |
 
-Check the download against the `SHA256SUMS` file on the release. Requirements: Windows 10 22H2 or Windows 11, 64-bit. Nothing else: the `.exe` is self-contained.
+Check the download against the `SHA256SUMS` file on the release. Requirements: Windows 10 22H2 or Windows 11, 64-bit. Keep the complete extracted folder together: it includes the runtime DLLs and resources beside `Spellbook.exe`, so no separate Windows App Runtime installation is required.
 
 ## Build from source
 

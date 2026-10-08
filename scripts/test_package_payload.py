@@ -2,9 +2,12 @@
 
 import hashlib
 import json
+import os
 from pathlib import Path
+import stat
 import tempfile
 import unittest
+from unittest import mock
 import zipfile
 
 from package_payload import REQUIRED_PAYLOAD, package
@@ -83,6 +86,65 @@ class PackageTests(unittest.TestCase):
             package(self.repo)
         self.assertEqual(archive.read_bytes(), old)
         self.assertEqual((archive.parent / "SHA256SUMS").read_bytes(), sums)
+
+    @unittest.skipUnless(os.name == "nt", "Windows read-only publication semantics")
+    def test_read_only_checksum_preserves_previous_zip_and_checksum(self):
+        archive = package(self.repo)
+        sums = archive.parent / "SHA256SUMS"
+        previous = archive.read_bytes(), sums.read_bytes()
+        self.write("artifacts/build/release/app/nested/runtime.bin", b"changed payload")
+        sums.chmod(stat.S_IREAD)
+        try:
+            with self.assertRaises(PermissionError):
+                package(self.repo)
+        finally:
+            sums.chmod(stat.S_IREAD | stat.S_IWRITE)
+        self.assertEqual((archive.read_bytes(), sums.read_bytes()), previous)
+
+    def test_checksum_publish_failure_removes_new_version_and_keeps_old_pair(self):
+        archive = package(self.repo)
+        sums = archive.parent / "SHA256SUMS"
+        previous = archive.read_bytes(), sums.read_bytes()
+        self.write("artifacts/build/release/src/core/generated/spellbook/core/build_info.hpp",
+                   b'constexpr auto kSemVer = "1.2.4";')
+        replace = Path.replace
+
+        def fail_checksum(source, destination):
+            if Path(destination) == sums:
+                raise PermissionError("checksum publication refused")
+            return replace(source, destination)
+
+        with mock.patch.object(Path, "replace", fail_checksum):
+            with self.assertRaisesRegex(PermissionError, "checksum publication refused"):
+                package(self.repo)
+        self.assertEqual((archive.read_bytes(), sums.read_bytes()), previous)
+        self.assertFalse((archive.parent / "Spellbook-1.2.4-win-x64-portable.zip").exists())
+
+    def test_failed_rollback_retains_previous_archive_for_recovery(self):
+        archive = package(self.repo)
+        sums = archive.parent / "SHA256SUMS"
+        previous = archive.read_bytes(), sums.read_bytes()
+        self.write("artifacts/build/release/app/nested/runtime.bin", b"changed payload")
+        replace = Path.replace
+        archive_publications = 0
+
+        def fail_checksum_and_rollback(source, destination):
+            nonlocal archive_publications
+            if Path(destination) == sums:
+                raise PermissionError("checksum publication refused")
+            if Path(destination) == archive:
+                archive_publications += 1
+                if archive_publications > 1:
+                    raise PermissionError("archive rollback refused")
+            return replace(source, destination)
+
+        with mock.patch.object(Path, "replace", fail_checksum_and_rollback):
+            with self.assertRaisesRegex(RuntimeError, "Recovery files retained"):
+                package(self.repo)
+        self.assertEqual(sums.read_bytes(), previous[1])
+        backups = list((self.repo / "artifacts/stage").glob("package-*/previous.zip"))
+        self.assertEqual(len(backups), 1)
+        self.assertEqual(backups[0].read_bytes(), previous[0])
 
     def test_restore_must_match_direct_pins(self):
         del self.assets["libraries"]["Microsoft.WindowsAppSDK/2.5.1"]

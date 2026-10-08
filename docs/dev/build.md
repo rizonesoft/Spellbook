@@ -11,7 +11,7 @@ How to set up a machine, build, test, run, and troubleshoot. The day-to-day comm
 | CMake 4.4.4, Ninja 1.13.2, clang-format 23.1.2, clang-tidy 22.1.8, actionlint 1.7.12 | `toolchain.json`: URL and SHA-256, downloaded by `scripts/setup.ps1` | `.tools/<name>/` (gitignored) |
 | vcpkg | `toolchain.json`: cloned at the pinned commit and bootstrapped | `.tools/vcpkg/` |
 | NuGet 7.9.0 | Versioned Microsoft download, SHA-256 pinned in `toolchain.json` | `.tools/nuget/nuget.exe` |
-| Windows App SDK 2.5.1 and C++/WinRT 3.0.260818.1 | Version/source/date pins in `toolchain.json`; consumed by the planned WinUI project in D00 T02 §3 | App package restore when the hybrid shell ships |
+| Windows App SDK 2.5.1 and C++/WinRT 3.0.260818.1 | Version/source/date pins in `toolchain.json`; consumed by `src/app/Spellbook.vcxproj` | Restored by the hybrid build into `artifacts/nuget/` |
 | sqlite3, spdlog, fmt, nlohmann-json, Catch2 | `vcpkg.json` (manifest mode), built on the first configure | `artifacts/vcpkg_installed/`, cached in `.tools/vcpkg-cache/` |
 
 Nothing from `.tools/` is ever replaced by a tool found on PATH: two machines must produce the same configure and format results.
@@ -76,6 +76,8 @@ It prints `PRAGMA user_version` and the tables. It refuses to `-Reset` your real
 pwsh scripts/package.ps1           # Release build, then artifacts/dist/*-portable.zip and SHA256SUMS
 ```
 
+Packaging prepares both outputs before publication and restores the previous archive if replacing `SHA256SUMS` fails. If restoration also fails, the error names retained recovery files under `artifacts/stage/package-*/`; preserve that directory and repair the ZIP/checksum pair before distributing it. Two file replacements do not provide power-loss atomicity.
+
 The installer (`-Installer`) arrives in M5. Releases are cut with `scripts/release.ps1`; see `standards/release.md` and the `release` skill.
 
 ## CI
@@ -96,10 +98,12 @@ The installer (`-Installer`) arrives in M5. Releases are cut with `scripts/relea
 
 ### Hybrid runner and package proofs
 
+The static MSBuild coverage gate requires unconditional owned-source declarations in the project. Conditional items/groups, dynamic target additions, exclusions, removals, updates, and `ExcludedFromBuild` metadata are rejected rather than credited as compiled sources. Extend the gate with evaluated-configuration proof before introducing such declarations.
+
 The root `Spellbook.slnx` opens the WinUI MSBuild project; the PowerShell build runner first prepares its CMake libraries and generated package/version properties. The project-source coverage gate rejects an owned app `.cpp` absent from the MSBuild target, unresolved source paths, and lower-layer references to app headers.
 
 `pwsh scripts/test-build-warning.ps1` creates an isolated candidate checkout under `build/warning-probes/`, injects C4996 in its copy of `MainWindow.xaml.cpp`, and requires the Release runner to reject it. The original worktree is unchanged. The probe uses a junction to the existing pinned `.tools` and retains its clone/logs as evidence; it never commits or pushes.
 
-`pwsh scripts/test-package.ps1` packages the existing Release build, verifies the ZIP checksum and complete payload, extracts it under `build/package-probes/`, smoke-runs that copy against isolated data, and reads the schema back. Six disposable package fixtures also test missing runtime files, missing vendor terms, stale restore pins, and unsafe paths. This probe runs in the full suite, CI, and the release packaging job. The executable's product version must match the generated package version, including with `-SkipBuild`.
+`pwsh scripts/test-package.ps1` packages the existing Release build, verifies the ZIP checksum and complete payload, extracts it under `build/package-probes/`, smoke-runs that copy against isolated data, and reads the schema back. Nine disposable package fixtures also test missing runtime files, missing vendor terms, stale restore pins, unsafe paths, checksum publication failures, and rollback recovery. This probe runs in the full suite, CI, and the release packaging job. The executable's product version must match the generated package version, including with `-SkipBuild`.
 
 The packager takes vendor terms from the resolved `artifacts/nuget-obj/project.assets.json` dependency closure and vcpkg copyright files. It requires the Windows App SDK license/NOTICE and C++/WinRT MIT license, preserves their contents, and explains that Spellbook's license does not relicense bundled components. Required-file failures leave an existing ZIP/checksum untouched. Both workflows cache `artifacts/nuget` using the package pins and project inputs; restored packages still pass normal NuGet restore and build checks.

@@ -89,9 +89,25 @@ def project_coverage(files: dict[str, str], project: str) -> list[str]:
     except ET.ParseError as error:
         return [f"{location}:1:app-project:invalid XML: {error}"]
     included = set()
+    parents = {child: parent for parent in root.iter() for child in parent}
     for item in root.iter():
-        if item.tag.rsplit("}", 1)[-1] != "ClCompile" or "Include" not in item.attrib:
+        if item.tag.rsplit("}", 1)[-1] != "ClCompile":
             continue
+        # This static gate deliberately accepts only unconditional owned-source
+        # declarations. It must not credit a file that MSBuild can skip later.
+        if any(child.tag.rsplit("}", 1)[-1] == "ExcludedFromBuild" for child in item):
+            findings.append(f"{location}:1:app-project:ExcludedFromBuild is unsupported; owned sources must compile in every configuration")
+        if any(key in item.attrib for key in ("Remove", "Update", "Exclude")):
+            findings.append(f"{location}:1:app-project:source removal/update/exclusion is unsupported")
+        if "Include" not in item.attrib:
+            continue
+        ancestors = [item]
+        while ancestors[-1] in parents:
+            ancestors.append(parents[ancestors[-1]])
+        if any("Condition" in ancestor.attrib or ancestor.tag.rsplit("}", 1)[-1]
+               in {"Choose", "When", "Otherwise", "Target", "ItemDefinitionGroup"}
+               for ancestor in ancestors):
+            findings.append(f"{location}:1:app-project:conditional or dynamic source declaration is unsupported")
         name = item.attrib["Include"].replace("\\", "/")
         if name == "$(GeneratedFilesDir)module.g.cpp":
             continue  # C++/WinRT-generated module, not an owned source.
@@ -136,6 +152,15 @@ def self_test() -> int:
         ('<Project><ClCompile Include="$(Unknown)source.cpp" /></Project>', True),
         ('<Project><ClCompile Include="a.cpp" /><ClCompile Include="a.cpp" /></Project>', True),
         ('<Project><ClCompile Include="a.cpp" /><ClCompile Include="$(GeneratedFilesDir)module.g.cpp" /></Project>', False),
+        ('<Project><ClCompile Include="a.cpp"><ExcludedFromBuild>true</ExcludedFromBuild></ClCompile></Project>', True),
+        ('<Project><ClCompile Include="a.cpp" Condition="false" /></Project>', True),
+        ('<Project><ItemGroup Condition="false"><ClCompile Include="a.cpp" /></ItemGroup></Project>', True),
+        ('<Project><ClCompile Include="a.cpp" Exclude="a.cpp" /></Project>', True),
+        ('<Project><ClCompile Include="a.cpp" /><ClCompile Remove="a.cpp" /></Project>', True),
+        ('<Project><ClCompile Include="a.cpp" /><ClCompile Update="a.cpp"><ExcludedFromBuild>true</ExcludedFromBuild></ClCompile></Project>', True),
+        ('<Project><ClCompile Include="a.cpp" /><ItemDefinitionGroup><ClCompile><ExcludedFromBuild>true</ExcludedFromBuild></ClCompile></ItemDefinitionGroup></Project>', True),
+        ('<Project><Choose><When Condition="false"><ItemGroup><ClCompile Include="a.cpp" /></ItemGroup></When></Choose></Project>', True),
+        ('<Project><Target Name="Unused"><ItemGroup><ClCompile Include="a.cpp" /></ItemGroup></Target></Project>', True),
     ]
     for project, should_fail in project_cases:
         got = project_coverage({"src/app/a.cpp": ""}, project)

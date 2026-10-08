@@ -105,6 +105,7 @@ def package(repo: Path) -> Path:
     temporary_archive = stage / "payload.zip"
     payload = stage / "payload"
     payload.mkdir()
+    retain_recovery = False
     try:
         for source in sorted(app.rglob("*")):
             if source.is_symlink() or not source.resolve().is_relative_to(app.resolve()):
@@ -123,19 +124,38 @@ def package(repo: Path) -> Path:
             for block in iter(lambda: stream.read(1024 * 1024), b""):
                 hasher.update(block)
             digest = hasher.hexdigest()
-        # Publish only after payload and notices are complete. A failed preflight
-        # leaves any previously published ZIP and checksum untouched.
-        temporary_archive.replace(archive)
         sums = stage / "SHA256SUMS"
         sums.write_text(f"{digest}  {archive.name}\n", encoding="ascii")
-        sums.replace(dist / "SHA256SUMS")
+        # Both outputs are ready before publication. Each replace is atomic,
+        # but the pair is not: restore the ZIP if checksum publication fails.
+        backup = stage / "previous.zip"
+        had_archive = archive.exists()
+        if had_archive:
+            shutil.copyfile(archive, backup)
+        temporary_archive.replace(archive)
+        try:
+            sums.replace(dist / "SHA256SUMS")
+        except OSError as publication_error:
+            try:
+                if had_archive:
+                    backup.replace(archive)
+                else:
+                    archive.unlink()
+            except OSError as rollback_error:
+                retain_recovery = True
+                raise RuntimeError(
+                    f"Checksum publication failed: {publication_error}; ZIP rollback failed: "
+                    f"{rollback_error}. Recovery files retained at {stage}"
+                ) from rollback_error
+            raise
         print(f"package: {archive.name}, {archive.stat().st_size} bytes, SHA256 {digest}")
         return archive
     finally:
         resolved = stage.resolve()
         if resolved.parent != stages.resolve() or not resolved.name.startswith("package-"):
             raise ValueError(f"Refusing unsafe package scratch cleanup: {resolved}")
-        shutil.rmtree(resolved)
+        if not retain_recovery:
+            shutil.rmtree(resolved)
 
 
 if __name__ == "__main__":
