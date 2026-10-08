@@ -59,6 +59,8 @@ pwsh scripts/lint.ps1          # library clang-tidy, MSVC app analysis, layering
 
 `scripts/test-self-contained-ci.ps1` is an additional hosted-only proof. It refuses local and self-hosted execution before changes, removes registered Windows App Runtime packages only from the disposable runner user, copies the Release app folder outside the checkout, checks the visible window and app-local runtime modules, captures its DPI and screenshot, and runs smoke. Evidence is uploaded from `build/self-contained-proof/`; it never removes runtime packages from a developer machine.
 
+The startup probes also read and dismiss their own interactive error dialogs through `scripts/test_startup_dialogs.py`. Corrupt-data and invalid-argument cases must name the failed startup and return 1; an isolated copy without its PRI must retain the startup context and return nonzero (WinUI may use a native failure status for invalid XAML resources). No real library or installed app files are changed.
+
 ## The dev database
 
 ```powershell

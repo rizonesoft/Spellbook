@@ -1,7 +1,8 @@
 #include <shellapi.h>
 
 #include <exception>
-#include <memory>
+#include <stdexcept>
+#include <string>
 #include <string_view>
 
 #include <spdlog/spdlog.h>
@@ -63,6 +64,18 @@ void parse_command_line(spellbook::app::LaunchOptions& options)
 }
 }  // namespace
 
+namespace spellbook::app
+{
+void show_startup_error(std::wstring_view reason)
+{
+    // This fallback must work even before WinRT/XAML resources initialize.
+    std::wstring message{L"Spellbook could not start.\n\n"};
+    message.append(reason);
+    const auto caption = core::utf8_to_wide(core::app_name());
+    MessageBoxW(nullptr, message.c_str(), caption.c_str(), MB_OK | MB_ICONERROR);
+}
+}  // namespace spellbook::app
+
 int WINAPI wWinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPWSTR, _In_ int)
 {
     int exit_code = 0;
@@ -80,7 +93,7 @@ int WINAPI wWinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPWSTR, _In_ int)
         spdlog::critical("Fatal: {}", winrt::to_string(error.message()));
         if (!options.smoke)
         {
-            MessageBoxW(nullptr, error.message().c_str(), L"Spellbook", MB_OK | MB_ICONERROR);
+            spellbook::app::show_startup_error(error.message().c_str());
         }
         exit_code = 1;
     }
@@ -89,8 +102,7 @@ int WINAPI wWinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPWSTR, _In_ int)
         spdlog::critical("Fatal: {}", error.what());
         if (!options.smoke)
         {
-            const auto message = spellbook::core::utf8_to_wide(error.what());
-            MessageBoxW(nullptr, message.c_str(), L"Spellbook", MB_OK | MB_ICONERROR);
+            spellbook::app::show_startup_error(spellbook::core::utf8_to_wide(error.what()));
         }
         exit_code = 1;
     }

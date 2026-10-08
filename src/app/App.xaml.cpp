@@ -33,7 +33,7 @@ void App::fail(winrt::hstring const& message)
     spdlog::critical("Fatal: {}", winrt::to_string(message));
     if (!options_.smoke)
     {
-        MessageBoxW(nullptr, message.c_str(), L"Spellbook", MB_OK | MB_ICONERROR);
+        ::spellbook::app::show_startup_error(message.c_str());
     }
     Exit();
 }

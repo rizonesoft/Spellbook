@@ -76,4 +76,6 @@ foreach ($context in @(@{ Actions='false'; Runner='github-hosted' }, @{ Actions=
     } finally { $process.Dispose() }
 }
 Write-Host 'PASS: clean-runtime proof refuses local and self-hosted execution'
+& python (Join-Path $PSScriptRoot 'test_startup_dialogs.py') $exe $probeRoot
+if ($LASTEXITCODE -ne 0) { throw "Interactive startup dialog probes failed; $probeRoot/startup-dialogs.json" }
 Write-Host "app probes: all passed; evidence: $probeRoot"
