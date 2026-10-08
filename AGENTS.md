@@ -16,13 +16,13 @@ Preserve user side changes. Before staging or committing, inspect `git status --
 
 ## What this project is
 
-**Spellbook** is a native Windows prompt manager: a fast desktop app to store, organise, search, template, and copy AI prompts, replacing a folder of Notepad `.txt` files. Tagline: *Your grimoire of AI prompts.* C++20, Win32, SQLite with FTS5. Executable `Spellbook.exe`, C++ namespace `spellbook`, data in `%LOCALAPPDATA%\Spellbook\` (`spellbook.db`, `logs\spellbook.log`).
+**Spellbook** is a native Windows prompt manager: a fast desktop app to store, organise, search, template, and copy AI prompts, replacing a folder of Notepad `.txt` files. Tagline: *Your grimoire of AI prompts.* C++20, WinUI 3 through C++/WinRT, SQLite with FTS5. Executable `Spellbook.exe`, C++ namespace `spellbook`, data in `%LOCALAPPDATA%\Spellbook\` (`spellbook.db`, `logs\spellbook.log`). The approved stack is recorded in ADR 0002; the existing Win32 bootstrap remains until D00 T02 §3 replaces it.
 
 | Path | Purpose |
 | ---- | ------- |
 | `src/core/` | `spellbook_core`: the domain model and services. Standard C++ only: no Windows headers, no storage, no UI |
 | `src/storage/` | `spellbook_storage`: `IPromptRepository`, `SqlitePromptRepository`, the SQLite wrapper, and the migration runner |
-| `src/app/` | `Spellbook.exe`: the Win32 shell (entry point, windows, resources, manifest). Thin by rule |
+| `src/app/` | `Spellbook.exe`: the WinUI 3 app, planned MSBuild `Spellbook.vcxproj` in `Spellbook.slnx`; thin by rule. ADR 0002 governs replacement of the current Win32 bootstrap in D00 T02 §3 |
 | `migrations/` | `NNNN_name.sql` schema steps, embedded into the binary at build time; a shipped one is never edited |
 | `tests/` | Catch2 suites, one executable per library (`tests/core/`, `tests/storage/`), run through CTest |
 | `scripts/` | The PowerShell 7 runners (`setup`, `build`, `test`, `run`, `format`, `lint`, `migrate`, `package`, `release`, `check-all`) and the stdlib Python gates (`todo-graph.py`, `check-layering.py`, `check-docs.py`) |
@@ -44,13 +44,13 @@ Everything here is Windows-only. The Python gates are stdlib Python 3 (`python` 
 
 ## The decisions this project runs on
 
-- **C++20 on MSVC** (the VS 2022 v143 toolset; a newer VS with the C++ x64 tools is accepted), **CMake presets** (`debug`, `release`, `relwithdebinfo`) with **Ninja**, **vcpkg in manifest mode** with the `x64-windows-static` triplet and the static CRT, so `Spellbook.exe` is one self-contained file. See `docs/adr/0001-tech-stack.md`.
-- **Win32, no UI framework.** Unicode W APIs only (`UNICODE`), UTF-16 at the API boundary and UTF-8 everywhere else (`core::utf8_to_wide` and `wide_to_utf8`), Per-Monitor-V2 DPI, Common Controls v6, the UTF-8 process code page, dark-mode-aware.
+- **C++20 on MSVC, Visual Studio 2026 v145.** The approved hybrid build keeps **CMake presets** and **Ninja** for core, storage, and tests; the app moves to MSBuild `src/app/Spellbook.vcxproj` in `Spellbook.slnx`. **vcpkg in manifest mode** provisionally retains `x64-windows-static` and the static CRT; D00 T02 §3 must prove compatibility or apply the consistent dynamic-CRT fallback. See `docs/adr/0002-winui-3.md`; toolchain and shell implementation belong to D00 T02 §2 and §3.
+- **WinUI 3 through C++/WinRT on Windows App SDK 2.5.1.** Unicode W APIs for native interoperability, UTF-16 at the API boundary and UTF-8 in core/storage, DPI-aware and dark-mode-aware. ADR 0002 supersedes the Win32-only UI decision. D00 T02 §3 replaces the bootstrap; §5 updates the UI standard and patterns, and §6 retargets open UI contracts.
 - **SQLite with FTS5** behind `IPromptRepository`. Versioned migrations in `migrations/`, one transaction per step, `PRAGMA user_version` as the schema version, a newer database refused rather than downgraded.
 - **Libraries:** sqlite3, spdlog (with fmt), nlohmann-json, Catch2. **A dependency is a decision:** a new one is added by a TODO section that records why and checks its license is MIT-compatible.
 - **The toolchain is repo-portable** (operator decision 2026-10-04): cmake, ninja, clang-format, clang-tidy, actionlint, and vcpkg are pinned in `toolchain.json` and live in `.tools/`; only MSVC and the Windows SDK are machine-wide. A tool from PATH is never used in their place.
 - **Version from git tags** (`v<SemVer>`, `cmake/SpellbookVersion.cmake`); no version string is typed into a project file.
-- **Packaging:** one **Inno Setup 7** installer with three modes (install for me, install for all users, portable) plus the portable ZIP; a `Spellbook.portable` marker beside the exe keeps all data in `Data\` beside it. Unsigned for v0.1.0. Channels: GitHub Releases, winget, Scoop, Chocolatey; the Microsoft Store waits for code signing. See `docs/adr/0003-v0.1.0-scope-and-distribution.md`.
+- **Packaging:** an unpackaged, self-contained app folder including the Windows App SDK runtime, delivered by one **Inno Setup 7** installer with three modes (install for me, install for all users, portable) plus the portable ZIP. A `Spellbook.portable` marker beside the exe keeps all data in `Data\` beside it. Unsigned for v0.1.0. Channels: GitHub Releases, winget, Scoop, Chocolatey; the Microsoft Store waits for code signing and its separate packaging work. See `docs/adr/0002-winui-3.md` and `docs/adr/0003-v0.1.0-scope-and-distribution.md`.
 - **Network:** the update check (on by default, at most daily, GitHub Releases API, no user data) and the opt-in AI features (OpenRouter with the user's key in Windows Credential Manager, or an ACP agent the user runs), both governed by the Privacy page in Settings; AI costs show per result with a monthly cap. Nothing else touches the network, and there are **no secrets in the repository**. See ADR 0003 and ADR 0004.
 - **v0.1.0 is the premium release** (ADR 0003): M1 to M5 plus capture, Jump List, Trash, backups, `.spell` files, duplicates, rich runes, composition, the smart editor, tabs, the starter grimoire, metadata, and crash safety. Windows 10 (1809+) and 11. Start with Windows is opt in.
 - **Unattended runs** (`process-plan`) push `main` after each stamped section, never force-push, never amend a pushed commit, and never tag; operator-only work lives in `todo/99-manual/` and is never run by an agent.

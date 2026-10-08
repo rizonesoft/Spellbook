@@ -12,11 +12,15 @@ Spellbook replaces a folder of Notepad `.txt` prompts with a desktop app to stor
 
 ### Language and compiler: C++20 on MSVC (Visual Studio 2022, v143)
 
+**Superseded by ADR 0002:** the compiler baseline becomes Visual Studio 2026 v145; C++20 remains. See [ADR 0002](0002-winui-3.md).
+
 The Win32 API is a C API, and MSVC is its first-class compiler: the SDK headers, the resource compiler, and the debugger are built around it. C++20 gives `std::span`, `std::format`-era fmt, concepts, and `std::chrono` calendar types without exotic features. A newer VS with the C++ x64 tools is accepted, so a fresh CI image keeps working.
 
 *Alternatives:* C# with WPF or WinUI (the stack of Isotone and ScratchPad) starts slower and needs a runtime; Rust has thinner Win32 tooling and no resource compiler story; clang-cl would work but adds a second compiler to support for no gain.
 
 ### UI: Win32 API, no framework
+
+**Superseded by ADR 0002:** the app adopts WinUI 3 through C++/WinRT. The original rationale below remains historical. See [ADR 0002](0002-winui-3.md).
 
 A native Win32 window starts in milliseconds, has no runtime to install, matches the system's controls, and gets accessibility, high contrast, and DPI behavior from Windows. The cost is more code per surface, which the layering rule contains: windows stay thin and logic lives in core. Per-Monitor-V2 DPI and Common Controls v6 come from the manifest; dark mode is done with `DwmSetWindowAttribute` and the `DarkMode_Explorer` theme where Windows supports it.
 
@@ -39,7 +43,11 @@ An embedded database in one file needs no server, no credentials, and no setup, 
 
 The triplet is `x64-windows-static` with the static CRT, so `Spellbook.exe` is one self-contained file with no redistributable to install.
 
+**Superseded by ADR 0002:** the single-file distribution assumption becomes a self-contained app folder; CRT compatibility remains provisional until the WinUI shell checkpoint. See [ADR 0002](0002-winui-3.md).
+
 ### Build: CMake presets, Ninja, and a repo-portable toolchain
+
+**Superseded by ADR 0002:** the app moves to MSBuild in a hybrid build; libraries and tests retain CMake presets and Ninja. See [ADR 0002](0002-winui-3.md).
 
 CMake presets give one build definition for Visual Studio, VS Code, the scripts, and CI. Ninja is fast and works the same everywhere. The operator decided on 2026-10-04 to keep the toolchain portable: cmake, ninja, clang-format, clang-tidy, actionlint, and vcpkg are pinned in `toolchain.json` (URL, SHA-256, version) and provisioned into `.tools/` by `scripts/setup.ps1`, so every clone and CI run use the same versions. Only MSVC and the Windows SDK are machine-wide, because they cannot practically be portable. This matters most for clang-format: VS 2022 and VS 2026 bundle different LLVM versions that format differently.
 
