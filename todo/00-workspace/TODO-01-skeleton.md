@@ -13,7 +13,7 @@ frozen: true
 > **Goal:** A clean clone becomes a working Spellbook in four commands (`setup`, `build`, `test`, `run`): the pinned toolchain provisions itself, the app opens an empty main window titled "Spellbook" with its icon, `%LOCALAPPDATA%\Spellbook\spellbook.db` is created at schema version 1, logging writes to disk, the gates run locally in one command, CI is green on GitHub, and the plan, standards, skills, and docs are in place for M1.
 
 > [!IMPORTANT]
-> **Current state (verified 2026-10-04):** Sections 1 to 9 were built and verified in the initialisation session on 2026-10-04; their stamps below quote the runs. §10 is in progress: the first `ci` run on `main` (37164511590, b39045c) was green in about 5 minutes and saved both caches (tools 337 MB, vcpkg binaries 42 MB); the second (37164815434, 312ee1f) restored them: build-and-test 92 s, Build Debug 33 s instead of 167 s, setup 2 s instead of 33 s. Owed: the negative probe in the Test checkpoint.
+> **Current state (verified 2026-10-08):** Sections 1 to 9 were built and verified in the initialisation session on 2026-10-04; their stamps below quote the runs. §10 is independently verified: the first `ci` run on `main` (37164511590, b39045c) saved both caches; run 37765874459 on acce571 restored the vcpkg cache and built Debug in 41 seconds. Isolated probe run 37794972751 failed the Format check on the deliberately misformatted `src/core/src/version.cpp`; the probe is not merged into `main`.
 
 ## Inputs
 
@@ -42,7 +42,7 @@ frozen: true
 |   7   |   §7    | The TODO system, its tooling, and the M0 to M5 plan | §6 |  [x]   |
 |   8   |   §8    | Agent infrastructure: AGENTS.md, standards, skills, hooks | §7 |  [x]   |
 |   9   |   §9    | README, docs, ADR, and the GitHub templates | §8 |  [x]   |
-|  10   |   §10   | CI green on GitHub | §9, D99 T01 §1 |  [ ]   |
+|  10   |   §10   | CI green on GitHub | §9, D99 T01 §1 |  [x]   |
 
 ---
 
@@ -185,14 +185,21 @@ The workflows only count once GitHub has run them. This needs the repository to 
 
 - [x] Push `main` and watch `ci` run. Done when: the `ci` run on `main` is green, and its log shows the vcpkg cache saved.
 - [x] Re-run `ci` and confirm the vcpkg cache restores. Done when: the second run's configure step takes under five minutes.
-- [ ] Commit: `"ci: record the first green run"` (the README badge goes live; no code change expected)
+- [x] Commit: `"ci: record the first green run"` (the README badge goes live; no code change expected)
 
 **Test checkpoint:** Driven run with evidence: `gh run list --workflow ci.yml --branch main --limit 1` shows `completed success`; a probe branch with a misformatted file fails the `format` step.
 
+Checkpoint evidence (2026-10-08): `pwsh scripts/gh.ps1 run list --workflow ci.yml --branch main --limit 1` reports successful run [37765874459](https://github.com/rizonesoft/Spellbook/actions/runs/37765874459) at `acce571ae4bb4dc80230d4a5d3bcf8168d2fb8ea`. The first run [37164511590](https://github.com/rizonesoft/Spellbook/actions/runs/37164511590) logs `Cache saved with key: vcpkg-v1-Windows-...`; the current run logs `Cache restored successfully` and `Restored 7 package(s)`. Workflow dispatch on isolated branch `probe/codex-format-9285`, commit `4454d4c421e9671f0712fbf15b7c743eeeee189b`, produced [37794972751](https://github.com/rizonesoft/Spellbook/actions/runs/37794972751): `Format check` failed with `format.ps1: 1 file(s) need formatting:`, `src\core\src\version.cpp`, and `Process completed with exit code 1.` The production workflow was unchanged. Local `pwsh scripts/check-all.ps1` exited 0 with `check-all: all gates passed` (21 gates); full output is in `build/codex/d00-t01-s10-check-all.log`.
+
 **Needs:** GitHub repository (`D99 T01 §1`)
+
+> **Verified:** 2026-10-08 | §10 | Independent `pwsh scripts/check-all.ps1` exit 0: `check-all: all gates passed` (21 gates), Debug and Release each `100% tests passed out of 29`, `todo-graph validate: 17 files, 120 sections, 0 fatal, 0 warnings`, `plan --check: current`; log `build/reviews/d00-t01-s10-9285/stage1-check-all.log`. Independent `pwsh scripts/gh.ps1 run list --workflow ci.yml --branch main --limit 1`: `completed success`, run 37765874459 at `acce571ae4bb4dc80230d4a5d3bcf8168d2fb8ea`. Run 37164511590: `Cache saved with key: vcpkg-v1-Windows-dae46a4519e9526225700f75f15edcb920f630574488acae39c4ff6e1d2b13e2`. Run 37765874459: `Cache restored successfully`, `Restored 7 package(s)`, Debug `Configuring done (16.1s)` in `build/codex/main-ci.log` (under five minutes), Build Debug 41 seconds. Isolated probe run 37794972751 at `4454d4c421e9671f0712fbf15b7c743eeeee189b`: only `Format check` failed, `format.ps1: 1 file(s) need formatting:`, `src\core\src\version.cpp`, `Process completed with exit code 1.` Hosted receipts: `build/reviews/d00-t01-s10-9285/stage1-main-list.log`, `stage1-37164511590.log`, `stage1-37765874459.log`, `stage1-37794972751.json`, and `stage1-37794972751.log` in the same directory; probe is not part of the production candidate.
+> **Implementer:** Codex (gpt-6-astra)
+> **Reviewer:** Codex gpt-6-astra, effort high, CLI 0.161.0, session `01a11bfc-10ce-7723-9b67-51a6aeb36321`; APPROVE in `build/reviews/d00-t01-s10-9285/codex-review.md`; candidate base `acce571ae4bb4dc80230d4a5d3bcf8168d2fb8ea` plus manifest `build/reviews/d00-t01-s10-9285/candidate.json` (SHA-256 `284473e150816f237d805b61903fbd753117cc966df84db90470c4f4513f43de`), all 187 files rechecked unchanged before stamping; receipt `build/reviews/d00-t01-s10-9285/stage1-manifest-verification.json`.
+> **Second reviewer:** Claude claude-sonnet-5-5, alias sonnet, explicit effort high, CLI 2.1.294, provider firstParty, session `8d1c5fa6-58f7-494e-8311-c0e5438723e8`; APPROVE, success, non-error, exit 0 in `build/reviews/d00-t01-s10-9285/sonnet-review.json` and `build/reviews/d00-t01-s10-9285/sonnet-exit.txt`; invocation and model mapping evidence `build/reviews/d00-t01-s10-9285/runtime-identities.json`.
 
 ## Verification
 
 - [x] `pwsh scripts/check-all.ps1` exits 0
 - [x] `python scripts/todo-graph.py validate` clean
-- [ ] `ci` green on `main` (§10)
+- [x] `ci` green on `main` (§10)

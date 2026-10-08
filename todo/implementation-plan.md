@@ -2,7 +2,7 @@
 
 The order to run every section in, from the M0 skeleton through the premium first release, v0.1.0, to the package channels after it.
 
-> **Progress:** **18 of 120 sections complete (15%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
+> **Progress:** **19 of 120 sections complete (15%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
 
 Seeded 2026-10-04 by the initialisation session from the project brief (milestones M0 to M5) and the conventions of Isotone, Resolute, and ScratchPad (recorded in [`../docs/reference-conventions.md`](../docs/reference-conventions.md)).
 
@@ -62,7 +62,7 @@ Everything later builds on a toolchain that provisions itself, a build with warn
 | [x] | `D00 T01 §8` | Agent infrastructure: AGENTS.md, standards, skills, hooks | 4 |
 | [x] | `D00 T01 §9` | README, docs, ADR, and the GitHub templates | 5 |
 | [x] | `D99 T01 §1` | Create the GitHub repository and push main | 3 |
-| [ ] | `D00 T01 §10` | CI green on GitHub | 3 |
+| [x] | `D00 T01 §10` | CI green on GitHub | 3 |
 | [x] | `D99 T01 §2` | Repository settings: labels, security, branch protection | 5 |
 | [x] | `D00 T03 §1` | Operator-only work in the graph: runnable now and elsewhere | 4 |
 | [x] | `D00 T03 §2` | The run skills: process-plan, process-phase, process-todo-file, groom-plan | 5 |
