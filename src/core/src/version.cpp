@@ -7,7 +7,7 @@ namespace spellbook::core
 
 std::string_view app_name() noexcept
 {
-    return "Spellbook";
+return    "Spellbook";
 }
 
 std::string_view version() noexcept
