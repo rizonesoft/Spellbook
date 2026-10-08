@@ -2,7 +2,7 @@
 schema_version: 1
 id: workspace-skeleton
 domain: 00-workspace
-status: active
+status: done
 title: "TODO-01 -- The M0 Skeleton"
 depends_on: []
 frozen: true
@@ -203,3 +203,5 @@ Checkpoint evidence (2026-10-08): `pwsh scripts/gh.ps1 run list --workflow ci.ym
 - [x] `pwsh scripts/check-all.ps1` exits 0
 - [x] `python scripts/todo-graph.py validate` clean
 - [x] `ci` green on `main` (§10)
+
+File closeout (2026-10-08): all ten sections have stamps. `pwsh scripts/check-all.ps1` exited 0 with `check-all: all gates passed` (21 gates; `build/codex/d00-t01-closeout-check-all.log`), including `storage: a failing step rolls back and leaves the last complete version` in both Debug and Release. `todo-graph validate` reports `17 files, 120 sections, 0 fatal, 0 warnings`. CI run [37796847419](https://github.com/rizonesoft/Spellbook/actions/runs/37796847419) completed success for `f2f98fd375f32c07e794bdafe541e4ac6e23c360`. No orphaned deferrals or new stubs remain; the repository interface and library panes belong to D01 T01, and the installer belongs to D05 T02 §2. The frozen migration and its committed fixture are unchanged.

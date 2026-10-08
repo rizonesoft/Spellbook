@@ -34,7 +34,6 @@ Current dependency-safe work comes from `python scripts/todo-graph.py query read
 
 | TODO | Domain | Title |
 | ---- | ------ | ----- |
-| [TODO-01](./00-workspace/TODO-01-skeleton.md) | 00-workspace | The M0 Skeleton (one section open: CI green on GitHub) |
 | [TODO-03](./00-workspace/TODO-03-unattended-runner.md) | 00-workspace | The Unattended Runner (next: §1 to §3 need no compiler) |
 | [TODO-02](./00-workspace/TODO-02-winui-stack.md) | 00-workspace | The WinUI 3 Stack (next: ADR 0002, then the VS 2026 workloads) |
 | [TODO-01](./99-manual/TODO-01-operator.md) | 99-manual | Operator Steps (blocking now: §5, the VS 2026 workloads) |
