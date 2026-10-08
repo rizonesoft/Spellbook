@@ -119,7 +119,10 @@ def package(repo: Path) -> Path:
                 if source.is_file():
                     output.write(source, source.relative_to(payload).as_posix())
         with temporary_archive.open("rb") as stream:
-            digest = hashlib.file_digest(stream, "sha256").hexdigest()
+            hasher = hashlib.sha256()
+            for block in iter(lambda: stream.read(1024 * 1024), b""):
+                hasher.update(block)
+            digest = hasher.hexdigest()
         # Publish only after payload and notices are complete. A failed preflight
         # leaves any previously published ZIP and checksum untouched.
         temporary_archive.replace(archive)
