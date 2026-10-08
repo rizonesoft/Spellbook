@@ -3,7 +3,7 @@
   Builds Spellbook (if needed) and launches Spellbook.exe.
 .DESCRIPTION
   Runs scripts/build.ps1 for -Config (Ninja rebuilds only what changed), then
-  starts artifacts/build/<preset>/bin/Spellbook.exe.
+  starts artifacts/build/<preset>/app/Spellbook.exe.
   -Smoke runs the launch smoke instead: the app starts fully (logging, database,
   migrations, main window), paints once, and exits. The script waits, checks the
   exit code is 0, and prints the log lines the run wrote. By default the smoke
@@ -44,19 +44,27 @@ if (-not (Test-Path $exe)) { throw "$exe not found. Run: pwsh scripts/build.ps1 
 $appArgs = @()
 if ($Smoke -and -not $DataDir) {
     $DataDir = Join-Path $RepoRoot "build/smoke/$($Presets[$Config])"
-    if (Test-Path $DataDir) { Remove-Item -Recurse -Force $DataDir }
+    $smokeRoot = [IO.Path]::GetFullPath((Join-Path $RepoRoot 'build/smoke')) + [IO.Path]::DirectorySeparatorChar
+    $DataDir = [IO.Path]::GetFullPath($DataDir)
+    if (-not $DataDir.StartsWith($smokeRoot, [StringComparison]::OrdinalIgnoreCase)) { throw 'Smoke data directory escapes build/smoke' }
+    if (Test-Path -LiteralPath $DataDir) { Remove-Item -LiteralPath $DataDir -Recurse -Force }
 }
 if ($DataDir) { $appArgs += @('--data-dir', $DataDir) }
+$start = [Diagnostics.ProcessStartInfo]::new($exe)
+$start.UseShellExecute = $false
+$start.CreateNoWindow = $true
+foreach ($argument in $appArgs) { $start.ArgumentList.Add($argument) }
 
 if (-not $Smoke) {
     Write-Step "start $exe $($appArgs -join ' ')"
-    if ($appArgs.Count -gt 0) { Start-Process -FilePath $exe -ArgumentList $appArgs } else { Start-Process -FilePath $exe }
+    [Diagnostics.Process]::Start($start) | Out-Null
     exit 0
 }
 
 $appArgs += '--smoke'
+$start.ArgumentList.Add('--smoke')
 Write-Step "smoke $exe $($appArgs -join ' ')"
-$p = Start-Process -FilePath $exe -ArgumentList $appArgs -PassThru
+$p = [Diagnostics.Process]::Start($start)
 if (-not $p.WaitForExit(60000)) {
     $p.Kill()
     throw 'smoke: Spellbook.exe did not exit within 60 seconds'

@@ -27,7 +27,7 @@ Legs: `msvc`, each tool in `toolchain.json`, `vcpkg`, `hooks` (sets `git config 
 
 GitHub-hosted CI and release jobs first run `scripts/setup-ci.ps1`. It adds a missing WinUI C++ component to the existing VS 2026 C++ installation on the disposable VM, then repeats component discovery. It refuses local and self-hosted execution. Installer exits other than 0 or 3010 fail; both accepted codes still require successful discovery and the normal setup/build checks. Local setup remains operator-owned. The installer uses the [documented modify command](https://learn.microsoft.com/en-us/visualstudio/install/use-command-line-parameters-to-install-visual-studio), with PowerShell waiting for completion.
 
-When moving an existing build tree from VS 2022 to VS 2026, run `pwsh scripts/build.ps1 -Config Debug -Clean` and `pwsh scripts/build.ps1 -Config Release -Clean` once so CMake redetects the compiler. The app is still the Win32 bootstrap until D00 T02 §3; these toolchain pins do not claim that the hybrid app already exists.
+When moving an existing build tree from VS 2022 to VS 2026, run `pwsh scripts/build.ps1 -Config Debug -Clean` and `pwsh scripts/build.ps1 -Config Release -Clean` once so CMake redetects the compiler. The runner builds the libraries and tests with CMake/Ninja, then restores and builds the WinUI project with MSBuild. The project opts into native C++ PackageReference support and requires VS 2026 18.7 or newer.
 
 ## Build, test, run
 
@@ -41,7 +41,7 @@ pwsh scripts/run.ps1 -DataDir build/try     # use a throwaway data folder
 
 The scripts enter the MSVC x64 developer environment themselves (through `vswhere` and `vcvars64.bat`), so they work from any PowerShell, not only a Developer prompt. The first configure builds the vcpkg ports (several minutes); afterwards configure takes seconds.
 
-Output lands under `artifacts/build/<preset>/`: `bin/Spellbook.exe`, the test executables, and `compile_commands.json` for clang-tidy and editors.
+Output lands under `artifacts/build/<preset>/`: `app/Spellbook.exe` with its complete runtime/resource payload, test executables under `bin/`, and `compile_commands.json` for library clang-tidy and editors. Copy the entire `app/` folder to deploy the shell; the executable alone is insufficient. Package pins and version resources are generated from `toolchain.json` and git tags when the runner configures CMake.
 
 ### Visual Studio and VS Code
 
@@ -52,10 +52,12 @@ Open the folder in Visual Studio 2026 or VS Code with the CMake Tools extension:
 ```powershell
 pwsh scripts/check-all.ps1     # everything CI runs
 pwsh scripts/format.ps1 -Check # clang-format
-pwsh scripts/lint.ps1          # clang-tidy and the layering check
+pwsh scripts/lint.ps1          # library clang-tidy, MSVC app analysis, layering
 ```
 
-`check-all.ps1` runs: the toolchain check, the layering self-test and check, the format check, Debug and Release builds, Debug and Release tests, the Release launch smoke, clang-tidy, actionlint, the docs check, the three TODO-graph gates, and the run guard probe (`scripts/check-campaign-stop.ps1`). Every gate runs even after a failure, and a table at the end shows each result.
+`check-all.ps1` runs: the toolchain checks and rejection probes, the layering self-test and check, the format check, Debug and Release hybrid builds, Debug and Release tests, the Release launch smoke and startup failure probes, library clang-tidy, MSVC app analysis, actionlint, the docs and TODO-graph gates, and the workflow/guard probes. Every gate runs even after a failure, and a table at the end shows each result. MSVC analysis retains `/W4 /WX` on app sources and excludes external headers with `/analyze:external-`.
+
+`scripts/test-self-contained-ci.ps1` is an additional hosted-only proof. It refuses local and self-hosted execution before changes, removes registered Windows App Runtime packages only from the disposable runner user, copies the Release app folder outside the checkout, checks the visible window and app-local runtime modules, captures its DPI and screenshot, and runs smoke. Evidence is uploaded from `build/self-contained-proof/`; it never removes runtime packages from a developer machine.
 
 ## The dev database
 

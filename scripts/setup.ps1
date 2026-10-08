@@ -131,10 +131,10 @@ function Get-MsvcInstallHelp {
     $vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio/Installer/vswhere.exe'
     $installation = $null
     if (Test-Path -LiteralPath $vswhere) {
-        $installation = & $vswhere -products * -version '[18.0,19.0)' -latest -property installationPath
+        $installation = & $vswhere -products * -version $Toolchain.msvc.vswhereVersionRange -latest -property installationPath
     }
     if (-not $installation) {
-        return 'Install Visual Studio 2026, then add Desktop development with C++ and Microsoft.VisualStudio.Component.WindowsAppSdkSupport.Cpp in Visual Studio Installer.'
+        return "Install Visual Studio 2026 in version range $($Toolchain.msvc.vswhereVersionRange), then add Desktop development with C++ and Microsoft.VisualStudio.Component.WindowsAppSdkSupport.Cpp in Visual Studio Installer."
     }
     return "Operator command (elevated PowerShell): & `"$installer`" modify --installPath `"$installation`" --add Microsoft.VisualStudio.Workload.NativeDesktop --add Microsoft.VisualStudio.Component.WindowsAppSdkSupport.Cpp --includeRecommended --passive"
 }

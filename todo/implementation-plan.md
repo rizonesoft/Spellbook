@@ -74,7 +74,7 @@ Everything later builds on a toolchain that provisions itself, a build with warn
 | [x] | `D99 T01 §5` | Install the Visual Studio 2026 C++ and WinUI workloads | 2 |
 | [x] | `D00 T02 §2` | The Visual Studio 2026 toolchain pins and the setup leg | 7 |
 | [x] | `D00 T02 §7` | Provision missing WinUI tools on disposable CI runners | 5 |
-| [ ] | `D00 T02 §3` | The WinUI 3 shell in the hybrid build | 9 |
+| [ ] | `D00 T02 §3` | The WinUI 3 shell in the hybrid build | 10 |
 | [ ] | `D00 T03 §4` | The UI driver for driven runs | 6 |
 | [ ] | `D00 T02 §4` | Runners, CI, and the portable package on the new stack | 7 |
 | [ ] | `D00 T02 §5` | The winui-patterns skill, the UI standard, and the architecture doc | 5 |

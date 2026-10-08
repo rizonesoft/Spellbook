@@ -17,7 +17,7 @@ endif()
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
-# Static CRT, matching the x64-windows-static vcpkg triplet: one self-contained exe.
+# Static CRT, matching the x64-windows-static triplet and the MSBuild app.
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
@@ -37,7 +37,13 @@ find_package(nlohmann_json CONFIG REQUIRED)
 
 add_subdirectory(src/core)
 add_subdirectory(src/storage)
-add_subdirectory(src/app)
+
+# The MSBuild app consumes the exact toolchain package pins and git-tag version.
+file(READ "${PROJECT_SOURCE_DIR}/toolchain.json" _spellbook_toolchain)
+string(JSON SPELLBOOK_APP_SDK_VERSION GET "${_spellbook_toolchain}" packages Microsoft.WindowsAppSDK version)
+string(JSON SPELLBOOK_CPPWINRT_VERSION GET "${_spellbook_toolchain}" packages Microsoft.Windows.CppWinRT version)
+configure_file(src/app/nuget_versions.props.in "${CMAKE_BINARY_DIR}/generated/nuget_versions.props" @ONLY)
+configure_file(src/app/res/version.rc.in "${CMAKE_BINARY_DIR}/generated/version.rc" @ONLY)
 
 option(SPELLBOOK_BUILD_TESTS "Build the unit tests" ON)
 if(SPELLBOOK_BUILD_TESTS)

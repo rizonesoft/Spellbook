@@ -1,0 +1,6 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="@SPELLBOOK_APP_SDK_VERSION@" />
+    <PackageReference Include="Microsoft.Windows.CppWinRT" Version="@SPELLBOOK_CPPWINRT_VERSION@" />
+  </ItemGroup>
+</Project>
