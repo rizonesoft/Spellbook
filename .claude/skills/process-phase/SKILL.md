@@ -54,7 +54,7 @@ Read the phase as the user will use it and ask what is missing: surfaces with no
 In table order, for each open row whose `resolve` exits 0:
 
 1. Before starting, read the previous push's CI result: `pwsh scripts/gh.ps1 run list --branch main --limit 1` (the wrapper finds the GitHub CLI when it is not on PATH). A failed run is this run's work first; one still running is checked again before the next section.
-2. `process-todo-section` on the row, then `review-todo-section` in a fresh context (a subagent given only the ref and the diff). The reviewer writes the stamp and flips the row, or refuses with findings you fix.
+2. `process-todo-section` on the row, then this agent's `review-todo-section`: a fresh Codex CLI review with global model/effort followed by a quick fresh Sonnet review at high effort. After both approve the same candidate, the independent Codex reviewer stamps it and flips the row. Fix any findings and repeat both stages on the changed candidate.
 3. `python scripts/todo-graph.py plan --sync` and `validate`, then commit once with the section's `Commit:` message and its ref (this is `process-todo-section` step 5, not a second commit).
 4. `git push origin main`. A rejected push is a red gate: fetch, rebase only your unpushed commits if the remote moved, re-run the gates, push again. Never force.
 5. Record the ref, the commit, the push, and the verdict in the Sections log.

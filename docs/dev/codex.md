@@ -74,7 +74,17 @@ Pause immediately persists a marker and prevents further continuation. The worke
 
 ## Proof and recovery
 
-Each section runs its exact checkpoint and full gates, receives independent fresh-context review, then is stamped, synchronized, committed, and pushed once. The next section waits for CI tied to that SHA. A stale review or self-review is insufficient. Report observed implementer/reviewer identities without inventing model IDs.
+Each section runs its exact checkpoint and full gates, receives both reviews described below, then is stamped, synchronized, committed, and pushed once during unattended execution. The next section waits for CI tied to that SHA. A stale review or self-review is insufficient.
+
+## Review order for either primary writer
+
+1. A new Codex CLI session performs the full independent review and reruns the checkpoint and repository gates. Its model and reasoning effort come from the operator's global Codex configuration automatically. The invocation supplies no model, effort, profile, or alternate configuration home; repository config does not pin them. Record the effective values from the runtime, not the parent writer's identity.
+2. A new Claude CLI session performs a quick second pass with `--model sonnet --effort high`. The rolling alias avoids a version pin. Quick refers to reviewing the changed scope and nearby contracts; it does not reduce effort or waive a verdict. Record the resolved model from Claude's runtime JSON, CLI version, and explicit high-effort invocation.
+3. Both must approve the same candidate. The exact independent Codex reviewer session then checks the Sonnet evidence and writes the final stamp. Findings return to the writer; implementation changes require both reviews again. Missing reviewers, incomplete evidence, or unavailable models block shipping.
+
+The commands and role boundaries live separately in each agent's own `review-todo-section` skill. Cross-provider CLI review is authorized; skills, lifecycle hooks, campaign scripts, configuration, and session state are not shared. The writer passes only the section, candidate identity, and evidence paths to fresh reviewers. The review directory under `build/reviews/<id>/` holds a manifest covering tracked and untracked candidate files, raw logs, reports, exit codes, and actual model identities. Stamp metadata names both reviewers and reports.
+
+The [Codex configuration precedence](https://learn.chatgpt.com/docs/config-file/config-basic) puts CLI/project settings above user defaults, so neither review commands nor project config override the global model/effort. The [Claude model configuration](https://code.claude.com/docs/en/model-config) documents that aliases can depend on installed CLI version, provider routing, and explicit alias pins. Verify the resolved Sonnet against the current official release; do not silently accept a stale alias, older provider mapping, fallback, or allowlist restriction as "latest". Keep installations current through the operator's normal update process; review itself does not rewrite global settings or auto-upgrade tools.
 
 Per-turn JSONL/stderr stays in `build/codex/runs/<run_id>/`; session identity stays in `build/codex/campaign.json`. Three consecutive CLI failures or three attempts without content progress pause the run; record chatter is excluded from progress. Paused is not complete. Terminal `## Closeout`/`PARKED` markers require no runnable rows in scope, with operator/blocked remainders recorded. Intermediate phase endings use level-three headings.
 

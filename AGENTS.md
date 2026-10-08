@@ -8,7 +8,9 @@ Never run concurrent writers in this checkout. A session that launches the Codex
 
 Codex uses only `.agents/skills/` and `.codex/` automation. Skills, lifecycle hooks, Git hooks, configuration, and runtime state are independently maintained files, never symlinked, imported, or automatically synchronized across agents. Shared repository build/test/format/lint/TODO scripts remain agent-neutral; keep agent-specific orchestration under its own agent directory. See `docs/dev/codex.md`.
 
-The writer cannot approve its own work. Use a fresh-context Codex reviewer subagent, given only the section reference and candidate diff, for every implemented section. Record the actual implementer and reviewer model identities when available; never invent them. An unavailable reviewer blocks stamping and shipping.
+The writer cannot approve its own work. Every implemented section needs two sequential reviews: a fresh Codex CLI session using the operator's global model and effort settings, then a quick fresh Claude CLI review using the rolling `sonnet` alias at `high` effort. Follow the Codex `review-todo-section` skill. Do not substitute a writer-inherited subagent for the global-configured Codex reviewer. Both must approve the same candidate before the independent Codex reviewer stamps it. Missing review, unresolved findings, or unverified model routing blocks shipping.
+
+Cross-provider review may invoke the installed native `codex` and `claude` CLIs, each with its own instructions, authentication, settings, and hooks. This is a review-only exception to workflow isolation, not permission to import the other agent's skills, reuse its campaign runner, transfer session state, or switch the writer.
 
 Preserve user side changes. Before staging or committing, inspect `git status --short` and enough diff/content to understand every dirty file. Include small, safe, non-secret, non-generated side edits in the coherent commit. Stop only for a concrete conflict or unsafe change; never discard user edits. On Windows use `exec_command` with `tty: true` and hidden background processes.
 

@@ -8,6 +8,7 @@ The format follows [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/
 
 ### Added
 
+- Sequential independent Codex review using global model/effort settings, followed by a quick latest-Sonnet review at high effort, for either primary writer.
 - A primary-writer selector for switching between Codex and Claude while preserving their separate workflows and paused run state.
 - An independent Codex writer workflow with its own skills, hooks, supervised plan runner, pause/recovery controls, and fresh-context review.
 - The Spellbook icon: a fanned deck of teal prompt cards with an AI sparkle, with a simpler drawing at small sizes, and new README banners.

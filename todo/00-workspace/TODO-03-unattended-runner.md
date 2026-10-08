@@ -45,6 +45,7 @@ depends_on: []
 
 |   6   |   §6    | Independent Codex writer workflow and supervised runner | §1, §2, §3 |  [x]   |
 |   7   |   §7    | Switch the primary writer between Codex and Claude | §6 |  [x]   |
+|   8   |   §8    | Sequential global-configured Codex and latest-Sonnet review | §7 |  [x]   |
 
 ---
 
@@ -148,6 +149,23 @@ Operator clarification 2026-10-08: either Codex or Claude must be selectable as 
 > **Verified:** 2026-10-08 | §7 | Independent review of `f3255a0ca6c8292e3e57119760fbe655f6a6da99` plus the complete tracked/untracked candidate tree. `python scripts/test_writer.py -v`: "Ran 7 tests", "OK"; `python -m unittest discover -s .claude/tests -v`: "Ran 4 tests", "OK"; `python -m unittest discover -s .codex/tests -v`: "Ran 23 tests", "OK". Tests prove both switch directions, active locks/guards, invalid selection, preserved paused state, serialized Claude registration, and wrong-writer resume refusal using temporary fixtures. `pwsh scripts/check-all.ps1`: exit 0, "check-all: all gates passed" (21 gates; full log `build/review-check-all-writer-switch.log`). `python scripts/writer.py status`: "primary writer: codex". No real campaign started or writer switched.
 > **Implementer:** Codex (GPT-6; exact model ID unavailable).
 > **Reviewer:** Independent fresh-context Codex subagent (GPT-6; exact model ID unavailable).
+
+## 8. Sequential Codex and Sonnet Review for Either Writer
+
+Operator decision 2026-10-08: every implemented section gets independent Codex review using its global model and effort, then a quick review using the latest Sonnet at high effort. Keep each agent's skills and runtime independently maintained; invoking the other native CLI for review is a narrow exception, not a shared runner or imported skill.
+
+- [x] Update `AGENTS.md`, `CLAUDE.md`, and each agent's own review/section/phase skills. Done when: both primary writers require Codex first and Sonnet second, children execute only their assigned stage, and only the independent reviewer stamps after both approvals. Cheaper substitute: a writer-inherited subagent silently choosing a different model.
+- [x] Document executable review commands, settings inheritance, model evidence, and latest-alias verification in each review skill and `docs/dev/codex.md`. Done when: Codex has no model/effort/profile override, Sonnet uses the rolling alias with explicit high effort, and stale aliases or incomplete reviews block shipping.
+- [x] Bind both reviews to the complete tracked/untracked candidate and preserve failure handling. Done when: changed implementation requires both stages again; raw evidence, actual identities, and both verdicts are recorded; no review starts a campaign or changes writer selection.
+- [x] Update `CHANGELOG.md` and prove the new sequence on this section. Done when: a real independent Codex review picks up current global settings, then an actual Sonnet review resolves the current alias at high effort, and the independent Codex reviewer checks both before stamping.
+- [x] Commit: `"workspace: require sequential Codex and Sonnet reviews (D00 T03 §8)"`
+
+**Test checkpoint:** `python .codex/scripts/check-workflow.py`, `python scripts/check-docs.py`, `python scripts/todo-graph.py validate`, and `pwsh scripts/check-all.ps1` exit 0. Execute the two real review stages on this candidate, capture Codex's effective model/effort and Sonnet's resolved model plus explicit high-effort invocation, and require both explicit approvals before stamping. Do not start a campaign, change global settings, or switch the writer.
+
+> **Verified:** 2026-10-08 | §8 | Independent checkpoint exits 0: "codex workflow: 14 skills, 0 findings", "0 findings", "todo-graph validate: 17 files, 119 sections, 0 fatal, 0 warnings"; full `pwsh scripts/check-all.ps1` exits 0, "check-all: all gates passed" (21 gates; Debug and Release each "100% tests passed out of 29"; Release smoke exit 0). Evidence: `build/reviews/d00-t03-s8/stage1-evidence.md` and `stage1-check-all.log` in that directory. Both sequential reviews explicitly APPROVE with exit 0; all 186 candidate hashes matched before finalization. Sonnet's three non-blocking notes were examined: existing entrypoints route to the updated review skill, and the official configuration URL was verified.
+> **Implementer:** Codex (GPT-6; exact writer model ID unavailable).
+> **Reviewer:** Codex `gpt-6-astra`, effort `high`, session `01a11a51-904d-7952-9117-7e7af1ccf20c`, confirmed from the runtime header and matching global configuration. Candidate: base `d5d15208f10c7b799032040bf387ac43ec45b353` plus the complete tracked/untracked tree in `build/reviews/d00-t03-s8/candidate.json`, manifest SHA-256 `c0d9e56cb05bb43f347d73e48c0b2b14e7ce779fa2c48aa8e68061dca43416d4`. Report: `build/reviews/d00-t03-s8/codex-review.md`; identity: `build/reviews/d00-t03-s8/stage1-identity.json`; final candidate check: `build/reviews/d00-t03-s8/finalize-manifest-before.json`.
+> **Second reviewer:** Claude `claude-sonnet-5-5`, alias `sonnet`, effort `high` by explicit invocation, CLI `2.1.294`, session `b665a556-ea17-4a65-b2b8-a2b834b5802f`. Runtime `modelUsage` identifies only that model on `firstParty`; result `subtype: success`, `is_error: false`; no separate effective-effort field is exposed. Report: `build/reviews/d00-t03-s8/sonnet-review.json`; invocation: `build/reviews/d00-t03-s8/sonnet-invocation.json`; current-alias and routing evidence: `build/reviews/d00-t03-s8/routing-evidence.json`.
 
 ## Verification
 

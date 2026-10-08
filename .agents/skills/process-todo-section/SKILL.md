@@ -49,7 +49,7 @@ Then run the section's **Test checkpoint exactly as written** and keep the outpu
 
 ## Step 5: hand to review, then commit
 
-Run `review-todo-section` on the section. It writes the stamp and flips the row. Then:
+Run `review-todo-section` on the section: independent Codex CLI review using global model/effort, then quick latest-Sonnet review at high effort. Both must approve the unchanged candidate before the independent Codex reviewer writes the stamp and flips the row. Then:
 
 ```bash
 python scripts/todo-graph.py plan --sync
