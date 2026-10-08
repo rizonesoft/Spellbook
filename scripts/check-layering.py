@@ -95,7 +95,8 @@ def project_coverage(files: dict[str, str], project: str) -> list[str]:
             continue
         # This static gate deliberately accepts only unconditional owned-source
         # declarations. It must not credit a file that MSBuild can skip later.
-        if any(child.tag.rsplit("}", 1)[-1] == "ExcludedFromBuild" for child in item):
+        if "ExcludedFromBuild" in item.attrib or any(
+                child.tag.rsplit("}", 1)[-1] == "ExcludedFromBuild" for child in item):
             findings.append(f"{location}:1:app-project:ExcludedFromBuild is unsupported; owned sources must compile in every configuration")
         if any(key in item.attrib for key in ("Remove", "Update", "Exclude")):
             findings.append(f"{location}:1:app-project:source removal/update/exclusion is unsupported")
@@ -156,6 +157,7 @@ def self_test() -> int:
         ('<Project><ClCompile Include="a.cpp" Condition="false" /></Project>', True),
         ('<Project><ItemGroup Condition="false"><ClCompile Include="a.cpp" /></ItemGroup></Project>', True),
         ('<Project><ClCompile Include="a.cpp" Exclude="a.cpp" /></Project>', True),
+        ('<Project><ClCompile Include="a.cpp" ExcludedFromBuild="true" /></Project>', True),
         ('<Project><ClCompile Include="a.cpp" /><ClCompile Remove="a.cpp" /></Project>', True),
         ('<Project><ClCompile Include="a.cpp" /><ClCompile Update="a.cpp"><ExcludedFromBuild>true</ExcludedFromBuild></ClCompile></Project>', True),
         ('<Project><ClCompile Include="a.cpp" /><ItemDefinitionGroup><ClCompile><ExcludedFromBuild>true</ExcludedFromBuild></ClCompile></ItemDefinitionGroup></Project>', True),
