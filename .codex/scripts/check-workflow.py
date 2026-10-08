@@ -6,6 +6,8 @@ import re
 import sys
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / 'scripts'))
+import writer
 EXPECTED = {'add-feature', 'add-migration', 'add-todo', 'build-and-test', 'create-todo',
             'fix-bug', 'groom-plan', 'process-phase', 'process-plan', 'process-todo-file',
             'process-todo-section', 'release', 'review-todo-section', 'win32-ui-patterns'}
@@ -13,6 +15,10 @@ EXPECTED = {'add-feature', 'add-migration', 'add-todo', 'build-and-test', 'creat
 
 def check(root: Path) -> list[str]:
     errors = []
+    try:
+        writer.selected(root)
+    except (OSError, ValueError) as error:
+        errors.append(f'writer.json: {error}')
     skills = root / '.agents/skills'
     actual = {p.parent.name for p in skills.glob('*/SKILL.md')}
     if actual != EXPECTED:

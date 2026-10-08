@@ -14,6 +14,9 @@ import time
 import uuid
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "scripts"))
+import writer
+
 NO_WINDOW = subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0
 
 
@@ -245,6 +248,7 @@ def supervise(root: Path, state: dict, executable: str) -> int:
     unchanged = 0
     previous = fingerprint(root)
     while True:
+        writer.require(root, "codex")
         again, reason = decision(root, state)
         if not again:
             state["status"] = "paused" if paused(root, state) else "finished"
@@ -293,7 +297,8 @@ def main() -> int:
         raise ValueError("start/resume needs --codex pointing to the installed native codex.exe")
     if args.action == "resume" and args.phase is not None:
         raise ValueError("resume retains the original phase scope")
-    with lock(root):
+    with writer.selection_lock(root), lock(root):
+        writer.require(root, "codex")
         # A crashed/interrupted supervisor may have left its worker draining.
         # Never clear pause or start another worker until that process exits.
         with lock(root, "worker.lock"):

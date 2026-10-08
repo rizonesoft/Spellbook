@@ -83,6 +83,8 @@ try {
         Invoke-Gate 'run guard probe' { & $pwsh -NoProfile -File scripts/check-campaign-stop.ps1 }
         Invoke-Gate 'Codex workflow layout' { & $python .codex/scripts/check-workflow.py }
         Invoke-Gate 'Codex campaign probes' { & $python -m unittest discover -s .codex/tests -v }
+        Invoke-Gate 'writer selection probes' { & $python scripts/test_writer.py -v }
+        Invoke-Gate 'Claude writer guard probes' { & $python -m unittest discover -s .claude/tests -v }
     } else {
         $results.Add([pscustomobject]@{ Gate = 'python gates'; Status = 'SKIP (no python)'; Seconds = 0 })
     }

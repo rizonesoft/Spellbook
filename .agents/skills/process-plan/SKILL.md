@@ -5,7 +5,7 @@ description: Run Spellbook's plan unattended with the Codex-only supervisor, or 
 
 # Process the Plan with Codex
 
-Codex is the primary writer. This skill owns plan execution, not requests merely to configure or inspect the workflow. Read `AGENTS.md` and `docs/dev/codex.md`. Use independent skills in `.agents/skills/`, hooks in `.codex/`, state in `build/codex/`, and records in `docs/codex-runs/`. Never activate another agent's workflow.
+Codex can be the primary writer when selected in `writer.json`. This skill owns plan execution, not requests merely to configure or inspect the workflow. Read `AGENTS.md` and `docs/dev/codex.md`. Use independent skills in `.agents/skills/`, hooks in `.codex/`, state in `build/codex/`, and records in `docs/codex-runs/`. Never activate another agent's workflow. Before start/resume and each implementation section run `python scripts/writer.py assert codex`; a mismatch stops implementation and does not change the selection automatically.
 
 ## Enter through the supervisor
 

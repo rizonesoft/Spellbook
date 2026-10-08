@@ -5,6 +5,8 @@ description: Execute one Spellbook phase through the Codex supervisor with indep
 
 # Process a Phase with Codex
 
+Before implementation and each section, run `python scripts/writer.py assert codex`. Switching the primary writer is an explicit operator action; this runner never selects itself automatically.
+
 Enter through `.agents/skills/process-plan/SKILL.md`; outside an owned worker, start its supervisor with `-Phase N`. A named phase does not chain. Inside a full-plan run, return to `process-plan` when this phase ends. Use the campaign's `docs/codex-runs/<run_id>.md`.
 
 1. Inspect dirty files and pause state. Read prior Codex evidence. Record Phase repairs, Shipped-row verification, Gap audit, Sections, Critical events, and Lessons.

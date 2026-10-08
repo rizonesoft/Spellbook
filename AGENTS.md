@@ -1,6 +1,8 @@
 # AGENTS.md
 
-Codex is the primary writer and implementation owner for this repository. Human orientation lives in `README.md`. Claude Code has independent instructions in `CLAUDE.md`; it does not import this file.
+The primary writer is selected by `writer.json`: either `codex` or `claude`, with equal implementation authority when selected. Human orientation lives in `README.md`. Claude Code has independent instructions in `CLAUDE.md`; it does not import this file.
+
+Before implementation or resuming a run, execute `python scripts/writer.py assert codex`. If Claude is selected, Codex may inspect or independently review, but must not implement. On an explicit request to switch writers, either agent may run `python scripts/writer.py select codex` or `python scripts/writer.py select claude`; this administrative action changes only the selection, never launches a run or migrates agent state. Check selection again before each section and after a pause. Do not hand-edit the setting to bypass an active-run refusal.
 
 Never run concurrent writers in this checkout. A session that launches the Codex supervisor monitors it; only the supervised worker writes implementation. Independent reviewers inspect and test without modifying implementation.
 

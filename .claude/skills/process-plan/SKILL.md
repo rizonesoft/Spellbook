@@ -24,6 +24,8 @@ Every section in `todo/99-manual/` is operator-only (accounts, secrets, approval
 
 ## 0. Route
 
+Before starting or resuming implementation, run `python scripts/writer.py assert claude`. A mismatch stops this runner without changing the selected writer. Repeat before each section and in every heartbeat before resuming work. Read-only audits remain permitted regardless of selection.
+
 ```bash
 git status -sb
 python scripts/todo-graph.py validate
@@ -60,7 +62,7 @@ If nothing is runnable now, report the runnable-elsewhere rows (the operator's t
 A run without a guard dies quietly at the first end of turn. Starting the first phase starts the guard, always, in this order:
 
 1. `CronList`. If a job whose prompt starts with `Claude run-guard heartbeat for Spellbook` exists, adopt it. Otherwise `CronCreate` with cron `3-59/5 * * * *`, recurring true, and the canonical prompt below with `<N>` and `<run file>` filled in.
-2. Write `build/claude-campaign-guard.json` (gitignored): `runner` `claude`, `workspace` the absolute repository path, `phase` the phase number, `run_file` the repo-relative run file (`docs/phase-runs/<YYYY-MM-DD>-phase-<N>.md`), `session_id` the value of `$CLAUDE_CODE_SESSION_ID` read in the shell, `cron_id` the job id. Delete any stale `build/claude-campaign-state.json`.
+2. Register the Claude guard through `python .claude/scripts/write-campaign-guard.py --session <session-id> --phase <N> --run-file <run-file> --cron <job-id>`, using `$CLAUDE_CODE_SESSION_ID` and the existing run record under `docs/phase-runs/`. The Claude-only helper checks the selected writer while holding the neutral transition lock, then writes `build/claude-campaign-guard.json`. Use this helper for every initial registration, resume, and phase repoint; never write the guard directly. If refused, delete only the heartbeat job just created for this failed start and report the blocker. A different existing session must pause/finish and release its guard before a new session registers. Delete this run's stale `build/claude-campaign-state.json` only after registration succeeds.
 3. Record the job id and the guard write in the run file's Critical events.
 
 The Stop hook (`.claude/hooks/campaign-stop.ps1`, wired in `.claude/settings.json`, built by `D00 T03 §3`) blocks this session's end of turn while the run is open, naming the next runnable row. It lets the turn end when the guard file is gone, the run file has a `## Closeout` heading or a column-0 `PARKED` line, or `query ready` reports `0 runnable now`; after three blocks with no change to the tree it trips its stall breaker and lets the turn end. The heartbeat covers what the hook cannot: a tripped breaker, an API error, a crash out of the turn. It dies with the session and a recurring job expires after 7 days: a run still open on day 7 creates a new job and rewrites `cron_id`; a run resumed in a new session rewrites the guard with the new `session_id`.
@@ -73,6 +75,8 @@ Canonical heartbeat prompt:
 
 ```text
 Claude run-guard heartbeat for Spellbook Phase <N> (run file <run file>). This session went idle while a process-plan run may still be open. Check, then act, in this turn.
+
+0. Run `python scripts/writer.py assert claude`. On mismatch, do not resume or switch the setting; delete this heartbeat job and report the selected writer.
 
 1. If build/claude-campaign-guard.json is missing, or <run file> has a line "## Closeout" or a column-0 line starting "PARKED": the run is over. CronDelete this job (find it with CronList by this prompt's first sentence), delete build/claude-campaign-state.json if present, and reply RUN FINISHED.
 2. If build/claude-campaign-state.json has trips of 2 or more: the run stalled twice with no change to the tree. Do not resume. Append a Critical events line to the run file naming what blocks it, delete the guard file and the state file, CronDelete this job, and report the stall to the operator.

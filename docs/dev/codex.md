@@ -1,6 +1,20 @@
 # Codex Writer Workflow
 
-Codex is Spellbook's primary implementation owner. `AGENTS.md` governs Codex. `CLAUDE.md` contains a separate complete Claude contract; neither imports the other. Only one writer may use this checkout at a time. This setup does not start the implementation plan.
+The primary implementation owner is selected in `writer.json`: either Codex or Claude. Both have equal writer authority when selected. `AGENTS.md` governs Codex. `CLAUDE.md` contains a separate complete Claude contract; neither imports the other. Only one writer may use this checkout at a time. Setup and switching do not start the implementation plan.
+
+## Select the primary writer
+
+```powershell
+python scripts/writer.py status
+python scripts/writer.py select claude
+python scripts/writer.py select codex
+```
+
+You can also tell either agent "make Claude the primary writer" or "make Codex the primary writer". Either may perform the selection operation; only the selected agent may then implement or resume its own runner. The other agent may independently review. The tracked `writer.json` is the single selection, initially `codex`; preserve its change in the next coherent commit. Existing sessions must recheck it before implementation, each section, and resume. Do not edit it manually to bypass the switch guard.
+
+Before switching, stop/pause the current writer and wait for its active worker to finish. The selector refuses an active Codex supervisor/worker, an unpaused Codex campaign, or any Claude campaign guard. The selection lock also serializes Codex startup and Claude's separate guard registration against switching. Uncertain stale state is a blocker to inspect, never deleted automatically. A paused Codex session remains paused with its identity and logs intact; switching back does not resume it. Claude retains its own pause/resume rules and records. Interactive writers must obey the same no-concurrent-writers rule; the selector cannot detect arbitrary editors or agents that ignore the protocol.
+
+Only the small, agent-neutral `scripts/writer.py` and selection metadata are shared for coordination. It reads activity indicators and writes only `writer.json` and its transition lock. Each agent registers and runs its own workflow. It imports neither agent runtime, starts no processes, changes no hooks, and copies no session state.
 
 ## Isolation
 

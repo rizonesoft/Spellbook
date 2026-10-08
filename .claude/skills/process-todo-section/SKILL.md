@@ -9,6 +9,8 @@ One section. One commit. The section is the contract, and a contract is checked 
 
 ## Step 0: resolve the argument
 
+Run `python scripts/writer.py assert claude` before implementation. If another writer is selected, stop implementation without changing the setting; independent review is still permitted.
+
 Never hand-translate a reference into a file name:
 
 ```bash

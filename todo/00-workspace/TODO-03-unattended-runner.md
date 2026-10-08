@@ -44,6 +44,7 @@ depends_on: []
 |   5   |   §5    | Unattended proof rules and the checkpoint sweep | §4, D00 T02 §6 |  [ ]   |
 
 |   6   |   §6    | Independent Codex writer workflow and supervised runner | §1, §2, §3 |  [x]   |
+|   7   |   §7    | Switch the primary writer between Codex and Claude | §6 |  [x]   |
 
 ---
 
@@ -130,6 +131,23 @@ Operator decision 2026-10-08: make Codex the primary writer, with separate skill
 > **Verified:** 2026-10-08 | §6 | Independent review of base `fcc2b83a0702a2039d78b2cd66675654d24962df` plus all tracked and untracked candidate changes. `python .codex/scripts/check-workflow.py`: "codex workflow: 14 skills, 0 findings", exit 0; `python -m unittest discover -s .codex/tests -v`: "Ran 22 tests in 15.832s", "OK", exit 0 (`build/review-codex-campaign-tests.log`); `pwsh .codex/scripts/run-plan.ps1 -Action audit`: "7 runnable now, 3 runnable elsewhere", "codex campaign: audit passed; no run started", exit 0 (`build/review-codex-audit.log`); independent `pwsh scripts/check-all.ps1`: all 19 gates PASS, "check-all: all gates passed", exit 0 (`build/review-check-all-codex-writer.log`). Regression cases prove exact-session resume, pause preservation, worker ownership after supervisor interruption, exclusion of committed run-record chatter from progress, bounded failures, phase scope, and unrelated-session isolation. Native hook transport was tested with temporary fixtures; project hook trust remains an operator/session prerequisite, and no real implementation campaign was started.
 > **Implementer:** Codex (GPT-6; exact model ID unavailable).
 > **Reviewer:** Independent fresh-context Codex reviewer (GPT-6; exact model ID unavailable).
+
+## 7. Switch the Primary Writer Between Codex and Claude
+
+Operator clarification 2026-10-08: either Codex or Claude must be selectable as the primary writer, with equal authority when selected. Keep their instructions, skills, hooks, runners, and runtime state independent. A small neutral selector may coordinate the choice; switching is not permission to start a run or transfer another agent's session.
+
+- [x] Add `writer.json` and `scripts/writer.py` for status, explicit selection, and selected-writer assertions. Done when: either direction works, malformed selection fails closed, active runners refuse switching, and paused state is preserved byte for byte. Cheaper substitute: rewriting instructions while an old worker remains active.
+- [x] Update `AGENTS.md`, `CLAUDE.md`, and each agent's own plan/phase/section skills. Done when: both consult the selection, neither silently selects itself, either may perform an explicit administrative switch, and independent review remains available to the other agent.
+- [x] Integrate the selection check and transition lock into `.codex/scripts/campaign.py`; add Claude-only `.claude/scripts/write-campaign-guard.py` for serialized registration. Done when: start/resume/registration cannot race a selection change and a wrong-writer resume cannot clear pause.
+- [x] Add selector tests in `scripts/test_writer.py` and separate runner tests under `.codex/tests/` and `.claude/tests/`; wire repository gates and CI. Done when: both directions, active locks/guards, malformed state, paused-state preservation, and wrong-writer registration/resume are proven with temporary fixtures.
+- [x] Update `docs/dev/codex.md` and `CHANGELOG.md`. Done when: status and both switch commands are documented, along with active-run refusal and the independent-state boundary.
+- [x] Commit: `"workspace: allow switching the primary writer (D00 T03 §7)"`
+
+**Test checkpoint:** `python scripts/test_writer.py -v`, `python -m unittest discover -s .claude/tests -v`, `python -m unittest discover -s .codex/tests -v`, and `pwsh scripts/check-all.ps1` exit 0; `python scripts/writer.py status` reads the selected writer. Exercise both selection directions only in temporary fixtures; do not start real campaigns. An independent reviewer checks and stamps the candidate.
+
+> **Verified:** 2026-10-08 | §7 | Independent review of `f3255a0ca6c8292e3e57119760fbe655f6a6da99` plus the complete tracked/untracked candidate tree. `python scripts/test_writer.py -v`: "Ran 7 tests", "OK"; `python -m unittest discover -s .claude/tests -v`: "Ran 4 tests", "OK"; `python -m unittest discover -s .codex/tests -v`: "Ran 23 tests", "OK". Tests prove both switch directions, active locks/guards, invalid selection, preserved paused state, serialized Claude registration, and wrong-writer resume refusal using temporary fixtures. `pwsh scripts/check-all.ps1`: exit 0, "check-all: all gates passed" (21 gates; full log `build/review-check-all-writer-switch.log`). `python scripts/writer.py status`: "primary writer: codex". No real campaign started or writer switched.
+> **Implementer:** Codex (GPT-6; exact model ID unavailable).
+> **Reviewer:** Independent fresh-context Codex subagent (GPT-6; exact model ID unavailable).
 
 ## Verification
 

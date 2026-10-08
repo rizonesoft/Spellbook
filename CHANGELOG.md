@@ -8,6 +8,7 @@ The format follows [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/
 
 ### Added
 
+- A primary-writer selector for switching between Codex and Claude while preserving their separate workflows and paused run state.
 - An independent Codex writer workflow with its own skills, hooks, supervised plan runner, pause/recovery controls, and fresh-context review.
 - The Spellbook icon: a fanned deck of teal prompt cards with an AI sparkle, with a simpler drawing at small sizes, and new README banners.
 - The Spellbook window: a native Win32 window titled Spellbook with its icon, aware of display scaling on every monitor, with a dark title bar when Windows apps are set to dark.

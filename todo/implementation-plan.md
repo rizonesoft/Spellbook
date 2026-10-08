@@ -2,7 +2,7 @@
 
 The order to run every section in, from the M0 skeleton through the premium first release, v0.1.0, to the package channels after it.
 
-> **Progress:** **16 of 117 sections complete (13%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
+> **Progress:** **17 of 118 sections complete (14%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
 
 Seeded 2026-10-04 by the initialisation session from the project brief (milestones M0 to M5) and the conventions of Isotone, Resolute, and ScratchPad (recorded in [`../docs/reference-conventions.md`](../docs/reference-conventions.md)).
 
@@ -68,6 +68,7 @@ Everything later builds on a toolchain that provisions itself, a build with warn
 | [x] | `D00 T03 §2` | The run skills: process-plan, process-phase, process-todo-file, groom-plan | 5 |
 | [x] | `D00 T03 §3` | The run guard: the Stop hook and its probe | 4 |
 | [x] | `D00 T03 §6` | Independent Codex writer workflow and supervised runner | 7 |
+| [x] | `D00 T03 §7` | Switch the primary writer between Codex and Claude | 6 |
 | [ ] | `D00 T02 §1` | ADR 0002 and the decision record | 5 |
 | [x] | `D99 T01 §5` | Install the Visual Studio 2026 C++ and WinUI workloads | 2 |
 | [ ] | `D00 T02 §2` | The Visual Studio 2026 toolchain pins and the setup leg | 5 |

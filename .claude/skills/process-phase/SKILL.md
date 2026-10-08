@@ -17,6 +17,8 @@ The whole plan is `process-plan`; this skill is one phase. Entered through `proc
 
 ## Step 0: open the run
 
+Run `python scripts/writer.py assert claude` before implementation and before each section. Register or repoint the guard only through the Claude-only helper specified by `process-plan`; the neutral selector never owns Claude's runtime state.
+
 Check that no other writer holds the tree (`git status`; ask about uncommitted work you did not make). Open `docs/phase-runs/<YYYY-MM-DD>-phase-<N>.md` and append every finding the moment it is made:
 
 ```markdown

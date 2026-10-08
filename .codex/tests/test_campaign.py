@@ -21,6 +21,7 @@ class CampaignTests(unittest.TestCase):
         self.temp = tempfile.TemporaryDirectory(prefix='spellbook-codex-')
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name).resolve()
+        (self.root / 'writer.json').write_text('{"schema_version":1,"primary_writer":"codex"}')
         for args in [['git', 'init', '-b', 'main'], ['git', 'config', 'user.name', 'Probe'],
                      ['git', 'config', 'user.email', 'probe@example.invalid']]:
             c.run(self.root, args)
@@ -201,6 +202,16 @@ class CampaignTests(unittest.TestCase):
         self.assertEqual(c.state_path(self.root).read_bytes(), before)
         self.assertTrue(c.paused(self.root, self.state))
 
+    def test_wrong_writer_cannot_resume_or_clear_pause(self):
+        c.pause(self.root, self.state, 'operator pause')
+        (self.root / 'writer.json').write_text('{"schema_version":1,"primary_writer":"claude"}')
+        native = self.root / 'codex.exe'
+        native.write_bytes(b'fixture')
+        with patch.object(c, 'ROOT', self.root), patch.object(c, 'preflight'), patch.object(sys, 'argv', ['campaign.py', 'resume', '--codex', str(native)]):
+            with self.assertRaisesRegex(ValueError, 'primary writer is claude'):
+                c.main()
+        self.assertTrue(c.paused(self.root, self.state))
+
     def test_cli_cannot_replace_session_identity(self):
         script = self.root / 'fake_cli.py'
         other = str(uuid.uuid4())
@@ -270,6 +281,8 @@ class CampaignTests(unittest.TestCase):
         shutil.copytree(source / 'hooks', self.root / '.codex/hooks')
         (self.root / '.codex/scripts').mkdir()
         shutil.copy2(SCRIPTS / 'campaign.py', self.root / '.codex/scripts/campaign.py')
+        (self.root / 'scripts').mkdir()
+        shutil.copy2(SCRIPTS.parents[1] / 'scripts/writer.py', self.root / 'scripts/writer.py')
         # Interrupt needs no TODO graph and proves JSON stdin, ownership, and cwd resolution.
         hooks = json.loads((source / 'hooks.json').read_text(encoding='utf-8'))
         command = hooks['hooks']['Interrupt'][0]['hooks'][0]['command']

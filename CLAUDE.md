@@ -1,6 +1,8 @@
 # Claude Code Instructions
 
-Standalone Claude Code instructions. Human orientation lives in `README.md`. Codex is the primary writer; Claude writes only when the operator explicitly assigns it work. Use only `.claude/skills/`, `.claude/settings.json`, and the Claude campaign state. Do not import `AGENTS.md`, use `.agents/skills/`, or execute `.codex/` automation. Never run two writers on this checkout.
+Standalone Claude Code instructions. Human orientation lives in `README.md`. The primary writer is selected by `writer.json`: either `claude` or `codex`, with equal implementation authority when selected. Use only `.claude/skills/`, `.claude/settings.json`, and the Claude campaign state. Do not import `AGENTS.md`, use `.agents/skills/`, or execute `.codex/` automation. Never run two writers on this checkout.
+
+Before implementation or resuming a run, execute `python scripts/writer.py assert claude`. If Codex is selected, Claude may inspect or independently review, but must not implement. On an explicit request to switch writers, either agent may run `python scripts/writer.py select claude` or `python scripts/writer.py select codex`; this administrative action changes only the selection, never launches a run or migrates agent state. Check selection again before each section and after a pause. Do not hand-edit the setting to bypass an active-run refusal. The neutral selector is the only shared writer coordination script; Claude guard registration lives in `.claude/scripts/write-campaign-guard.py`.
 
 ## What this project is
 
