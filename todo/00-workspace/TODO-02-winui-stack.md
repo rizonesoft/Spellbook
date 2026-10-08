@@ -116,6 +116,8 @@ This section replaces the Win32 shell from `D00 T01 §5` with a WinUI 3 one at f
 
 ## 4. Runners, CI, and the Portable Package on the New Stack
 
+**Corrected 2026-10-08:** The minimum build/run/analyzer wiring already shipped in §3; this section proves rejection paths and completes packaging, project coverage, notices, and cache wiring. The UI driver formerly preceding this row requires the patterns created in §5, so its dependency and order are repaired before continuing. Pre-stamp hosted proof uses an isolated candidate branch; after the reviewed section is committed and pushed, its exact main SHA must also pass CI before the next row.
+
 Every gate that ran on the Win32 build must run on the hybrid one, or `check-all.ps1` passes while the app is broken. CI must be green on the old stack first (`D00 T01 §10`) so a red run here is this change.
 
 - [ ] `scripts/build.ps1`: configure and build the CMake preset, then `msbuild Spellbook.slnx -restore` for the matching configuration, logs under `build/`. Done when: `pwsh scripts/build.ps1 -Config Release` produces `Spellbook.exe` and exits 0; a deliberate warning in `MainWindow.xaml.cpp` fails it.
@@ -124,10 +126,10 @@ Every gate that ran on the Win32 build must run on the hybrid one, or `check-all
 - [ ] `scripts/package.ps1`: zip the self-contained output folder (not one exe) as `Spellbook-<version>-win-x64-portable.zip`, with `SHA256SUMS`. Done when: the ZIP unzipped to a temp folder launches with `--smoke`.
 - [ ] Preserve the application license and third-party notices in the folder payload, including the Windows App SDK's separate license/NOTICE and C++/WinRT's MIT license, as recorded in ADR 0002. Done when: the extracted ZIP contains the vendor terms and does not present Microsoft's bundled binaries as Spellbook-owned MIT source.
 - [ ] `.github/workflows/ci.yml` and `release.yml`: build on `windows-latest` (VS 2026), with the NuGet package cache beside the existing tool and vcpkg caches. Done when: actionlint is clean.
-- [ ] `docs/dev/` build guide: VS 2026 workloads, `Spellbook.slnx`, and the hybrid build. Done when: `python scripts/check-docs.py` passes.
-- [ ] Commit: `"workspace: runners, ci, and the portable package on the winui stack (D00 T02 §4)"`
+- [ ] `docs/dev/` build guide, README, release standard, user packaging guidance, and each independently maintained build-and-test skill: VS 2026 workloads, `Spellbook.slnx`, the hybrid output paths, and full-folder package proofs. Done when: current instructions agree with the runners and `python scripts/check-docs.py` passes.
+- [ ] Commit: `"workspace: complete runners and packaging for winui (D00 T02 §4)"`
 
-**Test checkpoint:** Driven run with evidence: `pwsh scripts/check-all.ps1` exits 0 locally (quote its last lines), and the `ci` run on the pushed commit is green (quote its run id and duration).
+**Test checkpoint:** Driven run with evidence: `pwsh scripts/check-all.ps1` exits 0 locally (quote its last lines), and `ci` passes on the isolated candidate branch before review (quote its SHA, run id, and duration, and verify implementation equivalence). After the stamped commit is pushed, verify its exact main SHA also passes CI before advancing. Preserve probe history; never merge it.
 
 ## 5. The winui-patterns Skill, the UI Standard, and the Architecture Doc
 

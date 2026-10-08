@@ -8,6 +8,8 @@ The format follows [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/
 
 ### Fixed
 
+- Package the complete self-contained WinUI folder with third-party terms, verified checksums, and an extracted-app smoke test; gate MSBuild source coverage and cache pinned NuGet packages in CI.
+
 - Provision missing WinUI C++ tools on disposable GitHub-hosted runners before setup; local and self-hosted installation remains operator-owned.
 
 ### Added

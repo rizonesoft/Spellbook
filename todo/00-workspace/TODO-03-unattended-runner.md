@@ -43,7 +43,7 @@ depends_on: []
 |   1   |   §1    | Operator-only work in the graph: runnable now and elsewhere | -- |  [x]   |
 |   2   |   §2    | The run skills: process-plan, process-phase, process-todo-file, groom-plan | §1 |  [x]   |
 |   3   |   §3    | The run guard: the Stop hook and its probe | §2 |  [x]   |
-|   4   |   §4    | The UI driver for driven runs | D00 T02 §3 |  [ ]   |
+|   4   |   §4    | The UI driver for driven runs | D00 T02 §3, D00 T02 §5 |  [ ]   |
 |   5   |   §5    | Unattended proof rules and the checkpoint sweep | §4, §9, D00 T02 §6 |  [ ]   |
 
 |   6   |   §6    | Independent Codex writer workflow and supervised runner | §1, §2, §3 |  [x]   |
@@ -97,6 +97,8 @@ Without a guard a run dies quietly at the first end of turn. Port ScratchPad's `
 > **Implementer:** Claude (claude-opus-5-5)
 
 ## 4. The UI Driver for Driven Runs
+
+**Corrected 2026-10-08:** This section updates the `winui-patterns` skill created by `D00 T02 §5`, so that section is a prerequisite as well as the shell. Neither agent has that skill yet. The Phase 0 order now places the driver after its actual prerequisites; no work moves between phases.
 
 A driven run an agent cannot perform is not unattended. This section gives every surface section a scripted way to launch, drive, capture, and read back, and a rule that every interactive control carries an `AutomationProperties.AutomationId` (which is also what Narrator and Accessibility Insights read). This is the interaction/capture foundation, not the completed visual acceptance gate; §9 adds the matrix and actual image review. The earlier WinUI shell is bootstrap infrastructure and must be exercised by §9 before later UI feature acceptance.
 

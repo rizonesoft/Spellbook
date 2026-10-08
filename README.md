@@ -85,7 +85,7 @@ Once released, Spellbook ships two ways from the [releases page](https://github.
 | Form | Best for |
 | ---- | -------- |
 | **Installer** (`Spellbook-<version>-win-x64-Setup.exe`) | Most people: Start menu entry, optional start with Windows for the hotkey, clean uninstall |
-| **Portable ZIP** (`Spellbook-<version>-win-x64-Portable.zip`) | Trying it out, or locked-down machines: unzip and run |
+| **Portable ZIP** (`Spellbook-<version>-win-x64-portable.zip`) | Trying it out, or locked-down machines: unzip and run |
 
 Check the download against the `SHA256SUMS` file on the release. Requirements: Windows 10 22H2 or Windows 11, 64-bit. Nothing else: the `.exe` is self-contained.
 
@@ -195,7 +195,7 @@ flowchart TB
 | UI | WinUI 3 with C++/WinRT, Per-Monitor-V2 DPI, Unicode, and native interop |
 | Storage | SQLite with FTS5, behind `IPromptRepository` |
 | Libraries | spdlog and fmt (logging), nlohmann-json (settings and export), Catch2 (tests) |
-| Build | CMake presets, Ninja, vcpkg in manifest mode (static triplet) |
+| Build | CMake/Ninja libraries and tests, MSBuild WinUI app, pinned NuGet packages, and static vcpkg libraries |
 | Packaging | Portable ZIP now; Inno Setup 7 installer in M5 |
 
 The reasoning is in [ADR 0001](docs/adr/0001-tech-stack.md) and [docs/architecture.md](docs/architecture.md).

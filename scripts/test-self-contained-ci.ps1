@@ -4,7 +4,7 @@
 .DESCRIPTION
   Refuses local/self-hosted execution before any package or filesystem change.
   Removes registered Windows App Runtime packages for the disposable runner user,
-  then launches an external copy of the Release folder and captures its window.
+  then extracts the verified portable ZIP outside the checkout and captures its window.
 #>
 #Requires -Version 7.0
 [CmdletBinding()]
@@ -14,6 +14,12 @@ if ($env:GITHUB_ACTIONS -ne 'true' -or $env:RUNNER_ENVIRONMENT -ne 'github-hoste
     throw 'Clean-runtime proof requires a disposable GitHub-hosted runner'
 }
 . "$PSScriptRoot/_common.ps1"
+$versionHeader = Join-Path (Get-BuildDir Release) 'src/core/generated/spellbook/core/build_info.hpp'
+$version = (Select-String -LiteralPath $versionHeader -Pattern 'kSemVer = "([^"]+)"').Matches[0].Groups[1].Value
+$archive = Join-Path $RepoRoot "artifacts/dist/Spellbook-$version-win-x64-portable.zip"
+$archiveHash = (Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash.ToLowerInvariant()
+$checksum = '{0}  {1}' -f $archiveHash, ([IO.Path]::GetFileName($archive))
+if ((Get-Content -LiteralPath (Join-Path $RepoRoot 'artifacts/dist/SHA256SUMS') -Raw).Trim() -ne $checksum) { throw 'Portable ZIP checksum differs before deployment' }
 $packages = @(Get-AppxPackage '*WindowsAppRuntime*')
 foreach ($package in $packages) { Remove-AppxPackage -Package $package.PackageFullName -ErrorAction Stop }
 if (@(Get-AppxPackage '*WindowsAppRuntime*').Count -ne 0) { throw 'Windows App Runtime remains registered' }
@@ -22,10 +28,11 @@ $copyRoot = Join-Path $env:RUNNER_TEMP "spellbook-deployment-$([Guid]::NewGuid()
 $repoFull = [IO.Path]::GetFullPath($RepoRoot).TrimEnd('\') + '\'
 if ([IO.Path]::GetFullPath($copyRoot).StartsWith($repoFull, [StringComparison]::OrdinalIgnoreCase)) { throw 'Deployment copy must be outside the repository' }
 New-Item -ItemType Directory -Path $copyRoot | Out-Null
-Copy-Item -Path (Join-Path (Get-BuildDir 'Release') 'app/*') -Destination $copyRoot -Recurse
+Expand-Archive -LiteralPath $archive -DestinationPath $copyRoot
 $exe = Join-Path $copyRoot 'Spellbook.exe'
 $evidence = Join-Path $RepoRoot 'build/self-contained-proof'
 New-Item -ItemType Directory -Path $evidence -Force | Out-Null
+@{ archive = [IO.Path]::GetFileName($archive); sha256 = $archiveHash; version = $version } | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $evidence 'package.json')
 Add-Type -AssemblyName System.Drawing
 Add-Type @'
 using System;
