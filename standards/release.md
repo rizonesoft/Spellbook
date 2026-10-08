@@ -18,7 +18,7 @@ How Spellbook is versioned, packaged, and released. The mechanics are in `script
 
 Each release produces, under `artifacts/dist/` and attached to the GitHub release:
 
-- `Spellbook-<version>-win-x64-Portable.zip`: `Spellbook.exe`, `LICENSE`, `README.md`.
+- `Spellbook-<version>-win-x64-portable.zip`: the complete WinUI application folder (DLLs, PRI/resources, and icon), `LICENSE`, `README.md`, and `THIRD-PARTY-NOTICES/`. Development symbols and link libraries are excluded.
 - `Spellbook-<version>-win-x64-Setup.exe`: the Inno Setup 7 installer (from `D05 T02 §2`), per-user by default with an all-users option, and an uninstaller that keeps the user's data unless asked.
 - `SHA256SUMS` covering both.
 

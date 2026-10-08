@@ -53,6 +53,12 @@ jobs:
           path: .vcpkg-cache
           key: vcpkg-v1-${{ runner.os }}-${{ hashFiles('vcpkg.json', 'toolchain.json') }}
           restore-keys: vcpkg-v1-${{ runner.os }}-
+      - name: Cache pinned NuGet packages
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: artifacts/nuget
+          key: nuget-v1-${{ runner.os }}-${{ hashFiles('toolchain.json', 'src/app/Spellbook.vcxproj', 'src/app/nuget_versions.props.in') }}
+          restore-keys: nuget-v1-${{ runner.os }}-
       - name: Provision hosted WinUI C++ tools
         run: ./scripts/setup-ci.ps1
       - name: Toolchain
@@ -63,13 +69,13 @@ jobs:
         run: |
           ./scripts/test.ps1 -Config Release
           ./scripts/run.ps1 -Config Release -Smoke -NoBuild
-      - name: Package
-        run: ./scripts/package.ps1 -SkipBuild
+      - name: Package and verify extracted smoke
+        run: ./scripts/test-package.ps1
       - name: Check the package version matches the tag
         env:
           VERSION: ${{ steps.tag.outputs.version }}
         run: |
-          $zip = "artifacts/dist/Spellbook-$env:VERSION-win-x64-Portable.zip"
+          $zip = "artifacts/dist/Spellbook-$env:VERSION-win-x64-portable.zip"
           if (-not (Test-Path $zip)) { throw "expected $zip; the build derived a different version from the tag" }
       - name: Release notes from CHANGELOG.md
         env:
@@ -94,7 +100,7 @@ jobs:
         run: |
           $releaseArgs = @('release', 'create', $env:REF_NAME, '--verify-tag', '--title', "Spellbook $env:VERSION",
             '--notes-file', 'artifacts/release-notes.md',
-            "artifacts/dist/Spellbook-$env:VERSION-win-x64-Portable.zip", 'artifacts/dist/SHA256SUMS')
+            "artifacts/dist/Spellbook-$env:VERSION-win-x64-portable.zip", 'artifacts/dist/SHA256SUMS')
           if ($env:PRERELEASE -eq 'true') { $releaseArgs += '--prerelease' }
           gh @releaseArgs
           if ($LASTEXITCODE -ne 0) { throw "gh release create failed ($LASTEXITCODE)" }

@@ -73,6 +73,7 @@ try {
     Invoke-Gate 'test Release' { & $pwsh -NoProfile -File scripts/test.ps1 -Config Release -NoBuild }
     Invoke-Gate 'smoke Release' { & $pwsh -NoProfile -File scripts/run.ps1 -Config Release -Smoke -NoBuild }
     Invoke-Gate 'app startup probes' { & $pwsh -NoProfile -File scripts/test-app.ps1 -Config Release }
+    Invoke-Gate 'portable package probes' { & $pwsh -NoProfile -File scripts/test-package.ps1 }
     if (-not $SkipLint) {
         Invoke-Gate 'lint' { & $pwsh -NoProfile -File scripts/lint.ps1 }
     }

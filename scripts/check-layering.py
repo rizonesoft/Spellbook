@@ -16,7 +16,9 @@ from __future__ import annotations
 
 import re
 import sys
+import posixpath
 from pathlib import Path
+import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parent.parent
 INCLUDE = re.compile(r'^\s*#\s*include\s*[<"]([^>"]+)[>"]')
@@ -47,7 +49,9 @@ def _is_windows(inc: str) -> bool:
 
 
 def _is_app(inc: str) -> bool:
-    return inc.startswith("app/") or inc in {
+    normalized = inc.replace("\\", "/").lower()
+    headers = {p.name.lower() for p in (ROOT / "src/app").rglob("*") if p.suffix in {".h", ".hpp"}}
+    return "/app/" in "/" + normalized or normalized.rsplit("/", 1)[-1] in headers | {
         "main_window.hpp", "app_paths.hpp", "logging.hpp", "res/resource.h", "resource.h",
     }
 
@@ -76,6 +80,52 @@ def tree() -> dict[str, str]:
     return out
 
 
+def project_coverage(files: dict[str, str], project: str) -> list[str]:
+    """Require every owned app source to participate in the analyzed MSBuild app."""
+    location = "src/app/Spellbook.vcxproj"
+    findings = []
+    try:
+        root = ET.fromstring(project)
+    except ET.ParseError as error:
+        return [f"{location}:1:app-project:invalid XML: {error}"]
+    included = set()
+    parents = {child: parent for parent in root.iter() for child in parent}
+    for item in root.iter():
+        if item.tag.rsplit("}", 1)[-1] != "ClCompile":
+            continue
+        # This static gate deliberately accepts only unconditional owned-source
+        # declarations. It must not credit a file that MSBuild can skip later.
+        if "ExcludedFromBuild" in item.attrib or any(
+                child.tag.rsplit("}", 1)[-1] == "ExcludedFromBuild" for child in item):
+            findings.append(f"{location}:1:app-project:ExcludedFromBuild is unsupported; owned sources must compile in every configuration")
+        if any(key in item.attrib for key in ("Remove", "Update", "Exclude")):
+            findings.append(f"{location}:1:app-project:source removal/update/exclusion is unsupported")
+        if "Include" not in item.attrib:
+            continue
+        ancestors = [item]
+        while ancestors[-1] in parents:
+            ancestors.append(parents[ancestors[-1]])
+        if any("Condition" in ancestor.attrib or ancestor.tag.rsplit("}", 1)[-1]
+               in {"Choose", "When", "Otherwise", "Target", "ItemDefinitionGroup"}
+               for ancestor in ancestors):
+            findings.append(f"{location}:1:app-project:conditional or dynamic source declaration is unsupported")
+        name = item.attrib["Include"].replace("\\", "/")
+        if name == "$(GeneratedFilesDir)module.g.cpp":
+            continue  # C++/WinRT-generated module, not an owned source.
+        path = posixpath.normpath("src/app/" + name)
+        if "$" in name or "*" in name or ":" in name or name.startswith("/") or not path.startswith("src/app/"):
+            findings.append(f"{location}:1:app-project:unresolved or out-of-layer source: {name}")
+        elif path not in files:
+            findings.append(f"{location}:1:app-project:source does not exist: {name}")
+        elif path in included:
+            findings.append(f"{location}:1:app-project:duplicate source: {name}")
+        included.add(path)
+    for path in files:
+        if path.startswith("src/app/") and path.endswith(".cpp") and path not in included:
+            findings.append(f"{path}:1:app-project:owned source is absent from the MSBuild analyzer target")
+    return findings
+
+
 def self_test() -> int:
     cases = [
         ({"src/core/src/a.cpp": "#include <windows.h>\n"}, ["core-windows"]),
@@ -86,6 +136,8 @@ def self_test() -> int:
         ({"src/app/main.cpp": "#include <windows.h>\n#include \"spellbook/storage/database.hpp\"\n"}, []),
         ({"tests/core/a.cpp": '#include "spellbook/storage/migrations.hpp"\n'}, ["test-core-storage"]),
         ({"src/core/src/a.cpp": "  #  include <winrt/base.h>\n"}, ["core-windows"]),
+        ({"src/core/src/a.cpp": '#include "MainWindow.xaml.h"\n'}, ["core-app"]),
+        ({"src/storage/src/a.cpp": '#include "../app/App.xaml.h"\n'}, ["storage-app"]),
     ]
     failed = 0
     for i, (files, want) in enumerate(cases, 1):
@@ -93,14 +145,44 @@ def self_test() -> int:
         if got != want:
             failed += 1
             print(f"self-test case {i}: want {want}, got {got}")
-    print(f"check-layering self-test: {len(cases) - failed} passed, {failed} failed")
+    project_cases = [
+        ('<Project><ClCompile Include="a.cpp" /></Project>', False),
+        ('<Project />', True),
+        ('<Project><ClCompile Include="../core/a.cpp" /></Project>', True),
+        ('<Project><ClCompile Include="missing.cpp" /></Project>', True),
+        ('<Project><ClCompile Include="$(Unknown)source.cpp" /></Project>', True),
+        ('<Project><ClCompile Include="a.cpp" /><ClCompile Include="a.cpp" /></Project>', True),
+        ('<Project><ClCompile Include="a.cpp" /><ClCompile Include="$(GeneratedFilesDir)module.g.cpp" /></Project>', False),
+        ('<Project><ClCompile Include="a.cpp"><ExcludedFromBuild>true</ExcludedFromBuild></ClCompile></Project>', True),
+        ('<Project><ClCompile Include="a.cpp" Condition="false" /></Project>', True),
+        ('<Project><ItemGroup Condition="false"><ClCompile Include="a.cpp" /></ItemGroup></Project>', True),
+        ('<Project><ClCompile Include="a.cpp" Exclude="a.cpp" /></Project>', True),
+        ('<Project><ClCompile Include="a.cpp" ExcludedFromBuild="true" /></Project>', True),
+        ('<Project><ClCompile Include="a.cpp" /><ClCompile Remove="a.cpp" /></Project>', True),
+        ('<Project><ClCompile Include="a.cpp" /><ClCompile Update="a.cpp"><ExcludedFromBuild>true</ExcludedFromBuild></ClCompile></Project>', True),
+        ('<Project><ClCompile Include="a.cpp" /><ItemDefinitionGroup><ClCompile><ExcludedFromBuild>true</ExcludedFromBuild></ClCompile></ItemDefinitionGroup></Project>', True),
+        ('<Project><Choose><When Condition="false"><ItemGroup><ClCompile Include="a.cpp" /></ItemGroup></When></Choose></Project>', True),
+        ('<Project><Target Name="Unused"><ItemGroup><ClCompile Include="a.cpp" /></ItemGroup></Target></Project>', True),
+    ]
+    for project, should_fail in project_cases:
+        got = project_coverage({"src/app/a.cpp": ""}, project)
+        if bool(got) != should_fail:
+            failed += 1
+            print(f"project coverage self-test: {project}: {got}")
+    print(f"check-layering self-test: {len(cases) + len(project_cases) - failed} passed, {failed} failed")
     return 1 if failed else 0
 
 
 def main(argv: list[str]) -> int:
     if "--self-test" in argv:
         return self_test()
-    findings = scan(tree())
+    files = tree()
+    findings = scan(files)
+    project = ROOT / "src/app/Spellbook.vcxproj"
+    if project.is_file():
+        findings += project_coverage(files, project.read_text(encoding="utf-8"))
+    else:
+        findings.append("src/app/Spellbook.vcxproj:1:app-project:MSBuild app project is missing")
     for f in findings:
         print(f)
     print(f"{len(findings)} findings")

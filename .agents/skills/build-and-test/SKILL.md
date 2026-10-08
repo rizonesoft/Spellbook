@@ -17,7 +17,9 @@ pwsh scripts/run.ps1 -Smoke               # 4. start, migrate, paint, exit 0, in
 pwsh scripts/check-all.ps1                # 5. everything CI runs, in one command
 ```
 
-Configs: `Debug`, `Release`, `RelWithDebInfo`. Output: `artifacts/build/<preset>/bin/` (`Spellbook.exe`, `spellbook_core_tests.exe`, `spellbook_storage_tests.exe`). `-Clean` deletes the preset folder; the vcpkg binary cache in `.tools/vcpkg-cache` survives it, so a clean rebuild does not rebuild the dependencies.
+Configs: `Debug`, `Release`, `RelWithDebInfo`. The runner builds CMake libraries/tests, then the WinUI app through MSBuild `Spellbook.slnx`. App output is the complete `artifacts/build/<preset>/app/` folder; test executables remain under `bin/`. `-Clean` removes only the selected preset folder and retains dependency caches.
+
+`pwsh scripts/test-package.ps1` verifies the existing Release payload, vendor notices, checksum, and extracted-app smoke; it is part of `check-all.ps1`. `pwsh scripts/test-build-warning.ps1` proves an owned warning fails the Release runner in an isolated candidate copy. Library analysis uses clang-tidy; app analysis uses MSVC with `/W4 /WX`.
 
 The first configure on a machine builds the five vcpkg ports and takes several minutes. Later configures take seconds.
 
