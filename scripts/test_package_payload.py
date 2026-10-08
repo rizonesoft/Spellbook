@@ -15,7 +15,7 @@ from package_payload import REQUIRED_PAYLOAD, package
 
 class PackageTests(unittest.TestCase):
     def setUp(self):
-        self.temp = tempfile.TemporaryDirectory(prefix="spellbook-package-tests-")
+        self.temp = tempfile.TemporaryDirectory(prefix="spellbook-package-tests-\u00e9-")
         self.addCleanup(self.temp.cleanup)
         self.repo = Path(self.temp.name)
         self.app = self.repo / "artifacts/build/release/app"
