@@ -1,6 +1,6 @@
 # UI Standard
 
-How every Spellbook surface looks and behaves. Agent-specific implementation mechanics live in the independent [Codex WinUI skill](../.agents/skills/winui-patterns/SKILL.md) and [Claude WinUI skill](../.claude/skills/winui-patterns/SKILL.md); this file is the shared product policy.
+How every Spellbook surface looks and behaves. Implementation mechanics live in the [WinUI patterns skill](../.claude/skills/winui-patterns/SKILL.md); this file is the shared product policy.
 
 ## Principles and controls
 

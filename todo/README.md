@@ -95,7 +95,7 @@ Every `## N.` section has exactly one row and every row one section. `Depends On
 | `TNN §N`     | TODO-NN in the same domain, section N | `T02 §1`     |
 | `DNN TNN §N` | Domain NN, TODO-NN, section N         | `D03 T01 §4` |
 
-Never a bare number, and never a TODO without a section. An `-> XREF:` is bidirectional: the target file must carry an `-> XREF:` back, or `validate` is FATAL. Both independent skill trees, `.agents/skills/` for Codex and `.claude/skills/` for Claude, cite only full `DNN TNN §N` refs, and only live ones.
+Never a bare number, and never a TODO without a section. An `-> XREF:` is bidirectional: the target file must carry an `-> XREF:` back, or `validate` is FATAL. Skills under `.claude/skills/` cite only full `DNN TNN §N` refs, and only live ones.
 
 ## Proof: what a Test checkpoint may cite
 

@@ -29,7 +29,7 @@ depends_on: []
 ## Outcome
 
 - The GitHub repository exists, `main` is pushed, CI has run, labels and security settings are applied.
-- Ownership and branding decisions are recorded in `AGENTS.md`.
+- Ownership and branding decisions are recorded in `CLAUDE.md` (`AGENTS.md` until 2026-10-09).
 - The operator has accepted the import of their real prompt library.
 - Visual Studio 2026 has the C++ desktop and WinUI workloads.
 - The release candidate has passed a clean-machine check and the operator has approved the v0.1.0 tag in writing.
@@ -88,10 +88,10 @@ depends_on: []
 
 ## 4. Confirm Ownership, Branding, and the Publisher
 
-- [ ] Confirm the copyright line (the tree uses "Copyright (c) 2026 Rizonetech (Pty) Ltd", MIT, publisher Rizonesoft, as Isotone does) and whether "Spellbook" needs a trademark pre-screen before release, as Isotone's names had. Done when: the decision is a bullet in AGENTS.md "The decisions this project runs on".
+- [ ] Confirm the copyright line (the tree uses "Copyright (c) 2026 Rizonetech (Pty) Ltd", MIT, publisher Rizonesoft, as Isotone does) and whether "Spellbook" needs a trademark pre-screen before release, as Isotone's names had. Done when: the decision is a bullet in CLAUDE.md "The decisions this project runs on".
 - [ ] Commit: `"workspace: record the ownership and branding decision"`
 
-**Test checkpoint:** Static evidence: `grep -n "Rizonetech" LICENSE AGENTS.md src/app/res/version.rc.in` agrees with the recorded decision.
+**Test checkpoint:** Static evidence: `grep -n "Rizonetech" LICENSE CLAUDE.md src/app/res/version.rc.in` agrees with the recorded decision.
 
 ## 5. Install the Visual Studio 2026 C++ and WinUI Workloads
 

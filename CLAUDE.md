@@ -1,12 +1,10 @@
 # Claude Code Instructions
 
-Standalone Claude Code instructions. Human orientation lives in `README.md`. The primary writer is selected by `writer.json`: either `claude` or `codex`, with equal implementation authority when selected. Use only `.claude/skills/`, `.claude/settings.json`, and the Claude campaign state. Do not import `AGENTS.md`, use `.agents/skills/`, or execute `.codex/` automation. Never run two writers on this checkout.
+The canonical rules for this repository. Human orientation lives in `README.md`. Claude Code is the only writer and the only reviewer: use `.claude/skills/`, `.claude/settings.json`, and the Claude run guard. Never run two writers on this checkout; uncommitted work you did not make is a stop-and-ask.
 
-Before implementation or resuming a run, execute `python scripts/writer.py assert claude`. If Codex is selected, Claude may inspect or independently review, but must not implement. On an explicit request to switch writers, either agent may run `python scripts/writer.py select claude` or `python scripts/writer.py select codex`; this administrative action changes only the selection, never launches a run or migrates agent state. Check selection again before each section and after a pause. Do not hand-edit the setting to bypass an active-run refusal. The neutral selector is the only shared writer coordination script; Claude guard registration lives in `.claude/scripts/write-campaign-guard.py`.
+Every implemented section requires two independent Claude CLI reviews, each a fresh process and never the writer's session: first a full review using the rolling `opus` alias at `high` effort, which reruns the checkpoint and `check-all`, then a quick review using the rolling `sonnet` alias at `high` effort. Follow the `review-todo-section` skill. Both must approve the same candidate before the first reviewer's session stamps it; the writer cannot approve its own work.
 
-Every implemented section requires an independent Codex CLI review inheriting the operator's global Codex model and effort, followed by a quick independent Claude CLI review using the rolling `sonnet` alias at `high` effort. Follow Claude's own `review-todo-section` skill. The same two stages apply whichever primary writer is selected. Both must approve the same candidate before the independent Codex reviewer stamps it; the writer cannot approve its own work.
-
-Cross-provider review may invoke the installed native `codex` and `claude` CLIs with their own instructions, authentication, settings, and hooks. This review-only exception permits neither importing the other agent's skills nor using its campaign automation. A Codex child reviewer loads its own Codex contract; Claude keeps this independently maintained contract.
+Codex was removed as writer and reviewer on 2026-10-09 (`D00 T03 §10`). Sections it shipped are re-audited by `D00 T03 §11`; `docs/codex-runs/` is kept read-only as history.
 
 ## What this project is
 

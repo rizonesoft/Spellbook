@@ -345,13 +345,11 @@ class Tree:
                     self.fatal(f"{self.rel(path / 'INDEX.md')}:1:index-missing:{tf.path.name} is not listed")
 
     def _check_skills(self) -> None:
-        for owner in (".claude", ".agents"):
-            skills = self.root / owner / "skills"
-            for p in sorted(skills.rglob("*.md")):
-                for ln, line in enumerate(p.read_text(encoding="utf-8").splitlines(), 1):
-                    for m in FULL_REF_RE.finditer(line):
-                        if not self.lookup(m.group(0)):
-                            self.fatal(f"{self.rel(p)}:{ln}:skill-dead-ref:{m.group(0)} does not resolve")
+        for p in sorted((self.root / ".claude" / "skills").rglob("*.md")):
+            for ln, line in enumerate(p.read_text(encoding="utf-8").splitlines(), 1):
+                for m in FULL_REF_RE.finditer(line):
+                    if not self.lookup(m.group(0)):
+                        self.fatal(f"{self.rel(p)}:{ln}:skill-dead-ref:{m.group(0)} does not resolve")
 
     # ---- the plan projection -------------------------------------------
     def plan_path(self) -> Path:
@@ -671,20 +669,19 @@ def self_test() -> int:
             if not ok:
                 failed += 1
                 print(f"self-test '{name}': failed (outputs {outs}, resolve codes {rcodes})")
-    # Both independently owned skill trees are checked without importing either.
-    for owner in (".claude", ".agents"):
-        for ref, expected in (("D00 T01 §1", False), ("D00 T01 §99", True)):
-            with tempfile.TemporaryDirectory() as tmp:
-                root = Path(tmp)
-                _fixture(root)
-                skill = root / owner / "skills" / "probe" / "SKILL.md"
-                skill.parent.mkdir(parents=True)
-                skill.write_text(ref + "\n", encoding="utf-8")
-                got = any("skill-dead-ref" in finding for finding in Tree(root).validate())
-                if got != expected:
-                    failed += 1
-                    print(f"self-test '{owner} skill ref {ref}': expected dead={expected}, got {got}")
-    total = len(cases) + 1 + 3 + 4
+    # Skill refs are checked live: a resolving ref passes and a dead one is FATAL.
+    for ref, expected in (("D00 T01 §1", False), ("D00 T01 §99", True)):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            _fixture(root)
+            skill = root / ".claude" / "skills" / "probe" / "SKILL.md"
+            skill.parent.mkdir(parents=True)
+            skill.write_text(ref + "\n", encoding="utf-8")
+            got = any("skill-dead-ref" in finding for finding in Tree(root).validate())
+            if got != expected:
+                failed += 1
+                print(f"self-test 'skill ref {ref}': expected dead={expected}, got {got}")
+    total = len(cases) + 1 + 3 + 2
     print(f"todo-graph self-test: {total - failed} passed, {failed} failed")
     return 1 if failed else 0
 

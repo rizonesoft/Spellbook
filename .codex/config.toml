@@ -1,4 +1,0 @@
-# Codex-only capabilities. Inherit the operator's model and permission settings.
-[features]
-hooks = true
-multi_agent = true

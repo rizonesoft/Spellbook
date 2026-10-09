@@ -87,12 +87,8 @@ jobs:
         run: ./scripts/lint.ps1
       - name: Self-contained deployment proof
         run: ./scripts/test-self-contained-ci.ps1
-      - name: Codex workflow and campaign probes
-        run: |
-          python .codex/scripts/check-workflow.py
-          python -m unittest discover -s .codex/tests -v
-          python scripts/test_writer.py -v
-          python -m unittest discover -s .claude/tests -v
+      - name: Claude run guard registration probes
+        run: python -m unittest discover -s .claude/tests -v
       - name: Upload self-contained Spellbook folder
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
@@ -134,7 +130,7 @@ jobs:
         run: python3 scripts/check-docs.py
       - name: Assert the commit hooks are intact
         run: |
-          for hook in tools/githooks/pre-commit tools/githooks/commit-msg .codex/githooks/pre-commit .codex/githooks/commit-msg; do
+          for hook in tools/githooks/pre-commit tools/githooks/commit-msg; do
             test "$(git ls-files -s "$hook" | cut -d' ' -f1)" = "100755" || { echo "$hook index mode is not 100755"; exit 1; }
             if git show "HEAD:$hook" | grep -q $'\r'; then echo "$hook blob carries CR"; exit 1; fi
           done

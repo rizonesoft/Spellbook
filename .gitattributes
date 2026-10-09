@@ -21,7 +21,6 @@ CMakeLists.txt text eol=lf
 .clang-format text eol=lf
 .clang-tidy text eol=lf
 tools/githooks/** text eol=lf
-.codex/githooks/** text eol=lf
 *.toml text eol=lf
 
 # CRLF: Windows-native sources and resource files

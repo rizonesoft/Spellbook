@@ -9,7 +9,7 @@ One section. One commit. The section is the contract, and a contract is checked 
 
 ## Step 0: resolve the argument
 
-Run `python scripts/writer.py assert claude` before implementation. If another writer is selected, stop implementation without changing the setting; independent review is still permitted.
+Before implementation, check `git status`: uncommitted work you did not make is a stop-and-ask, never something to build on or commit.
 
 Never hand-translate a reference into a file name:
 
@@ -49,7 +49,7 @@ Then run the section's **Test checkpoint exactly as written** and keep the outpu
 
 ## Step 5: hand to review, then commit
 
-Run this agent's `review-todo-section`: independent Codex CLI review using global model/effort first, then a quick fresh Sonnet review using the latest alias at high effort. Both must approve the same candidate before the independent Codex reviewer stamps it and flips the row. Then:
+Run this agent's `review-todo-section`: a fresh full Opus CLI review at high effort first, then a quick fresh Sonnet review using the latest alias at high effort. Both must approve the same candidate before the independent Stage 1 reviewer stamps it and flips the row. Then:
 
 ```bash
 python scripts/todo-graph.py plan --sync

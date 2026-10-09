@@ -19,8 +19,7 @@ frozen: true
 
 - [`migrations/0001_init.sql`](../../migrations/0001_init.sql) -- the tables this file reads and writes; no schema change is expected
 - [`standards/ui.md`](../../standards/ui.md) -- layout, DPI, keyboard, and the theme vocabulary
-- [`.agents/skills/winui-patterns/SKILL.md`](../../.agents/skills/winui-patterns/SKILL.md) -- Codex XAML, binding, lifetime, and UI-thread patterns
-- [`.claude/skills/winui-patterns/SKILL.md`](../../.claude/skills/winui-patterns/SKILL.md) -- independently maintained Claude WinUI patterns
+- [`.claude/skills/winui-patterns/SKILL.md`](../../.claude/skills/winui-patterns/SKILL.md) -- XAML, binding, lifetime, and UI-thread patterns
 - -> XREF: D02 T01 §3 -- import writes through the folder and prompt operations §1 and §2 add
 - -> XREF: D05 T01 §2 -- the settings store owns the persisted vocabulary choice §4 reads
 - -> XREF: D00 T02 §6 -- the app moves to WinUI 3 (operator decision 2026-10-04); §5 to §7 are retargeted there before they are built
@@ -77,7 +76,7 @@ Folders (Chapters) are hierarchical through `folders.parent_id`. Sibling names a
 
 ## 3. LibraryService: Rules, Clock, and the Autosave Policy
 
-Logic belongs in core (AGENTS.md), so the UI calls one service and never the repository directly. The service takes an `IPromptRepository&` and an `IClock&` so tests fake both.
+Logic belongs in core (CLAUDE.md), so the UI calls one service and never the repository directly. The service takes an `IPromptRepository&` and an `IClock&` so tests fake both.
 
 - [ ] `src/core/include/spellbook/core/clock.hpp`: `IClock` with `now() -> Timestamp`, plus `SystemClock`. Done when: core still includes no Windows header (`check-layering.py` 0 findings).
 - [ ] Move `IPromptRepository` to `src/core/include/spellbook/core/prompt_repository.hpp` so core services can depend on it without depending on storage; storage implements it. Done when: `check-layering.py` reports 0 findings and `docs/architecture.md` shows the interface in core.

@@ -1,6 +1,6 @@
 # Architecture
 
-Spellbook separates tested C++ services and SQLite storage from its WinUI 3 presentation. [ADR 0002](adr/0002-winui-3.md) supersedes the original UI/build/deployment choices in [ADR 0001](adr/0001-tech-stack.md); other decisions remain in force. [AGENTS.md](../AGENTS.md), the independent `CLAUDE.md`, and the [standards](../standards/README.md) govern changes.
+Spellbook separates tested C++ services and SQLite storage from its WinUI 3 presentation. [ADR 0002](adr/0002-winui-3.md) supersedes the original UI/build/deployment choices in [ADR 0001](adr/0001-tech-stack.md); other decisions remain in force. [CLAUDE.md](../CLAUDE.md) and the [standards](../standards/README.md) govern changes.
 
 ## Layers
 
@@ -81,7 +81,7 @@ App holds the repository and window for their required lifetimes. Runtime object
 - **DPI:** XAML uses automatically scaled DIPs. Native `AppWindow` geometry uses physical pixels; the shell scales the 960 by 640 initial and 480 by 320 minimum DIP sizes at that boundary and refreshes limits from `XamlRoot.Changed`.
 - **Interop:** native W APIs remain for command-line parsing, paths, startup errors, and window-DPI lookup. Global hotkey/tray work is a later explicit native boundary. The manifest declares Per-Monitor-V2, the UTF-8 process code page, long-path awareness, segment heap, and Windows compatibility. WinRT/native resources never leak into core or storage.
 
-Implementation recipes are independently maintained in the [Codex WinUI skill](../.agents/skills/winui-patterns/SKILL.md) and [Claude WinUI skill](../.claude/skills/winui-patterns/SKILL.md). Shared interaction policy is in [the UI standard](../standards/ui.md).
+Implementation recipes live in the [WinUI patterns skill](../.claude/skills/winui-patterns/SKILL.md). Shared interaction policy is in [the UI standard](../standards/ui.md).
 
 ## Build and source ownership
 

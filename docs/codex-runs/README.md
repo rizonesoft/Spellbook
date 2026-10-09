@@ -1,5 +1,5 @@
-# Codex Run Records
+# Codex Run Records (Archived)
 
-Codex campaigns write `<run_id>.md` here using the supervisor's UUID. Record Phase repairs, Shipped-row verification, Gap audit, Sections, Critical events, and Lessons. Intermediate phases use `### Phase N closeout` or `### Phase N parked`. Final `## Closeout` or column-zero `PARKED <UTC stamp> <reason>` ends only a campaign whose scoped graph has no runnable rows. See [the Codex runbook](../dev/codex.md).
+**Archived 2026-10-09:** the operator removed Codex as writer and reviewer (`D00 T03 §10`). These records are kept read-only as the history of the sections Codex shipped, which `D00 T03 §11` re-audits. The runbook, supervisor, and hooks they cite were deleted; current run records live in [`../phase-runs/`](../phase-runs/README.md).
 
-This directory is independent of other agents' records. Runtime ownership, pause markers, and raw logs stay under ignored `build/codex/`.
+Each `<run_id>.md` was written by a Codex campaign using the supervisor's UUID, with Phase repairs, Shipped-row verification, Gap audit, Sections, Critical events, and Lessons. Raw logs from those runs were under ignored `build/codex/` and are not part of the repository.

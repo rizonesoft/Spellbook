@@ -1,13 +1,29 @@
-"""Claude-only guard registration, serialized with the neutral writer selector."""
+"""Claude run guard registration: one owning session, an existing run record, a serialized atomic write."""
 import argparse
+from contextlib import contextmanager
 import json
+import os
 from pathlib import Path
 import sys
 import uuid
 
 ROOT = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(ROOT / "scripts"))
-import writer
+
+
+@contextmanager
+def registration_lock(root: Path):
+    """Exclusive while held: a second registration fails instead of racing the ownership check."""
+    path = root / "build/claude-campaign-guard.lock"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        handle = os.open(path, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+    except FileExistsError:
+        raise OSError(f"guard registration in progress; delete {path} only if no registration is running") from None
+    try:
+        os.close(handle)
+        yield
+    finally:
+        path.unlink(missing_ok=True)
 
 
 def register(root: Path, session: str, phase: int, run_file: str, cron: str) -> None:
@@ -16,16 +32,13 @@ def register(root: Path, session: str, phase: int, run_file: str, cron: str) -> 
     record = (root / run_file).resolve()
     if not record.is_relative_to((root / "docs/phase-runs").resolve()) or not record.is_file():
         raise ValueError("run record must be an existing file under docs/phase-runs")
-    with writer.selection_lock(root):
-        writer.require(root, "claude")
+    with registration_lock(root):
         path = root / "build/claude-campaign-guard.json"
         if path.exists():
             old = json.loads(path.read_text(encoding="utf-8-sig"))
             if (old.get("session_id") != session or old.get("runner") != "claude"
                     or Path(old.get("workspace", "")).resolve() != root.resolve()):
                 raise ValueError("another Claude session owns the guard; pause it before transferring ownership")
-        else:
-            writer.ensure_idle(root)
         path.parent.mkdir(parents=True, exist_ok=True)
         temporary = path.with_name(path.name + "." + uuid.uuid4().hex + ".tmp")
         try:

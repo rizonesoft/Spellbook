@@ -33,7 +33,7 @@ depends_on: []
 - `pwsh scripts/build.ps1` builds `core` and `storage` through CMake and then `Spellbook.slnx` through MSBuild, under `/W4 /WX` on our code.
 - `Spellbook.exe` is a WinUI 3 window titled "Spellbook" that keeps every M0 behavior (icon, `--data-dir`, `--smoke`, the log lines, schema 1 on first start), and runs from its output folder on a machine with no Windows App SDK runtime installed.
 - `check-all.ps1`, CI, and `package.ps1` hold on the new stack; the portable ZIP holds the app folder.
-- ADR 0002, `AGENTS.md`, `standards/ui.md`, `docs/architecture.md`, and a `winui-patterns` skill describe WinUI; no open plan section asks for a Win32 control.
+- ADR 0002, `CLAUDE.md`, `standards/ui.md`, `docs/architecture.md`, and a `winui-patterns` skill describe WinUI; no open plan section asks for a Win32 control.
 
 ## Implementation Order
 
