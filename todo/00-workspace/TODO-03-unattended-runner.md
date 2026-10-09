@@ -50,7 +50,7 @@ depends_on: []
 |   7   |   §7    | Switch the primary writer between Codex and Claude | §6 |  [x]   |
 |   8   |   §8    | Sequential global-configured Codex and latest-Sonnet review | §7 |  [x]   |
 |   9   |   §9    | Automated visual matrix, image review, and acceptance gate | §4, §10, D00 T02 §6 |  [ ]   |
-|  10   |   §10   | Remove Codex: Claude is the only writer and reviewer | §8 |  [ ]   |
+|  10   |   §10   | Remove Codex: Claude is the only writer and reviewer | §8 |  [x]   |
 |  11   |   §11   | Re-audit every section Codex shipped | §10 |  [ ]   |
 
 ---
@@ -212,6 +212,11 @@ Operator decision 2026-10-09: adding Codex as a writer (§6 to §8) was a mistak
 - [x] Commit: `"workspace: remove codex as writer and reviewer (D00 T03 §10)"`
 
 **Test checkpoint:** Static evidence: `test -e .codex -o -e .agents -o -e AGENTS.md -o -e writer.json -o -e scripts/writer.py` is false, and `git grep -n -i -E "codex|AGENTS\.md|\.agents/|writer\.py|writer\.json" -- .claude scripts .github standards docs/README.md docs/architecture.md docs/dev CHANGELOG.md` prints nothing (exit 1). Unit tests: `python -m unittest discover -s .claude/tests -v` runs 5 tests OK, and a temporary copy of the helper without its ownership check fails `test_same_session_may_repoint_but_another_may_not`. `python scripts/todo-graph.py self-test`, `validate`, `plan --check`, and `python scripts/check-docs.py` pass; `pwsh scripts/check-all.ps1` exits 0. The section is itself reviewed by the new contract: a fresh Opus Stage 1 and a fresh Sonnet Stage 2 both approve before the Stage 1 session stamps it.
+
+> **Verified:** 2026-10-09 | §10 | `test -e .codex -o -e .agents -o -e AGENTS.md -o -e writer.json -o -e scripts/writer.py` exit 1; the scoped `git grep -n -i -E "codex|AGENTS\.md|\.agents/|writer\.py|writer\.json"` printed nothing, exit 1; `python -m unittest discover -s .claude/tests -v` "Ran 5 tests", "OK"; mutant on a temporary copy with the ownership check removed: "FAIL: test_same_session_may_repoint_but_another_may_not ... ValueError not raised", "FAILED (failures=1)", exit 1 (real helper untouched); "todo-graph self-test: 18 passed, 0 failed"; "todo-graph validate: 17 files, 123 sections, 0 fatal, 0 warnings"; "plan --check: current"; check-docs "0 findings"; independent `pwsh scripts/check-all.ps1` exit 0, all 22 gates PASS with no Codex gate, "check-all: all gates passed" (`build/reviews/d00-t03-s10-r2-20261009T092443/stage1-check-all.log`); CI run 37909707534 "completed" "success" for `3b80925353fdeb3e5a8ce50ab7497947cb0924c2` on main; `claude --help` (2.1.295) lists every flag the review contract uses except the accepted, undocumented `--max-turns`
+> **Implementer:** Claude (claude-opus-5-5)
+> **Reviewer:** Claude claude-opus-5-5, alias opus, effort high, session 43ddf694-1a9d-41db-8899-b96e8a4ac0a0, candidate 0f1f066..3b80925 with manifest `build/reviews/d00-t03-s10-r2-20261009T092443/candidate.json`, report `build/reviews/d00-t03-s10-r2-20261009T092443/stage1-report.md`.
+> **Second reviewer:** Claude claude-sonnet-5-5, alias sonnet, effort high, CLI 2.1.295, session e881aaf7-215f-44ad-a64b-e4719c752c4f, report `build/reviews/d00-t03-s10-r2-20261009T092443/stage2-report.md`.
 
 ## 11. Re-Audit Every Section Codex Shipped
 
