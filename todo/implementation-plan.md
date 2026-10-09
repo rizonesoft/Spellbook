@@ -78,7 +78,7 @@ Everything later builds on a toolchain that provisions itself, a build with warn
 | [x] | `D00 T02 §4` | Runners, CI, and the portable package on the new stack | 9 |
 | [x] | `D00 T02 §5` | The winui-patterns skill, the UI standard, and the architecture doc | 5 |
 | [x] | `D00 T03 §10` | Remove Codex: Claude is the only writer and reviewer | 7 |
-| [ ] | `D00 T03 §11` | Re-audit every section Codex shipped | 9 |
+| [ ] | `D00 T03 §11` | Re-audit every section Codex shipped | 10 |
 | [ ] | `D00 T03 §4` | The UI driver for driven runs | 6 |
 | [ ] | `D00 T02 §6` | Retarget the open UI sections of the plan to WinUI | 6 |
 | [ ] | `D00 T03 §9` | Automated visual matrix, image review, and acceptance gate | 7 |
