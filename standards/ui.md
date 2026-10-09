@@ -22,7 +22,7 @@ How every Spellbook surface looks and behaves. Agent-specific implementation mec
 - Consume WinUI brushes and styles through `{ThemeResource}` so the surface responds to theme changes. Default follows Windows; an explicit light/dark setting uses supported `RequestedTheme` on the content root. D05 T01 §1 owns the complete app-wide policy and its proof.
 - Use the platform's high-contrast resources. Any custom theme dictionary must supply meaningful light, dark, and high-contrast values, using the user's system contrast colors in the latter. Do not hard-code a dark palette into controls.
 - The current shell uses `MicaBackdrop` and a custom title-bar region registered with `SetTitleBar`. Preserve caption-button clearance, dragging, icon, title, system menu, keyboard access, and an opaque fallback when backdrop support is unavailable.
-- UIA peers provide each control's role, state, and supported interactions. Give every interactive control a stable `AutomationProperties.AutomationId` for driven tests, and a meaningful accessible name through content or `AutomationProperties.Name`/`LabeledBy`. An ID is not a spoken label. Shared driver and visual acceptance infrastructure is owned by D00 T03 §§4 and 9.
+- UIA peers provide each control's role, state, and supported interactions. Give every interactive control a stable kebab-case `AutomationProperties.AutomationId` for driven tests, and a meaningful accessible name from app vocabulary resources through content or `AutomationProperties.Name`/`LabeledBy`. An ID is not a spoken label. Use the [UI driver](../docs/dev/ui-driver.md) with isolated data and reviewer capture roots; D00 T03 §9 owns the separate full visual acceptance gate.
 
 ## Copy
 

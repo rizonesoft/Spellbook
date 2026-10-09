@@ -64,6 +64,10 @@ void MainWindow::initialize(bool smoke)
         {
             if (auto window = weak.get())
             {
+                spdlog::info("UI appearance: theme={}",
+                             window->Root().ActualTheme() == Microsoft::UI::Xaml::ElementTheme::Dark
+                                 ? "dark"
+                                 : "light");
                 window->Root().XamlRoot().Changed(
                     [weak](auto const&, auto const&)
                     {
@@ -72,6 +76,17 @@ void MainWindow::initialize(bool smoke)
                             live->update_size_limits();
                         }
                     });
+            }
+        });
+    Root().ActualThemeChanged(
+        [weak = get_weak()](auto const&, auto const&)
+        {
+            if (auto window = weak.get())
+            {
+                spdlog::info("UI appearance: theme={}",
+                             window->Root().ActualTheme() == Microsoft::UI::Xaml::ElementTheme::Dark
+                                 ? "dark"
+                                 : "light");
             }
         });
     Closed([](auto const&, auto const&) { spdlog::info("Main window closed"); });

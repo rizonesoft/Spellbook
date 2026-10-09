@@ -1,0 +1,48 @@
+{
+  "Scenario": "shell",
+  "Config": "Debug",
+  "RunDirectory": "R:\\GitHub\\Spellbook\\build\\drive\\shell-5389fed8cfbf487b8928297d55de77d1",
+  "SourceHead": "0f1f066dbd65374f6083940dc241ab0b89cc7a20",
+  "ExecutableSha256": "2528b81e5eb020d31c9f2312af4dfc7a55f0b4cd9aa067f6acd5f42fc38c1f3c",
+  "ResourcesSha256": "742f31a7a595475d507e28bbdbdc561c9739262a39972752d16a92c199868fbd",
+  "Assertions": [
+    "owned window title",
+    "empty-heading AutomationId and accessible text",
+    "latest database schema",
+    "one startup log entry",
+    "actual XAML theme",
+    "nonblank text anchor capture",
+    "clean exit"
+  ],
+  "Schema": 1,
+  "Capture": {
+    "Nonce": "3a62838b-2d1b-435e-8f56-ea62e2ececba",
+    "ProcessId": 144788,
+    "StartTicks": 639270991621205373,
+    "Window": 30156404,
+    "RequestedUtc": "2026-10-08T23:32:42.9695674Z",
+    "CapturedUtc": "2026-10-08T23:32:44.5120571Z",
+    "Path": "R:\\GitHub\\Spellbook\\build\\drive\\shell-5389fed8cfbf487b8928297d55de77d1\\capture.png",
+    "Width": 1440,
+    "Height": 960,
+    "Dpi": 144,
+    "Theme": "dark",
+    "HighContrast": false,
+    "Bounds": {
+      "Top": 266,
+      "Left": 266,
+      "Right": 1706,
+      "Bottom": 1226
+    },
+    "Anchor": {
+      "X": 777.0,
+      "Height": 56.0,
+      "Y": 765.0,
+      "Width": 418.0,
+      "Name": "Your grimoire is ready"
+    },
+    "AnchorContrast": 223,
+    "Sha256": "0c7cd22b3a8ef73aade7ae6c0aab65b712a03f2b585e5dc17f737a1e081949ee"
+  },
+  "PublishedPath": "R:\\GitHub\\Spellbook\\docs\\captures\\shell\\main-window-144dpi.png"
+}

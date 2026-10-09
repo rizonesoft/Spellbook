@@ -47,6 +47,10 @@ Use native APIs only for a documented capability or boundary: current shell DPI 
 
 Use the repository build-and-test runners. Exercise async failure, closure, keyboard/focus, theme/contrast, and DPI behavior relevant to the changed surface. Give interactive controls stable automation IDs and accessible names; IDs do not replace accessible names. The UI-driver and visual-matrix sections own the shared automation infrastructure. Tests always use isolated `--data-dir`; smoke additionally requires that argument. Never claim a screenshot alone proves persistence: read back the isolated database and cite the action log without prompt text.
 
+## Driven interaction evidence
+
+Give every interactive control a stable kebab-case `AutomationProperties.AutomationId` and an accessible name from the app vocabulary resources. Use `pwsh scripts/drive.ps1 -Scenario shell` for the current shell; add each later surface's scenario in its owning section. For independent review use `-CaptureRoot build/reviews/<unique>/captures` so candidate images remain unchanged. Read [the driver contract](../../../docs/dev/ui-driver.md) for isolated process/data ownership, bounded capture helpers, read-only SQLite queries, and retained failure/replacement evidence. A functional run at observed native DPI/theme does not satisfy D00 T03 §9's full visual matrix or image review.
+
 ## Primary references
 
 - [Ownership and weak references](https://learn.microsoft.com/en-us/windows/apps/develop/cpp-winrt/weak-references)

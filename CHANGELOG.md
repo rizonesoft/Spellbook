@@ -15,6 +15,8 @@ The format follows [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/
 
 ### Added
 
+- Stable shell automation selectors and actual-theme diagnostic logging, with an isolated UI Automation driver that verifies the shell, database, and rendered capture.
+
 - VS 2026 v145 and WinUI C++ toolchain checks, pinned NuGet provisioning, and Windows App SDK/C++/WinRT package pins for the upcoming WinUI shell.
 
 - Sequential independent Codex review using global model/effort settings, followed by a quick latest-Sonnet review at high effort, for either primary writer.

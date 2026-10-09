@@ -44,4 +44,6 @@ Hover over any themed label to see its plain meaning. A setting (M5) switches ev
 
 ## Troubleshooting
 
+The startup log records the window's actual light or dark appearance, including changes while it is open, without recording prompt content. The welcome heading retains its readable accessibility name and now has a stable selector for automated checks.
+
 If Spellbook will not start, it shows a message saying what failed. The last lines of `%LOCALAPPDATA%\Spellbook\logs\spellbook.log` say more; include them when you [report a bug](https://github.com/rizonesoft/Spellbook/issues/new?template=bug_report.yml).
